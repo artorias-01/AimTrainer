@@ -4,6 +4,7 @@ import type { ScenarioDef } from '../utils/scenarios';
 import { saveSessionResult } from '../utils/storage';
 import type { SessionResult } from '../utils/storage';
 import { soundManager } from '../utils/audio';
+import { useSettingsStore } from './useSettingsStore';
 
 export interface TargetInstance {
   id: string;
@@ -281,14 +282,16 @@ export const useGameStore = create<GameState>((set, get) => ({
 
     const now = Date.now();
 
-    // Check lifetime limits for reflex / timed scenarios (discrete state update ONLY on expiry)
+    // Check lifetime limits for reflex / timed scenarios (scaled by global pacing multiplier)
     if (activeScenario.hasLifetimeLimit && activeScenario.lifetimeMs) {
-      const limit = activeScenario.lifetimeMs;
-      const hasExpired = targets.some((t) => now - t.spawnTime > limit);
+      const speedMult = useSettingsStore.getState().targetSpeedMultiplier || 1.0;
+      // Proportional scaling: multiplier < 1.0 increases exposure window (easier), > 1.0 decreases exposure window (harder)
+      const effectiveLifetimeMs = Math.round(activeScenario.lifetimeMs / speedMult);
+      const hasExpired = targets.some((t) => now - t.spawnTime > effectiveLifetimeMs);
 
       if (hasExpired) {
         const updated = targets.map((t) => {
-          if (now - t.spawnTime > limit) {
+          if (now - t.spawnTime > effectiveLifetimeMs) {
             // Reuse stable target ID key (t.id) to eliminate unmount/remount pop jitter!
             return createRandomTarget(activeScenario, t.id);
           }

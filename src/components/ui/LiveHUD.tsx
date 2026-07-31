@@ -84,7 +84,7 @@ export const LiveHUD: React.FC = () => {
             initial={performanceMode ? false : { opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.35, ease: 'easeOut' }}
-            className="bg-[#0d0d0d]/90 backdrop-blur-md border border-[#262626] rounded-[12px] p-3.5 flex items-center justify-between gap-3 text-xs font-mono"
+            className="bg-[#0d0d0d]/95 backdrop-blur-md border border-[#262626] border-l-2 border-l-[#f5b8c9] rounded-[12px] p-3.5 flex items-center justify-between gap-3 text-xs font-mono shadow-lg"
           >
             <div className="flex flex-col">
               <span className="text-[9px] text-neutral-400 font-bold uppercase">HITS</span>

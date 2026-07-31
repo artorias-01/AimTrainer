@@ -355,18 +355,18 @@ export const SettingsPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Target Movement Pacing Multiplier */}
+          {/* Global Target Pacing Multiplier */}
           <div className="bg-[#141414] border border-[#262626] rounded-[12px] p-8 space-y-4">
             <div className="flex items-center justify-between border-b border-[#262626] pb-4">
               <h3 className="font-mono text-xs text-[#f5b8c9] uppercase tracking-widest flex items-center gap-2">
-                <Gauge className="w-4 h-4 text-[#f5b8c9]" /> TARGET MOVEMENT PACING MULTIPLIER
+                <Gauge className="w-4 h-4 text-[#f5b8c9]" /> GLOBAL TARGET PACING MULTIPLIER
               </h3>
               <span className="text-xs font-mono text-white font-bold bg-[#0d0d0d] px-3 py-1 rounded-[12px] border border-[#262626]">
                 {targetSpeedMultiplier}x PACING
               </span>
             </div>
             <p className="font-sans-ui text-xs text-neutral-400 leading-relaxed">
-              Globally scale target movement speeds across all tracking and strafe scenarios to match your skill level.
+              Globally scale target movement speeds and timed target exposure windows across all tracking, strafe, and reflex gauntlet scenarios.
             </p>
             <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 pt-2">
               {speedPacingPresets.map((p) => (
