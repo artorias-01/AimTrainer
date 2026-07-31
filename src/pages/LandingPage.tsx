@@ -138,48 +138,52 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -15 }}
               transition={{ duration: 0.2 }}
-              className="bg-[#0d0d0d]/95 border border-[#f5b8c9] rounded-[12px] p-5 space-y-4 max-w-sm mx-auto backdrop-blur-md shadow-xl text-left"
+              className="bg-[#0d0d0d]/95 border border-[#262626] rounded-[12px] p-5 space-y-4 max-w-sm mx-auto backdrop-blur-md shadow-xl text-left"
             >
-              <div className="flex items-center justify-between border-b border-[#262626] pb-2">
+              <div className="flex items-center justify-between border-b border-[#262626] pb-3">
                 <span className="font-mono text-xs text-[#f5b8c9] font-bold tracking-widest uppercase">
                   SELECT TRAINING DRILL
                 </span>
                 <span className="font-mono text-[10px] text-neutral-400">{SCENARIOS.length} DRILLS</span>
               </div>
 
-              {/* Scrollable Scenario Pick List */}
-              <div className="space-y-2 max-h-[260px] overflow-y-auto pr-1">
+              {/* Scrollable Scenario Hairline Pick List */}
+              <div className="divide-y divide-[#262626] border-b border-[#262626] max-h-[280px] overflow-y-auto pr-1.5 thin-pink-scrollbar">
                 {SCENARIOS.map((sc) => (
                   <button
                     key={sc.id}
                     onClick={() => handleSelectDrill(sc.id)}
                     onMouseEnter={() => soundManager.playHover()}
-                    className="w-full text-left p-3 rounded-[12px] bg-[#141414] hover:bg-[#f5b8c9] hover:text-[#0d0d0d] border border-[#262626] transition-all duration-150 active:scale-[0.98] group flex items-center justify-between"
+                    className="w-full text-left py-3 px-3 transition-all duration-150 group flex items-center justify-between hover:bg-[#f5b8c9]/10 border-l-2 border-l-transparent hover:border-l-[#f5b8c9] focus:outline-none"
                   >
                     <div>
-                      <span className="font-display font-bold text-sm block group-hover:text-[#0d0d0d]">
+                      <span className="font-display font-bold text-sm block text-neutral-200 group-hover:text-[#f5b8c9] transition-colors">
                         {sc.name}
                       </span>
-                      <span className="font-mono text-[10px] text-neutral-400 group-hover:text-[#0d0d0d]/80 block">
+                      <span className="font-mono text-[10px] text-neutral-500 group-hover:text-neutral-300 block transition-colors">
                         {sc.category.toUpperCase()} // {sc.durationSeconds}S
                       </span>
                     </div>
-                    <Target className="w-4 h-4 text-[#f5b8c9] group-hover:text-[#0d0d0d]" />
+                    <Target className="w-3.5 h-3.5 text-neutral-500 group-hover:text-[#f5b8c9] transition-colors" />
                   </button>
                 ))}
               </div>
 
-              {/* Back to Main Menu Button */}
+              {/* Back to Menu Text-First Button */}
               <button
                 onClick={() => {
                   soundManager.playClick();
                   setShowDrillMenu(false);
                 }}
                 onMouseEnter={() => soundManager.playHover()}
-                className="w-full py-2.5 rounded-[12px] bg-[#1a1a1a] hover:bg-[#262626] text-neutral-300 font-mono text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 border border-[#262626] active:scale-95 transition-all"
+                className="group relative font-display font-bold text-sm tracking-widest text-neutral-400 hover:text-white transition-colors duration-200 py-1.5 w-full flex items-center justify-center gap-2 focus:outline-none"
               >
-                <ArrowLeft className="w-3.5 h-3.5" />
-                BACK TO MENU
+                <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-[#f5b8c9] font-mono text-xs">‹</span>
+                <span className="relative">
+                  BACK TO MENU
+                  <span className="absolute bottom-0 left-0 w-0 h-[1.5px] bg-[#f5b8c9] group-hover:w-full transition-all duration-250 ease-out" />
+                </span>
+                <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-[#f5b8c9] font-mono text-xs">›</span>
               </button>
             </motion.div>
           )}

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { HeroScene } from '../components/3d/HeroScene';
 import { useSettingsStore } from '../store/useSettingsStore';
 import { useStatsStore } from '../store/useStatsStore';
 import { CrosshairPreview } from '../components/ui/CrosshairPreview';
@@ -215,9 +216,19 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
     <div
       tabIndex={0}
       onKeyDown={handleKeyDownRebind}
-      className="w-full bg-[#0d0d0d] text-white min-h-screen py-12 px-6 md:px-16 focus:outline-none select-none"
+      className="relative w-full bg-[#0d0d0d] text-white min-h-screen py-12 px-6 md:px-16 focus:outline-none select-none overflow-hidden"
     >
-      {/* Save Confirmation Toast */}
+      {/* Background 3D Real-Time Scene for Settings Atmosphere */}
+      <div className="fixed inset-0 z-0 opacity-35 pointer-events-none">
+        <HeroScene />
+      </div>
+
+      {/* Radial Dark Vignette Overlay */}
+      <div className="fixed inset-0 z-0 bg-gradient-to-t from-[#0d0d0d] via-[#0d0d0d]/85 to-[#0d0d0d]/95 pointer-events-none" />
+
+      {/* Settings Content Layer */}
+      <div className="relative z-10">
+        {/* Save Confirmation Toast */}
       {saveToast && (
         <div className="fixed bottom-6 right-6 z-50 bg-[#141414] border border-[#f5b8c9] text-white px-4 py-3 rounded-[12px] text-xs font-mono flex items-center gap-2.5 shadow-xl animate-fade-in">
           <CheckCircle2 className="w-4 h-4 text-[#f5b8c9]" />
@@ -1024,6 +1035,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
           </motion.div>
         )}
       </AnimatePresence>
+      </div>
     </div>
   );
 };

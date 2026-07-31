@@ -209,6 +209,22 @@ h1, h2, h3, .font-serif-display {
   background: #ffffff;
 }
 
+/* Thin Minimal Scrollbar */
+.thin-pink-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+.thin-pink-scrollbar::-webkit-scrollbar-track {
+  background: rgba(13, 13, 13, 0.6);
+  border-radius: 2px;
+}
+.thin-pink-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(245, 184, 201, 0.4);
+  border-radius: 2px;
+}
+.thin-pink-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #f5b8c9;
+}
+
 /* 3D preserve transform */
 .preserve-3d {
   transform-style: preserve-3d;
