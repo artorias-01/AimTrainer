@@ -35,39 +35,48 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
 
       {/* Centered Editorial Game Title & Menu Container */}
       <div className="relative z-10 max-w-lg w-full text-center space-y-6">
-        {/* Compact Title */}
-        <div className="space-y-1">
+        {/* Compact Title Section with Ornamental Divider */}
+        <div className="space-y-3">
           <h1 className="font-display font-extrabold text-4xl md:text-6xl tracking-tight leading-none text-white drop-shadow-md">
             AIM <span className="text-[#f5b8c9]">//</span> TT
           </h1>
+          <div className="flex items-center justify-center gap-3 w-40 mx-auto opacity-75">
+            <div className="h-px bg-gradient-to-r from-transparent to-[#f5b8c9] flex-1" />
+            <span className="text-[#f5b8c9] text-xs font-mono">◆</span>
+            <div className="h-px bg-gradient-to-l from-transparent to-[#f5b8c9] flex-1" />
+          </div>
           <p className="font-mono text-[10px] md:text-xs text-neutral-400 tracking-widest uppercase">
             3D ONLINE AIM ENGINE
           </p>
         </div>
 
-        {/* Dynamic Compact Menu (Switches between Main Menu & Drill Selector) */}
+        {/* Dynamic Menu (Switches between Main Menu & Drill Selector) */}
         <AnimatePresence mode="wait">
           {!showDrillMenu ? (
-            /* MAIN MENU (Compact Size) */
+            /* MAIN MENU (Text-First, Restrained, Borderless) */
             <motion.div
               key="main-menu"
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -15 }}
               transition={{ duration: 0.2 }}
-              className="flex flex-col items-center gap-3 max-w-xs mx-auto"
+              className="flex flex-col items-center gap-5 max-w-xs mx-auto py-2"
             >
-              {/* Option 1: START DRILL */}
+              {/* Option 1: START DRILL (Primary Action - Visually emphasized text with pink side ticks) */}
               <button
                 onClick={() => {
                   soundManager.playClick();
                   setShowDrillMenu(true);
                 }}
                 onMouseEnter={() => soundManager.playHover()}
-                className="group w-full py-3 px-6 rounded-[12px] bg-[#f5b8c9] hover:bg-white text-[#0d0d0d] font-display font-extrabold text-lg md:text-xl tracking-wider transition-all duration-150 transform hover:scale-105 active:scale-95 flex items-center justify-center gap-2 shadow-md shadow-[#f5b8c9]/20"
+                className="group relative font-display font-extrabold text-2xl md:text-3xl tracking-widest text-white hover:text-[#f5b8c9] transition-colors duration-200 py-1 flex items-center justify-center gap-2 focus:outline-none"
               >
-                <Play className="w-5 h-5 fill-[#0d0d0d] group-hover:scale-110 transition-transform" />
-                <span>START DRILL</span>
+                <span className="text-[#f5b8c9] font-mono text-base transition-transform group-hover:-translate-x-1">‹</span>
+                <span className="relative">
+                  START DRILL
+                  <span className="absolute bottom-0 left-0 w-0 h-[2.5px] bg-[#f5b8c9] group-hover:w-full transition-all duration-250 ease-out" />
+                </span>
+                <span className="text-[#f5b8c9] font-mono text-base transition-transform group-hover:translate-x-1">›</span>
               </button>
 
               {/* Option 2: DRILL LIBRARY */}
@@ -77,10 +86,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
                   onNavigate('library');
                 }}
                 onMouseEnter={() => soundManager.playHover()}
-                className="group w-full py-2.5 px-6 rounded-[12px] bg-[#0d0d0d]/90 hover:bg-[#1a1a1a] text-white border border-[#262626] hover:border-[#f5b8c9] font-display font-bold text-base md:text-lg tracking-wider transition-all duration-150 active:scale-95 flex items-center justify-center gap-2"
+                className="group relative font-display font-bold text-lg md:text-2xl tracking-widest text-neutral-300 hover:text-[#f5b8c9] transition-colors duration-200 py-1 flex items-center justify-center gap-2 focus:outline-none"
               >
-                <Library className="w-4 h-4 text-[#f5b8c9]" />
-                <span>DRILL LIBRARY</span>
+                <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-[#f5b8c9] font-mono text-sm">‹</span>
+                <span className="relative">
+                  DRILL LIBRARY
+                  <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-[#f5b8c9] group-hover:w-full transition-all duration-250 ease-out" />
+                </span>
+                <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-[#f5b8c9] font-mono text-sm">›</span>
               </button>
 
               {/* Option 3: ANALYTICS */}
@@ -90,10 +103,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
                   onNavigate('dashboard');
                 }}
                 onMouseEnter={() => soundManager.playHover()}
-                className="group w-full py-2.5 px-6 rounded-[12px] bg-[#0d0d0d]/90 hover:bg-[#1a1a1a] text-white border border-[#262626] hover:border-[#f5b8c9] font-display font-bold text-base md:text-lg tracking-wider transition-all duration-150 active:scale-95 flex items-center justify-center gap-2"
+                className="group relative font-display font-bold text-lg md:text-2xl tracking-widest text-neutral-300 hover:text-[#f5b8c9] transition-colors duration-200 py-1 flex items-center justify-center gap-2 focus:outline-none"
               >
-                <BarChart3 className="w-4 h-4 text-[#f5b8c9]" />
-                <span>ANALYTICS</span>
+                <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-[#f5b8c9] font-mono text-sm">‹</span>
+                <span className="relative">
+                  ANALYTICS
+                  <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-[#f5b8c9] group-hover:w-full transition-all duration-250 ease-out" />
+                </span>
+                <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-[#f5b8c9] font-mono text-sm">›</span>
               </button>
 
               {/* Option 4: OPTIONS */}
@@ -103,21 +120,25 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
                   onNavigate('settings');
                 }}
                 onMouseEnter={() => soundManager.playHover()}
-                className="group w-full py-2.5 px-6 rounded-[12px] bg-[#0d0d0d]/90 hover:bg-[#1a1a1a] text-white border border-[#262626] hover:border-[#f5b8c9] font-display font-bold text-base md:text-lg tracking-wider transition-all duration-150 active:scale-95 flex items-center justify-center gap-2"
+                className="group relative font-display font-bold text-lg md:text-2xl tracking-widest text-neutral-300 hover:text-[#f5b8c9] transition-colors duration-200 py-1 flex items-center justify-center gap-2 focus:outline-none"
               >
-                <Sliders className="w-4 h-4 text-[#f5b8c9]" />
-                <span>OPTIONS</span>
+                <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-[#f5b8c9] font-mono text-sm">‹</span>
+                <span className="relative">
+                  OPTIONS
+                  <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-[#f5b8c9] group-hover:w-full transition-all duration-250 ease-out" />
+                </span>
+                <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-[#f5b8c9] font-mono text-sm">›</span>
               </button>
             </motion.div>
           ) : (
             /* DRILL SELECTOR MENU */
             <motion.div
               key="drill-menu"
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -15 }}
               transition={{ duration: 0.2 }}
-              className="bg-[#0d0d0d]/95 border border-[#f5b8c9] rounded-[12px] p-5 space-y-4 max-w-sm mx-auto backdrop-blur-md shadow-xl"
+              className="bg-[#0d0d0d]/95 border border-[#f5b8c9] rounded-[12px] p-5 space-y-4 max-w-sm mx-auto backdrop-blur-md shadow-xl text-left"
             >
               <div className="flex items-center justify-between border-b border-[#262626] pb-2">
                 <span className="font-mono text-xs text-[#f5b8c9] font-bold tracking-widest uppercase">

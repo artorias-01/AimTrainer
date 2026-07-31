@@ -60,7 +60,7 @@ export function App() {
         {activePage === 'arena' && <ArenaPage onNavigate={handleNavigate} />}
         {activePage === 'results' && <ResultsPage onNavigate={handleNavigate} />}
         {activePage === 'dashboard' && <DashboardPage onNavigate={handleNavigate} />}
-        {activePage === 'settings' && <SettingsPage />}
+        {activePage === 'settings' && <SettingsPage onNavigate={handleNavigate} />}
       </main>
 
       {/* Persistent Global Footer */}
