@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { HeroScene } from '../components/3d/HeroScene';
-import { SCENARIOS } from '../utils/scenarios';
+import { SCENARIOS, getDailyChallengeScenario } from '../utils/scenarios';
+import { getDailyStreak } from '../utils/storage';
 import { useGameStore } from '../store/useGameStore';
 import { soundManager } from '../utils/audio';
-import { Target, Play, Sliders, BarChart3, Library, ArrowLeft } from 'lucide-react';
+import { Target, Flame } from 'lucide-react';
 
 interface LandingPageProps {
   onNavigate: (page: string, scenarioId?: string) => void;
@@ -13,6 +14,9 @@ interface LandingPageProps {
 export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
   const [showDrillMenu, setShowDrillMenu] = useState(false);
   const { setScenario } = useGameStore();
+
+  const dailyScenario = getDailyChallengeScenario();
+  const dailyStreak = getDailyStreak();
 
   const handleSelectDrill = (scenarioId: string) => {
     soundManager.playClick();
@@ -48,6 +52,20 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
           <p className="font-mono text-[10px] md:text-xs text-neutral-400 tracking-widest uppercase">
             3D ONLINE AIM ENGINE
           </p>
+        </div>
+
+        {/* Daily Challenge Feature Pill */}
+        <div className="flex justify-center">
+          <button
+            onClick={() => handleSelectDrill(dailyScenario.id)}
+            className="group px-4 py-2 rounded-[12px] bg-[#141414]/90 hover:bg-[#f5b8c9] text-[#f5b8c9] hover:text-[#0d0d0d] border border-[#f5b8c9]/40 text-xs font-mono font-bold flex items-center gap-2.5 transition-all shadow-lg backdrop-blur-sm"
+          >
+            <Flame className="w-4 h-4 fill-current text-orange-500 group-hover:text-[#0d0d0d]" />
+            <span>DAILY: {dailyScenario.name}</span>
+            <span className="bg-[#0d0d0d] group-hover:bg-[#0d0d0d] text-white px-2 py-0.5 rounded text-[10px]">
+              {dailyStreak.streakCount}D STREAK
+            </span>
+          </button>
         </div>
 
         {/* Dynamic Menu (Switches between Main Menu & Drill Selector) */}

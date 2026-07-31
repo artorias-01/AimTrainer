@@ -13,7 +13,7 @@ interface ArenaPageProps {
 export const ArenaPage: React.FC<ArenaPageProps> = ({ onNavigate }) => {
   const { status, startSession, pauseSession, resumeSession } = useGameStore();
   const { pauseKey, restartKey } = useSettingsStore();
-  const [isPointerLocked, setIsPointerLocked] = useState(false);
+  const [, setIsPointerLocked] = useState(false);
   const [isTouchDevice, setIsTouchDevice] = useState(false);
   const [pointerLockDenied, setPointerLockDenied] = useState(false);
 
@@ -145,7 +145,7 @@ export const ArenaPage: React.FC<ArenaPageProps> = ({ onNavigate }) => {
       />
 
       {/* Live In-Game HUD */}
-      <LiveHUD isPointerLocked={isPointerLocked || isTouchDevice} />
+      <LiveHUD />
 
       {/* Pause Drawer Modal */}
       {status === 'paused' && (

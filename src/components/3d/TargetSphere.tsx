@@ -152,6 +152,8 @@ export const TargetSphere: React.FC<TargetSphereProps> = React.memo(({
     }
   });
 
+  const targetShape = useSettingsStore((s) => s.targetShape) || 'sphere';
+
   return (
     <group ref={groupRef} position={[x, y, z]}>
       <mesh
@@ -159,7 +161,13 @@ export const TargetSphere: React.FC<TargetSphereProps> = React.memo(({
         onPointerOver={() => setHovered(true)}
         onPointerOut={() => setHovered(false)}
       >
-        <sphereGeometry args={[radius, 32, 32]} />
+        {targetShape === 'torus' ? (
+          <torusGeometry args={[radius * 0.8, radius * 0.3, 16, 32]} />
+        ) : targetShape === 'cube' ? (
+          <boxGeometry args={[radius * 1.5, radius * 1.5, radius * 1.5]} />
+        ) : (
+          <sphereGeometry args={[radius, 32, 32]} />
+        )}
         <meshStandardMaterial
           color={hovered ? '#ffffff' : baseColor}
           roughness={0.15}

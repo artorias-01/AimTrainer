@@ -1,3 +1,5 @@
+import { getStoredCustomScenarios } from './storage';
+
 export type ScenarioCategory = 'clicking' | 'tracking' | 'switching' | 'precision';
 
 export interface PlayerPosition {
@@ -27,6 +29,15 @@ export interface ScenarioDef {
   tags: string[];
   recommendedCm360: string;
   iconName: string;
+  isCustom?: boolean;
+}
+
+export interface WarmupRoutine {
+  id: string;
+  name: string;
+  description: string;
+  drillIds: string[];
+  isBuiltIn?: boolean;
 }
 
 export const SCENARIOS: ScenarioDef[] = [
@@ -41,7 +52,7 @@ export const SCENARIOS: ScenarioDef[] = [
     targetRadius: 0.45,
     targetSpeed: 0,
     arenaType: '1-wall',
-    playerPosition: { x: 0, y: 2.2, z: 1.8 }, // Close-range for wide angular flicking
+    playerPosition: { x: 0, y: 2.2, z: 1.8 },
     tags: ['FLICKING', 'SPEED', 'SPATIAL'],
     recommendedCm360: '25-35 cm',
     iconName: 'Grid',
@@ -71,9 +82,9 @@ export const SCENARIOS: ScenarioDef[] = [
     durationSeconds: 60,
     targetCount: 1,
     targetRadius: 0.55,
-    targetSpeed: 2.3, // Lowered base target speed (~36% cut) for approachable pacing
+    targetSpeed: 2.3,
     arenaType: '1-wall',
-    playerPosition: { x: 0, y: 2.2, z: 3.5 }, // Mid-range smooth tracking
+    playerPosition: { x: 0, y: 2.2, z: 3.5 },
     pathType: 'sinusoidal',
     directionChangeIntervalMs: 1200,
     speedVariance: 0.35,
@@ -92,7 +103,7 @@ export const SCENARIOS: ScenarioDef[] = [
     targetRadius: 0.25,
     targetSpeed: 0,
     arenaType: '1-wall',
-    playerPosition: { x: 0, y: 2.2, z: 4.8 }, // Farther back for fine micro-flicks
+    playerPosition: { x: 0, y: 2.2, z: 4.8 },
     tags: ['MICRO', 'HEADSHOT', 'SUB-PIXEL'],
     recommendedCm360: '35-50 cm',
     iconName: 'Target',
@@ -124,7 +135,7 @@ export const SCENARIOS: ScenarioDef[] = [
     durationSeconds: 60,
     targetCount: 1,
     targetRadius: 0.45,
-    targetSpeed: 2.9, // Lowered base target speed (~35% cut) for approachable pacing
+    targetSpeed: 2.9,
     arenaType: '1-wall',
     playerPosition: { x: 0, y: 2.2, z: 3.0 },
     pathType: 'erratic',
@@ -146,7 +157,7 @@ export const SCENARIOS: ScenarioDef[] = [
     targetRadius: 0.45,
     targetSpeed: 0,
     arenaType: '6-wall',
-    playerPosition: { x: 0, y: 2.2, z: 0.0 }, // Dead-center room spawn for 360° arena
+    playerPosition: { x: 0, y: 2.2, z: 0.0 },
     tags: ['360 DEGREE', 'SPATIAL', 'ROOM'],
     recommendedCm360: '20-30 cm',
     iconName: 'Maximize',
@@ -194,7 +205,7 @@ export const SCENARIOS: ScenarioDef[] = [
     durationSeconds: 60,
     targetCount: 1,
     targetRadius: 0.48,
-    targetSpeed: 3.6, // Lowered base target speed (~35% cut) for approachable pacing
+    targetSpeed: 3.6,
     arenaType: '1-wall',
     playerPosition: { x: 0, y: 2.2, z: 3.8 },
     pathType: 'erratic',
@@ -232,7 +243,7 @@ export const SCENARIOS: ScenarioDef[] = [
     targetRadius: 0.18,
     targetSpeed: 0,
     arenaType: '1-wall',
-    playerPosition: { x: 0, y: 2.2, z: 7.2 }, // Extended long-range distance
+    playerPosition: { x: 0, y: 2.2, z: 7.2 },
     tags: ['LONG RANGE', 'SNIPER', 'PIXEL CLICK'],
     recommendedCm360: '40-60 cm',
     iconName: 'Target',
@@ -248,7 +259,7 @@ export const SCENARIOS: ScenarioDef[] = [
     targetRadius: 0.2,
     targetSpeed: 0,
     arenaType: '1-wall',
-    playerPosition: { x: 0, y: 2.2, z: 5.5 }, // Far precision distance
+    playerPosition: { x: 0, y: 2.2, z: 5.5 },
     tags: ['ESCALATING', 'SHRINKING', 'ACCURACY'],
     recommendedCm360: '35-50 cm',
     iconName: 'Target',
@@ -273,6 +284,55 @@ export const SCENARIOS: ScenarioDef[] = [
   },
 ];
 
+export const PRESET_ROUTINES: WarmupRoutine[] = [
+  {
+    id: 'routine-5min-general',
+    name: '5-MINUTE GENERAL WARMUP',
+    description: 'Balanced warmup chaining flicking, precision, and tracking before competitive play.',
+    drillIds: ['gridshot-classic', 'flickshot-pro', 'tracking-sphere'],
+    isBuiltIn: true,
+  },
+  {
+    id: 'routine-reflex-timing',
+    name: 'REFLEX & TIMING INTENSIVE',
+    description: 'High-tempo reflex activation drill sequence for clutch timing under pressure.',
+    drillIds: ['burst-timing-click', 'reflex-reactivation', 'accuracy-gauntlet-timed'],
+    isBuiltIn: true,
+  },
+  {
+    id: 'routine-pure-precision',
+    name: 'PURE PRECISION & CONTROL',
+    description: 'Micro-flicking and long-range pixel precision for tactical shooter headshots.',
+    drillIds: ['micro-flicks', 'gridshot-small-grid', 'long-range-sniper'],
+    isBuiltIn: true,
+  },
+];
+
+export const BENCHMARK_SEQUENCE_IDS = [
+  'gridshot-classic',
+  'strafe-tracking',
+  'micro-flicks',
+  'multi-target-switching',
+];
+
+export function getAllScenarios(): ScenarioDef[] {
+  const custom = getStoredCustomScenarios();
+  return [...SCENARIOS, ...custom];
+}
+
 export function getScenarioById(id: string): ScenarioDef {
-  return SCENARIOS.find((s) => s.id === id) || SCENARIOS[0];
+  const all = getAllScenarios();
+  return all.find((s) => s.id === id) || SCENARIOS[0];
+}
+
+/* Deterministic Daily Challenge Picker */
+export function getDailyChallengeScenario(dateStr?: string): ScenarioDef {
+  const targetDate = dateStr || new Date().toISOString().split('T')[0];
+  let hash = 0;
+  for (let i = 0; i < targetDate.length; i++) {
+    hash = (hash << 5) - hash + targetDate.charCodeAt(i);
+    hash |= 0;
+  }
+  const index = Math.abs(hash) % SCENARIOS.length;
+  return SCENARIOS[index];
 }

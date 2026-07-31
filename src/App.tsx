@@ -8,7 +8,10 @@ import { ArenaPage } from './pages/ArenaPage';
 import { ResultsPage } from './pages/ResultsPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { SettingsPage } from './pages/SettingsPage';
+import { OnboardingOverlay } from './components/ui/OnboardingOverlay';
+import { CommandPalette } from './components/ui/CommandPalette';
 import { useGameStore } from './store/useGameStore';
+import { getOnboardingCompleted } from './utils/storage';
 
 function getInitialPage(): string {
   const hash = window.location.hash.replace(/^#\/?/, '').trim();
@@ -18,6 +21,8 @@ function getInitialPage(): string {
 
 export function App() {
   const [activePage, setActivePage] = useState<string>(getInitialPage);
+  const [showOnboarding, setShowOnboarding] = useState<boolean>(!getOnboardingCompleted());
+  const [showCommandPalette, setShowCommandPalette] = useState<boolean>(false);
   const { setScenario } = useGameStore();
 
   // Listen to browser Back / Forward buttons and hash changes
@@ -36,6 +41,21 @@ export function App() {
     };
   }, []);
 
+  // Global keyboard listener for Ctrl+K / Cmd+K Command Palette
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setShowCommandPalette((prev) => !prev);
+      } else if (e.key === 'Escape') {
+        setShowCommandPalette(false);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   const handleNavigate = (page: string, scenarioId?: string) => {
     if (scenarioId) {
       setScenario(scenarioId);
@@ -47,6 +67,16 @@ export function App() {
 
   return (
     <div className="relative min-h-screen bg-[#0d0d0d] text-white flex flex-col font-sans-ui selection:bg-[#f5b8c9] selection:text-[#0d0d0d]">
+      {/* Onboarding Overlay for first-run users */}
+      {showOnboarding && <OnboardingOverlay onDismiss={() => setShowOnboarding(false)} />}
+
+      {/* Command Palette Modal (Cmd/Ctrl + K) */}
+      <CommandPalette
+        isOpen={showCommandPalette}
+        onClose={() => setShowCommandPalette(false)}
+        onNavigate={handleNavigate}
+      />
+
       {/* Dynamic Floating Ambient Particle Field (Inner pages ONLY, NOT landing or arena) */}
       {activePage !== 'arena' && activePage !== 'landing' && <ParticleBackground />}
 

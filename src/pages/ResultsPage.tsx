@@ -5,17 +5,29 @@ import { useStatsStore } from '../store/useStatsStore';
 import { useSettingsStore } from '../store/useSettingsStore';
 import { SCENARIOS } from '../utils/scenarios';
 import { HeatmapChart } from '../components/ui/HeatmapChart';
+import { ReactionTimeHistogram } from '../components/ui/ReactionTimeHistogram';
 import confetti from 'canvas-confetti';
 import { soundManager } from '../utils/audio';
-import { Trophy, RotateCcw, Library, BarChart2, Flame, Target, Zap, Clock, ArrowRight, Play, User } from 'lucide-react';
-import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { Trophy, RotateCcw, Library, Target, Zap, Clock, ArrowRight, Play, User, Download, Award, Layers, Flame } from 'lucide-react';
 
 interface ResultsPageProps {
   onNavigate: (page: string, scenarioId?: string) => void;
 }
 
 export const ResultsPage: React.FC<ResultsPageProps> = ({ onNavigate }) => {
-  const { lastSessionSummary, isNewPB, startSession, setScenario, activeScenario } = useGameStore();
+  const {
+    lastSessionSummary,
+    isNewPB,
+    startSession,
+    setScenario,
+    activeScenario,
+    activeRoutine,
+    routineResults,
+    isBenchmarkMode,
+    lastBenchmarkSummary,
+    advancePlaylistStep,
+  } = useGameStore();
+
   const { refreshStats } = useStatsStore();
   const { displayName } = useSettingsStore();
 
@@ -44,28 +56,133 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ onNavigate }) => {
     maxCombo: 38,
     grade: 'S' as const,
     hitLocations: [],
+    reactionTimesMs: [240, 260, 310, 190, 280, 220, 250],
   };
 
-  // Find next scenario in catalog
   const currentIndex = SCENARIOS.findIndex((s) => s.id === summary.scenarioId);
   const nextScenario = SCENARIOS[(currentIndex + 1) % SCENARIOS.length];
 
-  // Mock chart data for session TTK graph
-  const ttkTrendData = [
-    { shot: 'Shot 1-20', ttk: summary.avgTtkMs + 45 },
-    { shot: 'Shot 21-40', ttk: summary.avgTtkMs + 20 },
-    { shot: 'Shot 41-60', ttk: summary.avgTtkMs - 10 },
-    { shot: 'Shot 61-80', ttk: summary.avgTtkMs - 25 },
-    { shot: 'Shot 81+', ttk: summary.avgTtkMs - 15 },
-  ];
+  const handleDownloadShareCard = () => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 1200;
+    canvas.height = 630;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    ctx.fillStyle = '#0d0d0d';
+    ctx.fillRect(0, 0, 1200, 630);
+
+    ctx.strokeStyle = '#f5b8c9';
+    ctx.lineWidth = 4;
+    ctx.strokeRect(20, 20, 1160, 590);
+
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '900 48px Georgia';
+    ctx.fillText('AIM // TT PERFORMANCE REPORT', 60, 100);
+
+    ctx.fillStyle = '#f5b8c9';
+    ctx.font = 'bold 24px monospace';
+    ctx.fillText(`DRILL: ${summary.scenarioName.toUpperCase()}`, 60, 150);
+
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '900 96px Georgia';
+    ctx.fillText(summary.score.toLocaleString(), 60, 280);
+    ctx.font = 'bold 24px monospace';
+    ctx.fillStyle = '#888888';
+    ctx.fillText('SCORE', 60, 320);
+
+    ctx.fillStyle = '#f5b8c9';
+    ctx.fillRect(900, 80, 220, 220);
+    ctx.fillStyle = '#0d0d0d';
+    ctx.font = '900 120px Georgia';
+    ctx.fillText(summary.grade, 950, 230);
+
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 36px monospace';
+    ctx.fillText(`ACCURACY: ${summary.accuracy}%`, 60, 420);
+    ctx.fillText(`HITS: ${summary.hits} / ${summary.hits + summary.misses}`, 60, 480);
+    ctx.fillText(`AVG TTK: ${summary.avgTtkMs}ms`, 600, 420);
+    ctx.fillText(`MAX STREAK: ${summary.maxCombo}X`, 600, 480);
+
+    ctx.fillStyle = '#666666';
+    ctx.font = '18px monospace';
+    ctx.fillText(`PLAYER: ${displayName} • ${new Date(summary.timestamp).toLocaleDateString()}`, 60, 560);
+
+    const link = document.createElement('a');
+    link.download = `aimtt-result-${summary.scenarioId}-${Date.now()}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    soundManager.playClick();
+  };
+
+  const handleNextInPlaylist = () => {
+    soundManager.playClick();
+    const hasNext = advancePlaylistStep();
+    if (hasNext) {
+      onNavigate('arena');
+    }
+  };
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="w-full bg-[#0d0d0d] text-white min-h-screen py-12 px-6 md:px-16 space-y-12 select-none"
+      className="w-full bg-[#0d0d0d] text-white min-h-screen py-12 px-6 md:px-16 space-y-12 select-none text-left"
     >
+      {/* Benchmark Rank Summary Overlay Card if finished benchmark */}
+      {isBenchmarkMode && lastBenchmarkSummary && (
+        <div className="max-w-7xl mx-auto bg-[#141414] border border-[#f5b8c9] rounded-[12px] p-8 space-y-6 text-center">
+          <div className="flex justify-center items-center gap-3 text-[#f5b8c9] font-mono text-xs uppercase tracking-widest font-bold">
+            <Award className="w-5 h-5 text-[#f5b8c9]" /> BENCHMARK TEST COMPLETED
+          </div>
+          <div className="flex items-center justify-center gap-6">
+            <div className="text-left">
+              <span className="text-xs font-mono text-neutral-400 block uppercase">COMPOSITE AIM RATING</span>
+              <span className="font-display font-extrabold text-6xl text-white">
+                {lastBenchmarkSummary.compositeScore}
+              </span>
+            </div>
+            <div className="w-20 h-20 bg-[#f5b8c9] text-[#0d0d0d] rounded-[12px] flex items-center justify-center font-display font-extrabold text-4xl">
+              {lastBenchmarkSummary.grade}
+            </div>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs font-mono bg-[#0d0d0d] p-4 rounded-[12px] border border-[#262626]">
+            {lastBenchmarkSummary.drillScores.map((ds, idx) => (
+              <div key={idx} className="space-y-1 text-left">
+                <span className="text-neutral-500 text-[10px] block">{ds.scenarioName}</span>
+                <span className="font-bold text-white block">{ds.score.toLocaleString()} SCORE</span>
+                <span className="text-[#f5b8c9] block">{ds.accuracy}% ACC</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Routine Summary Card if routine active */}
+      {activeRoutine && routineResults.length > 0 && (
+        <div className="max-w-7xl mx-auto bg-[#141414] border border-[#262626] rounded-[12px] p-6 space-y-4">
+          <div className="flex items-center justify-between border-b border-[#262626] pb-3">
+            <span className="font-mono text-xs text-[#f5b8c9] uppercase tracking-widest flex items-center gap-2 font-bold">
+              <Layers className="w-4 h-4 text-[#f5b8c9]" /> ROUTINE: {activeRoutine.name}
+            </span>
+            <span className="text-xs font-mono text-neutral-400">
+              {routineResults.length} / {activeRoutine.drillIds.length} DRILLS COMPLETED
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 font-mono text-xs">
+            {routineResults.map((r, idx) => (
+              <div key={idx} className="bg-[#0d0d0d] p-3.5 rounded-[12px] border border-[#262626] space-y-1">
+                <span className="text-neutral-500 text-[10px] block">#{idx + 1} {r.scenarioName}</span>
+                <span className="font-bold text-white text-base block">{r.score.toLocaleString()}</span>
+                <span className="text-[#f5b8c9] text-xs font-bold block">{r.accuracy}% ACC</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div className="max-w-7xl mx-auto space-y-4 border-b border-[#262626] pb-8 flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div className="space-y-2">
@@ -78,12 +195,22 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ onNavigate }) => {
           </h1>
         </div>
 
-        {isNewPB && (
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-[12px] bg-[#f5b8c9] text-[#0d0d0d] font-mono font-extrabold text-sm uppercase tracking-wider animate-bounce">
-            <Trophy className="w-4 h-4 fill-[#0d0d0d]" />
-            NEW PERSONAL BEST RECORD!
-          </div>
-        )}
+        <div className="flex flex-wrap gap-3">
+          {isNewPB && (
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-[12px] bg-[#f5b8c9] text-[#0d0d0d] font-mono font-extrabold text-sm uppercase tracking-wider animate-bounce">
+              <Trophy className="w-4 h-4 fill-[#0d0d0d]" />
+              NEW PB RECORD!
+            </div>
+          )}
+
+          <button
+            onClick={handleDownloadShareCard}
+            className="px-4 py-2.5 rounded-[12px] bg-[#1a1a1a] hover:bg-[#262626] text-white border border-[#262626] hover:border-[#f5b8c9] text-xs font-mono font-bold flex items-center gap-2 transition-all"
+          >
+            <Download className="w-4 h-4 text-[#f5b8c9]" />
+            DOWNLOAD RESULT CARD (PNG)
+          </button>
+        </div>
       </div>
 
       {/* Main Stats Grid */}
@@ -94,7 +221,7 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ onNavigate }) => {
           <div className="bg-[#141414] border border-[#262626] rounded-[12px] p-8 flex items-center justify-between">
             <div className="space-y-2">
               <span className="text-xs font-mono text-neutral-400">PERFORMANCE RATING</span>
-              <div className="font-display font-extrabold text-7xl text-white">
+              <div className="font-display font-extrabold text-6xl md:text-7xl text-white">
                 {summary.score.toLocaleString()}
               </div>
               <span className="text-xs font-mono text-neutral-400 block">
@@ -102,7 +229,7 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ onNavigate }) => {
               </span>
             </div>
 
-            <div className="w-24 h-24 rounded-[12px] bg-[#f5b8c9] text-[#0d0d0d] flex items-center justify-center font-display font-extrabold text-5xl">
+            <div className="w-24 h-24 rounded-[12px] bg-[#f5b8c9] text-[#0d0d0d] flex items-center justify-center font-display font-extrabold text-5xl shrink-0">
               {summary.grade}
             </div>
           </div>
@@ -146,23 +273,32 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ onNavigate }) => {
 
           {/* Action Buttons */}
           <div className="space-y-3">
-            {/* Prominent Next Drill CTA */}
-            <button
-              onClick={() => {
-                soundManager.playClick();
-                if (!document.fullscreenElement) {
-                  document.documentElement.requestFullscreen().catch(() => {});
-                }
-                setScenario(nextScenario.id);
-                startSession();
-                onNavigate('arena');
-              }}
-              onMouseEnter={() => soundManager.playHover()}
-              className="btn-editorial-pink w-full py-4 text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 active:scale-95 transition-all"
-            >
-              <Play className="w-4 h-4 fill-[#0d0d0d]" />
-              NEXT DRILL: {nextScenario.name} <ArrowRight className="w-4 h-4" />
-            </button>
+            {(activeRoutine || isBenchmarkMode) ? (
+              <button
+                onClick={handleNextInPlaylist}
+                className="btn-editorial-pink w-full py-4 text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 active:scale-95 transition-all"
+              >
+                <Play className="w-4 h-4 fill-[#0d0d0d]" />
+                CONTINUE NEXT DRILL IN SEQUENCE <ArrowRight className="w-4 h-4" />
+              </button>
+            ) : (
+              <button
+                onClick={() => {
+                  soundManager.playClick();
+                  if (!document.fullscreenElement) {
+                    document.documentElement.requestFullscreen().catch(() => {});
+                  }
+                  setScenario(nextScenario.id);
+                  startSession();
+                  onNavigate('arena');
+                }}
+                onMouseEnter={() => soundManager.playHover()}
+                className="btn-editorial-pink w-full py-4 text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 active:scale-95 transition-all"
+              >
+                <Play className="w-4 h-4 fill-[#0d0d0d]" />
+                NEXT DRILL: {nextScenario.name} <ArrowRight className="w-4 h-4" />
+              </button>
+            )}
 
             <div className="flex gap-3">
               <button
@@ -195,7 +331,7 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ onNavigate }) => {
           </div>
         </div>
 
-        {/* Right Column: Heatmap & TTK Graph (7 Cols) */}
+        {/* Right Column: Heatmap & Reaction Time Histogram (7 Cols) */}
         <div className="lg:col-span-7 space-y-6">
           {/* Spatial Heatmap Card */}
           <div className="bg-[#141414] border border-[#262626] rounded-[12px] p-6 space-y-4">
@@ -211,48 +347,8 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ onNavigate }) => {
             </div>
           </div>
 
-          {/* TTK Trend Graph */}
-          <div className="bg-[#141414] border border-[#262626] rounded-[12px] p-6 space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="font-mono text-xs text-[#f5b8c9] uppercase tracking-widest flex items-center gap-2">
-                <BarChart2 className="w-4 h-4 text-[#f5b8c9]" /> TTK SPEED PACE TREND (MS)
-              </h3>
-              <span className="text-xs font-mono text-neutral-400">FASTER = LOWER</span>
-            </div>
-
-            <div className="h-44 w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={ttkTrendData}>
-                  <defs>
-                    <linearGradient id="pinkGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#f5b8c9" stopOpacity={0.4} />
-                      <stop offset="95%" stopColor="#f5b8c9" stopOpacity={0.0} />
-                    </linearGradient>
-                  </defs>
-                  <XAxis dataKey="shot" stroke="#666666" fontSize={10} tickLine={false} />
-                  <YAxis stroke="#666666" fontSize={10} tickLine={false} domain={['dataMin - 20', 'dataMax + 20']} />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: '#0d0d0d',
-                      borderColor: '#262626',
-                      borderRadius: '12px',
-                      color: '#ffffff',
-                      fontSize: '12px',
-                      fontFamily: 'Space Grotesk',
-                    }}
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="ttk"
-                    stroke="#f5b8c9"
-                    strokeWidth={2}
-                    fillOpacity={1}
-                    fill="url(#pinkGradient)"
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
+          {/* Reaction Time Distribution Histogram */}
+          <ReactionTimeHistogram reactionTimesMs={summary.reactionTimesMs || []} />
         </div>
       </div>
     </motion.div>

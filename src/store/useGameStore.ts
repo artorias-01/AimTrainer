@@ -1,8 +1,8 @@
 import { create } from 'zustand';
-import { getScenarioById } from '../utils/scenarios';
-import type { ScenarioDef } from '../utils/scenarios';
-import { saveSessionResult } from '../utils/storage';
-import type { SessionResult } from '../utils/storage';
+import { getScenarioById, BENCHMARK_SEQUENCE_IDS } from '../utils/scenarios';
+import type { ScenarioDef, WarmupRoutine } from '../utils/scenarios';
+import { saveSessionResult, saveBenchmarkRun } from '../utils/storage';
+import type { SessionResult, BenchmarkRunResult } from '../utils/storage';
 import { soundManager } from '../utils/audio';
 import { useSettingsStore } from './useSettingsStore';
 
@@ -49,6 +49,17 @@ interface GameState {
   lastSessionSummary: SessionResult | null;
   isNewPB: boolean;
 
+  /* Playlist / Warmup Routine State */
+  activeRoutine: WarmupRoutine | null;
+  routineStepIndex: number;
+  routineResults: SessionResult[];
+
+  /* Benchmark Test State */
+  isBenchmarkMode: boolean;
+  benchmarkStepIndex: number;
+  benchmarkDrillResults: { scenarioId: string; scenarioName: string; score: number; accuracy: number; avgTtkMs: number }[];
+  lastBenchmarkSummary: BenchmarkRunResult | null;
+
   setScenario: (scenarioId: string) => void;
   startSession: () => void;
   pauseSession: () => void;
@@ -59,6 +70,10 @@ interface GameState {
   registerMiss: (clickX?: number, clickY?: number) => void;
   flushTrackingTicks: (hitsDelta: number, missesDelta: number) => void;
   updateTargetPositions: (delta: number) => void;
+
+  startRoutine: (routine: WarmupRoutine) => void;
+  startBenchmark: () => void;
+  advancePlaylistStep: () => boolean;
 }
 
 export const useGameStore = create<GameState>((set, get) => ({
@@ -78,6 +93,15 @@ export const useGameStore = create<GameState>((set, get) => ({
   lastSessionSummary: null,
   isNewPB: false,
 
+  activeRoutine: null,
+  routineStepIndex: 0,
+  routineResults: [],
+
+  isBenchmarkMode: false,
+  benchmarkStepIndex: 0,
+  benchmarkDrillResults: [],
+  lastBenchmarkSummary: null,
+
   setScenario: (scenarioId) => {
     clearActiveCountdownInterval();
     const sc = getScenarioById(scenarioId);
@@ -91,15 +115,79 @@ export const useGameStore = create<GameState>((set, get) => ({
       misses: 0,
       streak: 0,
       maxCombo: 0,
+      activeRoutine: null,
+      isBenchmarkMode: false,
     });
   },
 
+  startRoutine: (routine) => {
+    clearActiveCountdownInterval();
+    if (!routine || routine.drillIds.length === 0) return;
+    const firstScenario = getScenarioById(routine.drillIds[0]);
+    set({
+      activeRoutine: routine,
+      routineStepIndex: 0,
+      routineResults: [],
+      isBenchmarkMode: false,
+      activeScenario: firstScenario,
+      timeLeft: firstScenario.durationSeconds,
+      status: 'idle',
+    });
+    get().startSession();
+  },
+
+  startBenchmark: () => {
+    clearActiveCountdownInterval();
+    const firstScenario = getScenarioById(BENCHMARK_SEQUENCE_IDS[0]);
+    set({
+      isBenchmarkMode: true,
+      benchmarkStepIndex: 0,
+      benchmarkDrillResults: [],
+      activeRoutine: null,
+      activeScenario: firstScenario,
+      timeLeft: firstScenario.durationSeconds,
+      status: 'idle',
+    });
+    get().startSession();
+  },
+
+  advancePlaylistStep: () => {
+    const { activeRoutine, routineStepIndex, isBenchmarkMode, benchmarkStepIndex } = get();
+
+    if (activeRoutine) {
+      const nextIndex = routineStepIndex + 1;
+      if (nextIndex < activeRoutine.drillIds.length) {
+        const nextScenario = getScenarioById(activeRoutine.drillIds[nextIndex]);
+        set({
+          routineStepIndex: nextIndex,
+          activeScenario: nextScenario,
+          timeLeft: nextScenario.durationSeconds,
+          status: 'idle',
+        });
+        get().startSession();
+        return true;
+      }
+    } else if (isBenchmarkMode) {
+      const nextIndex = benchmarkStepIndex + 1;
+      if (nextIndex < BENCHMARK_SEQUENCE_IDS.length) {
+        const nextScenario = getScenarioById(BENCHMARK_SEQUENCE_IDS[nextIndex]);
+        set({
+          benchmarkStepIndex: nextIndex,
+          activeScenario: nextScenario,
+          timeLeft: nextScenario.durationSeconds,
+          status: 'idle',
+        });
+        get().startSession();
+        return true;
+      }
+    }
+    return false;
+  },
+
   startSession: () => {
-    // Guard against re-entrant calls while status is already 'countdown'
     if (get().status === 'countdown') return;
 
     clearActiveCountdownInterval();
-
     const { activeScenario } = get();
     const initialTargets = generateTargetsForScenario(activeScenario);
 
@@ -151,7 +239,7 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   stopSession: () => {
     clearActiveCountdownInterval();
-    const { status, score, hits, misses, hitTimingsMs, hitLocations, activeScenario, maxCombo } = get();
+    const { status, score, hits, misses, hitTimingsMs, hitLocations, activeScenario, maxCombo, activeRoutine, routineResults, isBenchmarkMode, benchmarkDrillResults } = get();
     if (status === 'finished') return;
 
     const totalShots = hits + misses;
@@ -179,11 +267,55 @@ export const useGameStore = create<GameState>((set, get) => ({
       maxCombo,
       grade,
       hitLocations,
+      reactionTimesMs: hitTimingsMs,
     };
 
     const { isNewPB } = saveSessionResult(summary);
     if (isNewPB) {
       soundManager.playPersonalBest();
+    }
+
+    /* Accumulate Routine or Benchmark Step Results */
+    if (activeRoutine) {
+      const updatedRoutineResults = [...routineResults, summary];
+      set({ routineResults: updatedRoutineResults });
+    } else if (isBenchmarkMode) {
+      const updatedBenchmarkDrills = [
+        ...benchmarkDrillResults,
+        {
+          scenarioId: activeScenario.id,
+          scenarioName: activeScenario.name,
+          score,
+          accuracy,
+          avgTtkMs: avgTtk,
+        },
+      ];
+      set({ benchmarkDrillResults: updatedBenchmarkDrills });
+
+      // If benchmark sequence completed (all 4 drills)
+      if (updatedBenchmarkDrills.length === BENCHMARK_SEQUENCE_IDS.length) {
+        // Compute composite score: normalized average of scaled drill scores (0 - 1000)
+        const avgScore = Math.round(
+          updatedBenchmarkDrills.reduce((acc, d) => acc + Math.min(1000, Math.round((d.score / 60000) * 1000)), 0) / updatedBenchmarkDrills.length
+        );
+        let benchGrade: 'S+' | 'S' | 'A' | 'B' | 'C' | 'D' = 'C';
+        if (avgScore >= 900) benchGrade = 'S+';
+        else if (avgScore >= 800) benchGrade = 'S';
+        else if (avgScore >= 700) benchGrade = 'A';
+        else if (avgScore >= 600) benchGrade = 'B';
+        else if (avgScore >= 500) benchGrade = 'C';
+        else benchGrade = 'D';
+
+        const benchmarkRun: BenchmarkRunResult = {
+          id: 'bench-' + Date.now(),
+          timestamp: Date.now(),
+          compositeScore: avgScore,
+          grade: benchGrade,
+          drillScores: updatedBenchmarkDrills,
+        };
+        saveBenchmarkRun(benchmarkRun);
+        set({ lastBenchmarkSummary: benchmarkRun });
+      }
     }
 
     set({
@@ -222,7 +354,6 @@ export const useGameStore = create<GameState>((set, get) => ({
 
     const updatedTargets = targets.map((t) => {
       if (t.id === targetId) {
-        // Reuse stable target.id key across hits for seamless component updates
         return createRandomTarget(activeScenario, t.id);
       }
       return t;
@@ -282,17 +413,14 @@ export const useGameStore = create<GameState>((set, get) => ({
 
     const now = Date.now();
 
-    // Check lifetime limits for reflex / timed scenarios (scaled by global pacing multiplier)
     if (activeScenario.hasLifetimeLimit && activeScenario.lifetimeMs) {
       const speedMult = useSettingsStore.getState().targetSpeedMultiplier || 1.0;
-      // Proportional scaling: multiplier < 1.0 increases exposure window (easier), > 1.0 decreases exposure window (harder)
       const effectiveLifetimeMs = Math.round(activeScenario.lifetimeMs / speedMult);
       const hasExpired = targets.some((t) => now - t.spawnTime > effectiveLifetimeMs);
 
       if (hasExpired) {
         const updated = targets.map((t) => {
           if (now - t.spawnTime > effectiveLifetimeMs) {
-            // Reuse stable target ID key (t.id) to eliminate unmount/remount pop jitter!
             return createRandomTarget(activeScenario, t.id);
           }
           return t;
@@ -319,36 +447,31 @@ function generateTargetsForScenario(scenario: ScenarioDef): TargetInstance[] {
 
 function createRandomTarget(scenario: ScenarioDef, id: string): TargetInstance {
   const radius = scenario.targetRadius;
-  const clearance = radius + 0.12; // Wall clearance offset so spheres never intersect wall geometry
+  const clearance = radius + 0.12;
 
-  // Default Front Wall (Wall plane at Z = -6.5)
   let z = -6.5 + clearance;
   let x = (Math.random() - 0.5) * (18 - clearance * 2);
   let y = clearance + 0.4 + Math.random() * (5.8 - clearance * 2);
 
   if (scenario.id === 'long-range-sniper') {
-    z = -6.5 + clearance; // Spawn in front of front wall
+    z = -6.5 + clearance;
     x = (Math.random() - 0.5) * 14;
     y = 1.2 + Math.random() * 4.2;
   } else if (scenario.arenaType === '6-wall') {
     const wallChoice = Math.floor(Math.random() * 4);
     if (wallChoice === 0) {
-      // Front Wall (Z = -6.5)
       z = -6.5 + clearance;
       x = (Math.random() - 0.5) * (14 - clearance * 2);
       y = clearance + 0.5 + Math.random() * (5.5 - clearance * 2);
     } else if (wallChoice === 1) {
-      // Rear Wall (Z = +6.5)
       z = 6.5 - clearance;
       x = (Math.random() - 0.5) * (14 - clearance * 2);
       y = clearance + 0.5 + Math.random() * (5.5 - clearance * 2);
     } else if (wallChoice === 2) {
-      // Left Wall (X = -11.0)
       x = -11.0 + clearance;
       z = (Math.random() - 0.5) * (9.5 - clearance * 2) - 1.5;
       y = clearance + 0.5 + Math.random() * (5.5 - clearance * 2);
     } else {
-      // Right Wall (X = +11.0)
       x = 11.0 - clearance;
       z = (Math.random() - 0.5) * (9.5 - clearance * 2) - 1.5;
       y = clearance + 0.5 + Math.random() * (5.5 - clearance * 2);

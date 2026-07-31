@@ -8,9 +8,15 @@ import {
   saveStoredCrosshair,
   getStoredAudio,
   saveStoredAudio,
+  getScenarioCrosshairMap,
+  saveScenarioCrosshairMap,
+  getSavedCrosshairPresets,
 } from '../utils/storage';
 import type { CrosshairConfig } from '../utils/storage';
 import { soundManager } from '../utils/audio';
+
+export type TargetShape = 'sphere' | 'torus' | 'cube';
+export type ArenaBackdrop = 'grid-room' | 'minimal-void' | 'gradient-room';
 
 interface SettingsState {
   settings: SensitivityProfile;
@@ -24,6 +30,9 @@ interface SettingsState {
   displayName: string;
   pauseKey: string;
   restartKey: string;
+  targetShape: TargetShape;
+  arenaBackdrop: ArenaBackdrop;
+  scenarioCrosshairMap: Record<string, string>;
 
   updateSettings: (partial: Partial<SensitivityProfile>) => void;
   updateCrosshair: (partial: Partial<CrosshairConfig>) => void;
@@ -34,6 +43,10 @@ interface SettingsState {
   toggleSound: () => void;
   setDisplayName: (name: string) => void;
   setKeybinds: (pause: string, restart: string) => void;
+  setTargetShape: (shape: TargetShape) => void;
+  setArenaBackdrop: (backdrop: ArenaBackdrop) => void;
+  setScenarioCrosshair: (targetKey: string, presetId: string) => void;
+  getCrosshairForScenario: (scenarioId: string, category: string) => CrosshairConfig;
 }
 
 const initialSettings = getStoredSettings();
@@ -44,8 +57,10 @@ const initialPauseKey = localStorage.getItem('aimtt_pause_key') || 'Escape';
 const initialRestartKey = localStorage.getItem('aimtt_restart_key') || 'KeyR';
 const initialSpeedMult = parseFloat(localStorage.getItem('aimtt_speed_mult_v1') || '1.0');
 const initialPerfMode = localStorage.getItem('aimtt_perf_mode_v1') === 'true';
+const initialShape = (localStorage.getItem('aimtt_target_shape_v1') as TargetShape) || 'sphere';
+const initialBackdrop = (localStorage.getItem('aimtt_arena_backdrop_v1') as ArenaBackdrop) || 'grid-room';
+const initialCrosshairMap = getScenarioCrosshairMap();
 
-// Initialize audio sound manager with stored levels
 soundManager.setMasterVolume(initialAudio.masterVolume);
 soundManager.setHitVolume(initialAudio.hitVolume);
 soundManager.setSoundEnabled(initialAudio.soundEnabled);
@@ -66,6 +81,9 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
   displayName: initialHandle,
   pauseKey: initialPauseKey,
   restartKey: initialRestartKey,
+  targetShape: initialShape,
+  arenaBackdrop: initialBackdrop,
+  scenarioCrosshairMap: initialCrosshairMap,
 
   updateSettings: (partial) => {
     const updated = { ...get().settings, ...partial };
@@ -131,5 +149,37 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     localStorage.setItem('aimtt_pause_key', pause);
     localStorage.setItem('aimtt_restart_key', restart);
     set({ pauseKey: pause, restartKey: restart });
+  },
+
+  setTargetShape: (shape) => {
+    localStorage.setItem('aimtt_target_shape_v1', shape);
+    set({ targetShape: shape });
+  },
+
+  setArenaBackdrop: (backdrop) => {
+    localStorage.setItem('aimtt_arena_backdrop_v1', backdrop);
+    set({ arenaBackdrop: backdrop });
+  },
+
+  setScenarioCrosshair: (targetKey, presetId) => {
+    const map = { ...get().scenarioCrosshairMap };
+    if (!presetId) {
+      delete map[targetKey];
+    } else {
+      map[targetKey] = presetId;
+    }
+    saveScenarioCrosshairMap(map);
+    set({ scenarioCrosshairMap: map });
+  },
+
+  getCrosshairForScenario: (scenarioId, category) => {
+    const map = get().scenarioCrosshairMap;
+    const presetId = map[scenarioId] || map[category];
+    if (presetId) {
+      const presets = getSavedCrosshairPresets();
+      const match = presets.find((p) => p.id === presetId);
+      if (match) return match.config;
+    }
+    return get().crosshair; // Fallback to global default crosshair
   },
 }));

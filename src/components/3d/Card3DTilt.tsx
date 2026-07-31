@@ -4,9 +4,10 @@ interface Card3DTiltProps {
   children: React.ReactNode;
   className?: string;
   onClick?: () => void;
+  onMouseEnter?: () => void;
 }
 
-export const Card3DTilt: React.FC<Card3DTiltProps> = ({ children, className = '', onClick }) => {
+export const Card3DTilt: React.FC<Card3DTiltProps> = ({ children, className = '', onClick, onMouseEnter }) => {
   const [rotateX, setRotateX] = useState(0);
   const [rotateY, setRotateY] = useState(0);
 
@@ -32,6 +33,7 @@ export const Card3DTilt: React.FC<Card3DTiltProps> = ({ children, className = ''
   return (
     <div
       onClick={onClick}
+      onMouseEnter={onMouseEnter}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       className={`transition-transform duration-200 ease-out preserve-3d cursor-pointer ${className}`}

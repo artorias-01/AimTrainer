@@ -23,7 +23,7 @@ const ArenaController: React.FC<ArenaControllerProps> = ({ onPointerLockChange, 
     updateTargetPositions,
     tickSecond,
   } = useGameStore();
-  const { settings } = useSettingsStore();
+  const { settings, arenaBackdrop } = useSettingsStore();
 
   const yawRef = useRef<number>(0);
   const pitchRef = useRef<number>(0);
@@ -277,38 +277,45 @@ const ArenaController: React.FC<ArenaControllerProps> = ({ onPointerLockChange, 
         </group>
       ))}
 
-      {/* Front Target Wall (Z = -6.5) */}
-      <mesh position={[0, 3.2, -6.5]}>
-        <planeGeometry args={[22, 10]} />
-        <meshStandardMaterial color="#121212" roughness={0.8} />
-      </mesh>
+      {/* Environment & Backdrop Options */}
+      {arenaBackdrop !== 'minimal-void' && (
+        <>
+          {/* Front Target Wall (Z = -6.5) */}
+          <mesh position={[0, 3.2, -6.5]}>
+            <planeGeometry args={[22, 10]} />
+            <meshStandardMaterial color={arenaBackdrop === 'gradient-room' ? '#181216' : '#121212'} roughness={0.8} />
+          </mesh>
 
-      {/* Rear Target Wall (Z = +6.5 for 360 6-Wall Mode) */}
-      <mesh position={[0, 3.2, 6.5]} rotation={[0, Math.PI, 0]}>
-        <planeGeometry args={[22, 10]} />
-        <meshStandardMaterial color="#121212" roughness={0.8} />
-      </mesh>
+          {/* Rear Target Wall (Z = +6.5 for 360 6-Wall Mode) */}
+          <mesh position={[0, 3.2, 6.5]} rotation={[0, Math.PI, 0]}>
+            <planeGeometry args={[22, 10]} />
+            <meshStandardMaterial color="#121212" roughness={0.8} />
+          </mesh>
 
-      {/* Left Wall (X = -11) */}
-      <mesh position={[-11, 3.2, -1.5]} rotation={[0, Math.PI / 2, 0]}>
-        <planeGeometry args={[12, 10]} />
-        <meshStandardMaterial color="#0d0d0d" roughness={0.9} />
-      </mesh>
+          {/* Left Wall (X = -11) */}
+          <mesh position={[-11, 3.2, -1.5]} rotation={[0, Math.PI / 2, 0]}>
+            <planeGeometry args={[12, 10]} />
+            <meshStandardMaterial color="#0d0d0d" roughness={0.9} />
+          </mesh>
 
-      {/* Right Wall (X = +11) */}
-      <mesh position={[11, 3.2, -1.5]} rotation={[0, -Math.PI / 2, 0]}>
-        <planeGeometry args={[12, 10]} />
-        <meshStandardMaterial color="#0d0d0d" roughness={0.9} />
-      </mesh>
+          {/* Right Wall (X = +11) */}
+          <mesh position={[11, 3.2, -1.5]} rotation={[0, -Math.PI / 2, 0]}>
+            <planeGeometry args={[12, 10]} />
+            <meshStandardMaterial color="#0d0d0d" roughness={0.9} />
+          </mesh>
 
-      {/* Floor with Editorial Grid Lines at Y = 0 */}
-      <gridHelper args={[30, 30, '#f5b8c9', '#262626']} position={[0, 0, -1.5]} />
+          {/* Floor with Editorial Grid Lines at Y = 0 */}
+          {arenaBackdrop === 'grid-room' && (
+            <gridHelper args={[30, 30, '#f5b8c9', '#262626']} position={[0, 0, -1.5]} />
+          )}
 
-      {/* Ceiling Plane at Y = 7.5 */}
-      <mesh position={[0, 7.5, -1.5]} rotation={[Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[22, 12]} />
-        <meshStandardMaterial color="#080808" />
-      </mesh>
+          {/* Ceiling Plane at Y = 7.5 */}
+          <mesh position={[0, 7.5, -1.5]} rotation={[Math.PI / 2, 0, 0]}>
+            <planeGeometry args={[22, 12]} />
+            <meshStandardMaterial color="#080808" />
+          </mesh>
+        </>
+      )}
     </group>
   );
 };

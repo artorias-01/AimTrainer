@@ -20,7 +20,6 @@ import {
   Check,
   Volume2,
   VolumeX,
-  Keyboard,
   User,
   Download,
   Copy,
@@ -28,7 +27,6 @@ import {
   CheckCircle2,
   Gauge,
   AlertCircle,
-  Cpu,
   Save,
   Zap,
   ArrowLeft,
@@ -62,6 +60,11 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
     pauseKey,
     restartKey,
     setKeybinds,
+    targetShape,
+    setTargetShape,
+    arenaBackdrop,
+    setArenaBackdrop,
+    setScenarioCrosshair,
   } = useSettingsStore();
 
   const { clearHistory } = useStatsStore();
@@ -603,6 +606,42 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
                   </div>
                 </div>
 
+                {/* Per-Scenario Crosshair Profile Assignment */}
+                <div className="space-y-3 bg-[#0d0d0d] p-5 rounded-[12px] border border-[#262626]">
+                  <label className="text-[10px] font-mono text-[#f5b8c9] uppercase tracking-widest block font-bold">
+                    ASSIGN CROSSHAIR PRESET TO SPECIFIC DRILL OR CATEGORY
+                  </label>
+                  <p className="font-sans-ui text-xs text-neutral-400">
+                    Automatically override active crosshair when launching specific scenarios (e.g. dot for precision, cross for clicking).
+                  </p>
+                  <div className="flex gap-2">
+                    <select
+                      id="scenario-crosshair-select"
+                      className="flex-1 bg-[#141414] border border-[#262626] rounded-[12px] px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-[#f5b8c9]"
+                    >
+                      <option value="tracking">CATEGORY: TRACKING</option>
+                      <option value="clicking">CATEGORY: CLICKING</option>
+                      <option value="precision">CATEGORY: PRECISION</option>
+                      <option value="switching">CATEGORY: SWITCHING</option>
+                    </select>
+
+                    <button
+                      onClick={() => {
+                        const sel = document.getElementById('scenario-crosshair-select') as HTMLSelectElement;
+                        if (sel && selectedPresetId) {
+                          setScenarioCrosshair(sel.value, selectedPresetId);
+                          showSaveConfirmation(`ASSIGNED PRESET TO ${sel.value.toUpperCase()}`);
+                        } else {
+                          showSaveConfirmation('PLEASE SELECT A SAVED PRESET FIRST');
+                        }
+                      }}
+                      className="btn-editorial-pink px-4 py-2 text-xs font-bold uppercase"
+                    >
+                      LINK PRESET
+                    </button>
+                  </div>
+                </div>
+
                 {/* Line Color Hex Input */}
                 <div className="space-y-3 bg-[#0d0d0d] p-5 rounded-[12px] border border-[#262626]">
                   <label className="text-[10px] font-mono text-[#f5b8c9] uppercase tracking-widest block">
@@ -982,6 +1021,63 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
                 <p className="font-sans-ui text-xs text-neutral-400 leading-relaxed">
                   Disables ambient background particle fields, caps 3D Canvas resolution to 1.0 DPR, and disables non-essential animations to maximize frame rate and eliminate input latency on low-spec hardware.
                 </p>
+                {/* Cosmetic Target Shapes */}
+                <div className="space-y-3 bg-[#0d0d0d] p-5 rounded-[12px] border border-[#262626]">
+                  <label className="text-[10px] font-mono text-[#f5b8c9] uppercase tracking-widest block font-bold">
+                    COSMETIC TARGET SHAPE
+                  </label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {[
+                      { id: 'sphere', label: 'SPHERE' },
+                      { id: 'torus', label: 'TORUS' },
+                      { id: 'cube', label: 'CUBE' },
+                    ].map((shape) => (
+                      <button
+                        key={shape.id}
+                        onClick={() => {
+                          setTargetShape(shape.id as any);
+                          showSaveConfirmation(`TARGET SHAPE SET TO ${shape.label}`);
+                        }}
+                        className={`py-2 rounded-[12px] text-xs font-mono font-bold transition-all border ${
+                          targetShape === shape.id
+                            ? 'bg-[#f5b8c9] text-[#0d0d0d] border-[#f5b8c9]'
+                            : 'bg-[#141414] text-neutral-400 border-[#262626] hover:text-white'
+                        }`}
+                      >
+                        {shape.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Cosmetic Arena Backdrops */}
+                <div className="space-y-3 bg-[#0d0d0d] p-5 rounded-[12px] border border-[#262626]">
+                  <label className="text-[10px] font-mono text-[#f5b8c9] uppercase tracking-widest block font-bold">
+                    COSMETIC ARENA BACKDROP
+                  </label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {[
+                      { id: 'grid-room', label: 'GRID ROOM' },
+                      { id: 'minimal-void', label: 'MINIMAL VOID' },
+                      { id: 'gradient-room', label: 'GRADIENT ROOM' },
+                    ].map((backdrop) => (
+                      <button
+                        key={backdrop.id}
+                        onClick={() => {
+                          setArenaBackdrop(backdrop.id as any);
+                          showSaveConfirmation(`BACKDROP SET TO ${backdrop.label}`);
+                        }}
+                        className={`py-2 rounded-[12px] text-xs font-mono font-bold transition-all border ${
+                          arenaBackdrop === backdrop.id
+                            ? 'bg-[#f5b8c9] text-[#0d0d0d] border-[#f5b8c9]'
+                            : 'bg-[#141414] text-neutral-400 border-[#262626] hover:text-white'
+                        }`}
+                      >
+                        {backdrop.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
             )}
 
