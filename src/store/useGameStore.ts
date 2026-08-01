@@ -60,6 +60,13 @@ interface GameState {
   benchmarkDrillResults: { scenarioId: string; scenarioName: string; score: number; accuracy: number; avgTtkMs: number }[];
   lastBenchmarkSummary: BenchmarkRunResult | null;
 
+  /* Continuous tracking fields */
+  timeOnTargetMs: number;
+  totalSessionTimeMs: number;
+  currentTrackingStreakMs: number;
+  longestTrackingStreakMs: number;
+  trackingTimeline: { timeSec: number; onTargetPct: number }[];
+
   setScenario: (scenarioId: string) => void;
   startSession: () => void;
   pauseSession: () => void;
@@ -69,6 +76,7 @@ interface GameState {
   registerHit: (targetId: string, hitX?: number, hitY?: number) => void;
   registerMiss: (clickX?: number, clickY?: number) => void;
   flushTrackingTicks: (hitsDelta: number, missesDelta: number) => void;
+  recordTrackingTick: (frameMs: number, isOnTarget: boolean) => void;
   updateTargetPositions: (delta: number) => void;
 
   startRoutine: (routine: WarmupRoutine) => void;
@@ -92,6 +100,12 @@ export const useGameStore = create<GameState>((set, get) => ({
   lastHitResult: null,
   lastSessionSummary: null,
   isNewPB: false,
+
+  timeOnTargetMs: 0,
+  totalSessionTimeMs: 0,
+  currentTrackingStreakMs: 0,
+  longestTrackingStreakMs: 0,
+  trackingTimeline: [],
 
   activeRoutine: null,
   routineStepIndex: 0,
@@ -205,6 +219,11 @@ export const useGameStore = create<GameState>((set, get) => ({
       hitLocations: [],
       lastHitResult: null,
       isNewPB: false,
+      timeOnTargetMs: 0,
+      totalSessionTimeMs: 0,
+      currentTrackingStreakMs: 0,
+      longestTrackingStreakMs: 0,
+      trackingTimeline: [],
     });
 
     soundManager.playBeep(false);
@@ -237,22 +256,86 @@ export const useGameStore = create<GameState>((set, get) => ({
     }
   },
 
+  recordTrackingTick: (frameMs, isOnTarget) => {
+    const { status, timeOnTargetMs, totalSessionTimeMs, currentTrackingStreakMs, longestTrackingStreakMs, score } = get();
+    if (status !== 'playing' || frameMs <= 0) return;
+
+    const newTotalTime = totalSessionTimeMs + frameMs;
+    let newTimeOnTarget = timeOnTargetMs;
+    let newCurrentStreak = currentTrackingStreakMs;
+    let newLongestStreak = longestTrackingStreakMs;
+    let scoreDelta = 0;
+
+    if (isOnTarget) {
+      newTimeOnTarget += frameMs;
+      newCurrentStreak += frameMs;
+      newLongestStreak = Math.max(longestTrackingStreakMs, newCurrentStreak);
+      const streakMult = Math.min(2.0, 1.0 + newCurrentStreak / 5000);
+      scoreDelta = frameMs * 1.25 * streakMult;
+    } else {
+      newCurrentStreak = 0;
+    }
+
+    set({
+      totalSessionTimeMs: newTotalTime,
+      timeOnTargetMs: newTimeOnTarget,
+      currentTrackingStreakMs: newCurrentStreak,
+      longestTrackingStreakMs: newLongestStreak,
+      score: Math.round(score + scoreDelta),
+    });
+  },
+
   stopSession: () => {
     clearActiveCountdownInterval();
-    const { status, score, hits, misses, hitTimingsMs, hitLocations, activeScenario, maxCombo, activeRoutine, routineResults, isBenchmarkMode, benchmarkDrillResults } = get();
+    const {
+      status,
+      score,
+      hits,
+      misses,
+      hitTimingsMs,
+      hitLocations,
+      activeScenario,
+      maxCombo,
+      activeRoutine,
+      routineResults,
+      isBenchmarkMode,
+      benchmarkDrillResults,
+      timeOnTargetMs,
+      totalSessionTimeMs,
+      longestTrackingStreakMs,
+      trackingTimeline,
+    } = get();
     if (status === 'finished') return;
 
-    const totalShots = hits + misses;
-    const accuracy = totalShots > 0 ? Math.round((hits / totalShots) * 1000) / 10 : 0;
-    const avgTtk = hitTimingsMs.length > 0 ? Math.round(hitTimingsMs.reduce((a, b) => a + b, 0) / hitTimingsMs.length) : 0;
+    const isTracking = activeScenario.category === 'tracking';
 
+    let accuracy = 0;
+    let avgTtk = 0;
     let grade: 'S+' | 'S' | 'A' | 'B' | 'C' | 'D' = 'C';
-    if (accuracy >= 95 && score > 70000) grade = 'S+';
-    else if (accuracy >= 90 && score > 60000) grade = 'S';
-    else if (accuracy >= 85 && score > 45000) grade = 'A';
-    else if (accuracy >= 75 && score > 30000) grade = 'B';
-    else if (accuracy >= 60) grade = 'C';
-    else grade = 'D';
+
+    if (isTracking) {
+      const durationMs = (activeScenario.durationSeconds || 60) * 1000;
+      const totalTimeMs = totalSessionTimeMs > 0 ? totalSessionTimeMs : durationMs;
+      accuracy = totalTimeMs > 0 ? Math.round((timeOnTargetMs / totalTimeMs) * 1000) / 10 : 0;
+
+      if (accuracy >= 85 && score > 65000) grade = 'S+';
+      else if (accuracy >= 75 && score > 55000) grade = 'S';
+      else if (accuracy >= 65 && score > 40000) grade = 'A';
+      else if (accuracy >= 50 && score > 25000) grade = 'B';
+      else if (accuracy >= 35) grade = 'C';
+      else grade = 'D';
+    } else {
+      const totalShots = hits + misses;
+      accuracy = totalShots > 0 ? Math.round((hits / totalShots) * 1000) / 10 : 0;
+      avgTtk = hitTimingsMs.length > 0 ? Math.round(hitTimingsMs.reduce((a, b) => a + b, 0) / hitTimingsMs.length) : 0;
+
+      if (accuracy >= 95 && score > 70000) grade = 'S+';
+      else if (accuracy >= 90 && score > 60000) grade = 'S';
+      else if (accuracy >= 85 && score > 45000) grade = 'A';
+      else if (accuracy >= 75 && score > 30000) grade = 'B';
+      else if (accuracy >= 60) grade = 'C';
+      else grade = 'D';
+    }
 
     const summary: SessionResult = {
       id: 'session-' + Date.now(),
@@ -261,13 +344,18 @@ export const useGameStore = create<GameState>((set, get) => ({
       timestamp: Date.now(),
       score,
       accuracy,
-      hits,
-      misses,
-      avgTtkMs: avgTtk,
-      maxCombo,
+      hits: isTracking ? Math.round(timeOnTargetMs / 1000) : hits,
+      misses: isTracking ? Math.round(Math.max(0, totalSessionTimeMs - timeOnTargetMs) / 1000) : misses,
+      avgTtkMs: isTracking ? 0 : avgTtk,
+      maxCombo: isTracking ? Math.round((longestTrackingStreakMs / 1000) * 10) / 10 : maxCombo,
       grade,
-      hitLocations,
-      reactionTimesMs: hitTimingsMs,
+      hitLocations: isTracking ? [] : hitLocations,
+      reactionTimesMs: isTracking ? [] : hitTimingsMs,
+      isTracking,
+      timeOnTargetMs,
+      totalSessionTimeMs,
+      longestStreakMs: longestTrackingStreakMs,
+      trackingTimeline,
     };
 
     const { isNewPB } = saveSessionResult(summary);
@@ -294,7 +382,6 @@ export const useGameStore = create<GameState>((set, get) => ({
 
       // If benchmark sequence completed (all 4 drills)
       if (updatedBenchmarkDrills.length === BENCHMARK_SEQUENCE_IDS.length) {
-        // Compute composite score: normalized average of scaled drill scores (0 - 1000)
         const avgScore = Math.round(
           updatedBenchmarkDrills.reduce((acc, d) => acc + Math.min(1000, Math.round((d.score / 60000) * 1000)), 0) / updatedBenchmarkDrills.length
         );
@@ -326,8 +413,16 @@ export const useGameStore = create<GameState>((set, get) => ({
   },
 
   tickSecond: () => {
-    const { status, timeLeft } = get();
+    const { status, timeLeft, activeScenario, timeOnTargetMs, totalSessionTimeMs, trackingTimeline } = get();
     if (status !== 'playing') return;
+
+    if (activeScenario.category === 'tracking') {
+      const elapsedSec = activeScenario.durationSeconds - timeLeft + 1;
+      const currentPct = totalSessionTimeMs > 0 ? Math.round((timeOnTargetMs / totalSessionTimeMs) * 100) : 0;
+      set({
+        trackingTimeline: [...trackingTimeline, { timeSec: elapsedSec, onTargetPct: currentPct }],
+      });
+    }
 
     if (timeLeft > 1) {
       set({ timeLeft: timeLeft - 1 });

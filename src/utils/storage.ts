@@ -49,7 +49,7 @@ export interface SessionResult {
   scenarioName: string;
   timestamp: number;
   score: number;
-  accuracy: number; // 0 - 100
+  accuracy: number; // 0 - 100 (for click: discrete hit %, for tracking: time-on-target %)
   hits: number;
   misses: number;
   avgTtkMs: number;
@@ -57,6 +57,13 @@ export interface SessionResult {
   grade: 'S+' | 'S' | 'A' | 'B' | 'C' | 'D';
   hitLocations?: { x: number; y: number }[]; // 2D matrix hit coordinates normalized -1 to 1 for heatmap
   reactionTimesMs?: number[]; // Reaction times for histogram
+
+  // Tracking-specific continuous performance metrics:
+  isTracking?: boolean;
+  timeOnTargetMs?: number;
+  totalSessionTimeMs?: number;
+  longestStreakMs?: number;
+  trackingTimeline?: { timeSec: number; onTargetPct: number }[];
 }
 
 export interface PersonalBest {
@@ -65,6 +72,8 @@ export interface PersonalBest {
   bestAccuracy: number;
   bestTtkMs: number;
   timestamp: number;
+  isTracking?: boolean;
+  bestLongestStreakMs?: number;
 }
 
 export interface WarmupRoutine {
@@ -274,6 +283,8 @@ export function saveSessionResult(session: SessionResult): { isNewPB: boolean } 
       bestAccuracy: session.accuracy,
       bestTtkMs: session.avgTtkMs,
       timestamp: session.timestamp,
+      isTracking: session.isTracking,
+      bestLongestStreakMs: session.longestStreakMs,
     };
     localStorage.setItem(PB_KEY, JSON.stringify(pbs));
   }

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { HeroScene } from '../components/3d/HeroScene';
-import { SCENARIOS } from '../utils/scenarios';
+import { getAllScenarios } from '../utils/scenarios';
 import { getDailyStreak } from '../utils/storage';
 import { useGameStore } from '../store/useGameStore';
 import { soundManager } from '../utils/audio';
@@ -16,6 +16,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
   const { setScenario } = useGameStore();
 
   const dailyStreak = getDailyStreak();
+  const allScenarios = getAllScenarios();
 
   const handleSelectDrill = (scenarioId: string) => {
     soundManager.playClick();
@@ -158,12 +159,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
                 <span className="font-mono text-xs text-pink font-bold tracking-widest uppercase">
                   SELECT TRAINING DRILL
                 </span>
-                <span className="font-mono text-[10px] text-neutral-400">{SCENARIOS.length} DRILLS</span>
+                <span className="font-mono text-[10px] text-neutral-400">{allScenarios.length} DRILLS</span>
               </div>
 
               {/* Scrollable Scenario Hairline Pick List */}
               <div className="divide-y divide-[#262626] border-b border-[#262626] max-h-[280px] overflow-y-auto pr-1.5 thin-pink-scrollbar">
-                {SCENARIOS.map((sc) => (
+                {allScenarios.map((sc) => (
                   <button
                     key={sc.id}
                     onClick={() => handleSelectDrill(sc.id)}
@@ -171,9 +172,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
                     className="w-full text-left py-3 px-3 transition-all duration-150 group flex items-center justify-between hover:bg-pink/10 border-l-2 border-l-transparent hover:border-l-pink focus:outline-none"
                   >
                     <div>
-                      <span className="font-display font-bold text-sm block text-neutral-200 group-hover:text-pink transition-colors">
-                        {sc.name}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="font-display font-bold text-sm block text-neutral-200 group-hover:text-pink transition-colors">
+                          {sc.name}
+                        </span>
+                        {sc.isCustom && (
+                          <span className="text-[9px] font-mono font-bold text-white bg-pink-600 px-1.5 py-0.5 rounded-[4px]">
+                            CUSTOM
+                          </span>
+                        )}
+                      </div>
                       <span className="font-mono text-[10px] text-neutral-500 group-hover:text-neutral-300 block transition-colors">
                         {sc.category.toUpperCase()} // {sc.durationSeconds}S
                       </span>

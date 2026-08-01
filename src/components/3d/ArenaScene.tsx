@@ -19,7 +19,7 @@ const ArenaController: React.FC<ArenaControllerProps> = ({ onPointerLockChange, 
     targets,
     registerHit,
     registerMiss,
-    flushTrackingTicks,
+    recordTrackingTick,
     updateTargetPositions,
     tickSecond,
   } = useGameStore();
@@ -31,9 +31,6 @@ const ArenaController: React.FC<ArenaControllerProps> = ({ onPointerLockChange, 
   const pitchRef = useRef<number>(0);
   const isLockedRef = useRef<boolean>(false);
   const lastSecondTickRef = useRef<number>(0);
-  const lastTrackingFlushRef = useRef<number>(0);
-  const trackingHitsAccumulatorRef = useRef<number>(0);
-  const trackingMissesAccumulatorRef = useRef<number>(0);
   const lastTouchRef = useRef<{ x: number; y: number } | null>(null);
 
   // Set FOV and position camera based on activeScenario.playerPosition
@@ -222,7 +219,7 @@ const ArenaController: React.FC<ArenaControllerProps> = ({ onPointerLockChange, 
     // Update target movement for tracking/strafe tasks
     updateTargetPositions(delta);
 
-    // If tracking scenario, accumulate frame lock and flush at throttled 5 Hz (200ms)
+    // If tracking scenario, calculate precise continuous time-on-target
     if (activeScenario.category === 'tracking') {
       raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
       const intersects = raycaster.intersectObjects(scene.children, true);
@@ -235,22 +232,8 @@ const ArenaController: React.FC<ArenaControllerProps> = ({ onPointerLockChange, 
         return false;
       });
 
-      if (isTargetHit) {
-        trackingHitsAccumulatorRef.current += 1;
-      } else {
-        trackingMissesAccumulatorRef.current += 1;
-      }
-
-      // Flush accumulator to Zustand store at 5 Hz (every 200ms)
-      if (now - lastTrackingFlushRef.current >= 200) {
-        lastTrackingFlushRef.current = now;
-        flushTrackingTicks(
-          trackingHitsAccumulatorRef.current,
-          trackingMissesAccumulatorRef.current
-        );
-        trackingHitsAccumulatorRef.current = 0;
-        trackingMissesAccumulatorRef.current = 0;
-      }
+      const frameMs = delta * 1000;
+      recordTrackingTick(frameMs, isTargetHit);
     }
   });
 

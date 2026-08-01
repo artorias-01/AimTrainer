@@ -46,10 +46,15 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
 
   recent20.forEach((s) => {
     const sc = SCENARIOS.find((item) => item.id === s.scenarioId);
-    const cat = sc?.category || 'clicking';
+    const cat = sc?.category || (s.isTracking ? 'tracking' : 'clicking');
     if (categoryStats[cat]) {
-      categoryStats[cat].totalHits += s.hits;
-      categoryStats[cat].totalShots += s.hits + s.misses;
+      if (s.isTracking || cat === 'tracking') {
+        categoryStats[cat].totalHits += s.accuracy;
+        categoryStats[cat].totalShots += 100;
+      } else {
+        categoryStats[cat].totalHits += s.hits;
+        categoryStats[cat].totalShots += s.hits + s.misses;
+      }
     }
   });
 

@@ -79,6 +79,7 @@ interface SettingsState {
   arenaBackdrop: ArenaBackdrop;
   arenaColor: string;
   themeAccentColor: string;
+  infinitePracticeMode: boolean;
   scenarioCrosshairMap: Record<string, string>;
 
   updateSettings: (partial: Partial<SensitivityProfile>) => void;
@@ -95,6 +96,7 @@ interface SettingsState {
   setArenaBackdrop: (backdrop: ArenaBackdrop) => void;
   setArenaColor: (color: string) => void;
   setThemeAccentColor: (color: string) => void;
+  setInfinitePracticeMode: (enabled: boolean) => void;
   setScenarioCrosshair: (targetKey: string, presetId: string) => void;
   getCrosshairForScenario: (scenarioId: string, category: string) => CrosshairConfig;
 }
@@ -112,6 +114,7 @@ const initialTargetColor = localStorage.getItem('aimtt_target_color_v1') || '#f5
 const initialBackdrop = (localStorage.getItem('aimtt_arena_backdrop_v1') as ArenaBackdrop) || 'grid-room';
 const initialArenaColor = localStorage.getItem('aimtt_arena_color_v1') || '#121212';
 const initialThemeAccent = localStorage.getItem('aimtt_theme_accent_v1') || '#f5b8c9';
+const initialPracticeMode = localStorage.getItem('aimtt_infinite_practice_v1') !== 'false';
 const initialCrosshairMap = getScenarioCrosshairMap();
 
 applyThemeAccent(initialThemeAccent);
@@ -141,7 +144,13 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
   arenaBackdrop: initialBackdrop,
   arenaColor: initialArenaColor,
   themeAccentColor: initialThemeAccent,
+  infinitePracticeMode: initialPracticeMode,
   scenarioCrosshairMap: initialCrosshairMap,
+
+  setInfinitePracticeMode: (enabled) => {
+    localStorage.setItem('aimtt_infinite_practice_v1', enabled ? 'true' : 'false');
+    set({ infinitePracticeMode: enabled });
+  },
 
   updateSettings: (partial) => {
     const updated = { ...get().settings, ...partial };

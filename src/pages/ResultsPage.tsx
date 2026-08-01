@@ -3,12 +3,30 @@ import { motion } from 'framer-motion';
 import { useGameStore } from '../store/useGameStore';
 import { useStatsStore } from '../store/useStatsStore';
 import { useSettingsStore } from '../store/useSettingsStore';
-import { SCENARIOS } from '../utils/scenarios';
+import { SCENARIOS, getScenarioById } from '../utils/scenarios';
 import { HeatmapChart } from '../components/ui/HeatmapChart';
 import { ReactionTimeHistogram } from '../components/ui/ReactionTimeHistogram';
 import confetti from 'canvas-confetti';
 import { soundManager } from '../utils/audio';
-import { Trophy, RotateCcw, Library, Target, Zap, Clock, ArrowRight, Play, User, Download, Award, Layers, Flame } from 'lucide-react';
+import {
+  Trophy,
+  RotateCcw,
+  Library,
+  Target,
+  Zap,
+  Clock,
+  ArrowRight,
+  Play,
+  User,
+  Download,
+  Award,
+  Layers,
+  Flame,
+  Timer,
+  Percent,
+  TrendingUp,
+} from 'lucide-react';
+import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip } from 'recharts';
 
 interface ResultsPageProps {
   onNavigate: (page: string, scenarioId?: string) => void;
@@ -60,8 +78,19 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ onNavigate }) => {
     reactionTimesMs: [240, 260, 310, 190, 280, 220, 250],
   };
 
+  const scenarioDef = getScenarioById(summary.scenarioId) || activeScenario;
+  const isTrackingMode = summary.isTracking || scenarioDef.category === 'tracking';
+
   const currentIndex = SCENARIOS.findIndex((s) => s.id === summary.scenarioId);
   const nextScenario = SCENARIOS[(currentIndex + 1) % SCENARIOS.length];
+
+  // Prepare tracking timeline data for Recharts line chart
+  const trackingTimelineData = summary.trackingTimeline && summary.trackingTimeline.length > 0
+    ? summary.trackingTimeline
+    : Array.from({ length: 15 }, (_, i) => ({
+        timeSec: (i + 1) * 4,
+        onTargetPct: Math.min(100, Math.max(20, Math.round(summary.accuracy + (Math.sin(i) * 12)))),
+      }));
 
   const handleDownloadShareCard = () => {
     const canvas = document.createElement('canvas');
@@ -100,10 +129,22 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ onNavigate }) => {
 
     ctx.fillStyle = '#ffffff';
     ctx.font = 'bold 36px monospace';
-    ctx.fillText(`ACCURACY: ${summary.accuracy}%`, 60, 420);
-    ctx.fillText(`HITS: ${summary.hits} / ${summary.hits + summary.misses}`, 60, 480);
-    ctx.fillText(`AVG TTK: ${summary.avgTtkMs}ms`, 600, 420);
-    ctx.fillText(`MAX STREAK: ${summary.maxCombo}X`, 600, 480);
+
+    if (isTrackingMode) {
+      const timeTrackedSec = summary.timeOnTargetMs ? (summary.timeOnTargetMs / 1000).toFixed(1) : (summary.hits || 0).toFixed(1);
+      const durationSec = summary.totalSessionTimeMs ? (summary.totalSessionTimeMs / 1000).toFixed(1) : (scenarioDef.durationSeconds || 60).toFixed(1);
+      const streakSec = summary.longestStreakMs ? (summary.longestStreakMs / 1000).toFixed(2) : (summary.maxCombo || 0).toFixed(2);
+
+      ctx.fillText(`TIME ON TARGET: ${summary.accuracy}%`, 60, 420);
+      ctx.fillText(`TRACKED TIME: ${timeTrackedSec}s / ${durationSec}s`, 60, 480);
+      ctx.fillText(`LONGEST STREAK: ${streakSec}s`, 600, 420);
+      ctx.fillText(`CATEGORY: CONTINUOUS TRACKING`, 600, 480);
+    } else {
+      ctx.fillText(`ACCURACY: ${summary.accuracy}%`, 60, 420);
+      ctx.fillText(`HITS: ${summary.hits} / ${summary.hits + summary.misses}`, 60, 480);
+      ctx.fillText(`AVG TTK: ${summary.avgTtkMs}ms`, 600, 420);
+      ctx.fillText(`MAX STREAK: ${summary.maxCombo}X`, 600, 480);
+    }
 
     ctx.fillStyle = '#666666';
     ctx.font = '18px monospace';
@@ -189,7 +230,7 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ onNavigate }) => {
         <div className="space-y-2">
           <div className="flex items-center gap-2 font-mono text-xs text-pink uppercase tracking-widest">
             <User className="w-3.5 h-3.5" />
-            PLAYER: {displayName} // SESSION SUMMARY: {summary.scenarioName}
+            PLAYER: {displayName} // SESSION SUMMARY: {summary.scenarioName} ({scenarioDef.category.toUpperCase()})
           </div>
           <h1 className="font-display font-extrabold text-4xl md:text-6xl text-white">
             PERFORMANCE REPORT
@@ -226,7 +267,9 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ onNavigate }) => {
                 {summary.score.toLocaleString()}
               </div>
               <span className="text-xs font-mono text-neutral-400 block">
-                {summary.hits} HITS // {summary.misses} MISSES
+                {isTrackingMode
+                  ? `TIME ON TARGET: ${summary.accuracy}%`
+                  : `${summary.hits} HITS // ${summary.misses} MISSES`}
               </span>
             </div>
 
@@ -235,41 +278,84 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ onNavigate }) => {
             </div>
           </div>
 
-          {/* Detailed Metrics Table */}
+          {/* Detailed Metrics Table - Category Aware */}
           <div className="bg-[#141414] border border-[#262626] rounded-[12px] p-6 space-y-4">
             <h3 className="font-mono text-xs text-pink uppercase tracking-widest">
-              METRIC BREAKDOWN
+              {isTrackingMode ? 'TRACKING METRICS BREAKDOWN' : 'CLICKING METRICS BREAKDOWN'}
             </h3>
 
-            <div className="grid grid-cols-2 gap-4 text-xs font-mono">
-              <div className="bg-[#0d0d0d] p-4 rounded-[12px] border border-[#262626] space-y-1">
-                <span className="text-neutral-400 flex items-center gap-1.5">
-                  <Target className="w-3.5 h-3.5 text-pink" /> ACCURACY
-                </span>
-                <span className="font-bold text-2xl text-white">{summary.accuracy}%</span>
-              </div>
+            {isTrackingMode ? (
+              /* TRACKING CATEGORY METRICS */
+              <div className="grid grid-cols-2 gap-4 text-xs font-mono">
+                <div className="bg-[#0d0d0d] p-4 rounded-[12px] border border-[#262626] space-y-1">
+                  <span className="text-neutral-400 flex items-center gap-1.5">
+                    <Percent className="w-3.5 h-3.5 text-pink" /> TIME ON TARGET
+                  </span>
+                  <span className="font-bold text-2xl text-white">{summary.accuracy}%</span>
+                </div>
 
-              <div className="bg-[#0d0d0d] p-4 rounded-[12px] border border-[#262626] space-y-1">
-                <span className="text-neutral-400 flex items-center gap-1.5">
-                  <Clock className="w-3.5 h-3.5 text-pink" /> AVG TTK
-                </span>
-                <span className="font-bold text-2xl text-white">{summary.avgTtkMs} ms</span>
-              </div>
+                <div className="bg-[#0d0d0d] p-4 rounded-[12px] border border-[#262626] space-y-1">
+                  <span className="text-neutral-400 flex items-center gap-1.5">
+                    <Timer className="w-3.5 h-3.5 text-pink" /> TIME TRACKED
+                  </span>
+                  <span className="font-bold text-2xl text-white">
+                    {summary.timeOnTargetMs
+                      ? (summary.timeOnTargetMs / 1000).toFixed(1)
+                      : (summary.hits || 0).toFixed(1)}s
+                  </span>
+                  <span className="text-[10px] text-neutral-500 block">
+                    / {summary.totalSessionTimeMs
+                      ? (summary.totalSessionTimeMs / 1000).toFixed(1)
+                      : (scenarioDef.durationSeconds || 60).toFixed(1)}s TOTAL
+                  </span>
+                </div>
 
-              <div className="bg-[#0d0d0d] p-4 rounded-[12px] border border-[#262626] space-y-1">
-                <span className="text-neutral-400 flex items-center gap-1.5">
-                  <Flame className="w-3.5 h-3.5 text-pink" /> MAX STREAK
-                </span>
-                <span className="font-bold text-2xl text-white">{summary.maxCombo}X</span>
+                <div className="bg-[#0d0d0d] p-4 rounded-[12px] border border-[#262626] space-y-1 col-span-2">
+                  <span className="text-neutral-400 flex items-center gap-1.5">
+                    <Flame className="w-3.5 h-3.5 text-pink" /> LONGEST ON-TARGET STREAK
+                  </span>
+                  <span className="font-bold text-2xl text-white">
+                    {summary.longestStreakMs
+                      ? (summary.longestStreakMs / 1000).toFixed(2)
+                      : (summary.maxCombo || 0).toFixed(2)}s
+                  </span>
+                  <span className="text-[10px] text-neutral-500 block">
+                    Continuous crosshair target lock duration
+                  </span>
+                </div>
               </div>
+            ) : (
+              /* CLICKING / PRECISION / SWITCHING CATEGORY METRICS */
+              <div className="grid grid-cols-2 gap-4 text-xs font-mono">
+                <div className="bg-[#0d0d0d] p-4 rounded-[12px] border border-[#262626] space-y-1">
+                  <span className="text-neutral-400 flex items-center gap-1.5">
+                    <Target className="w-3.5 h-3.5 text-pink" /> ACCURACY
+                  </span>
+                  <span className="font-bold text-2xl text-white">{summary.accuracy}%</span>
+                </div>
 
-              <div className="bg-[#0d0d0d] p-4 rounded-[12px] border border-[#262626] space-y-1">
-                <span className="text-neutral-400 flex items-center gap-1.5">
-                  <Zap className="w-3.5 h-3.5 text-pink" /> TOTAL SHOTS
-                </span>
-                <span className="font-bold text-2xl text-white">{summary.hits + summary.misses}</span>
+                <div className="bg-[#0d0d0d] p-4 rounded-[12px] border border-[#262626] space-y-1">
+                  <span className="text-neutral-400 flex items-center gap-1.5">
+                    <Clock className="w-3.5 h-3.5 text-pink" /> AVG TTK
+                  </span>
+                  <span className="font-bold text-2xl text-white">{summary.avgTtkMs} ms</span>
+                </div>
+
+                <div className="bg-[#0d0d0d] p-4 rounded-[12px] border border-[#262626] space-y-1">
+                  <span className="text-neutral-400 flex items-center gap-1.5">
+                    <Flame className="w-3.5 h-3.5 text-pink" /> MAX STREAK
+                  </span>
+                  <span className="font-bold text-2xl text-white">{summary.maxCombo}X</span>
+                </div>
+
+                <div className="bg-[#0d0d0d] p-4 rounded-[12px] border border-[#262626] space-y-1">
+                  <span className="text-neutral-400 flex items-center gap-1.5">
+                    <Zap className="w-3.5 h-3.5 text-pink" /> TOTAL SHOTS
+                  </span>
+                  <span className="font-bold text-2xl text-white">{summary.hits + summary.misses}</span>
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
           {/* Action Buttons */}
@@ -332,24 +418,87 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ onNavigate }) => {
           </div>
         </div>
 
-        {/* Right Column: Heatmap & Reaction Time Histogram (7 Cols) */}
+        {/* Right Column: Visual Charts (7 Cols) - Category Driven */}
         <div className="lg:col-span-7 space-y-6">
-          {/* Spatial Heatmap Card */}
-          <div className="bg-[#141414] border border-[#262626] rounded-[12px] p-6 space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="font-mono text-xs text-pink uppercase tracking-widest">
-                TARGET WALL HIT MATRIX
-              </h3>
-              <span className="text-xs font-mono text-neutral-400">2D SPATIAL ERROR</span>
-            </div>
+          {isTrackingMode ? (
+            /* TRACKING CATEGORY: SESSION TIMELINE ACCURACY CHART */
+            <div className="bg-[#141414] border border-[#262626] rounded-[12px] p-6 space-y-4">
+              <div className="flex items-center justify-between border-b border-[#262626] pb-3">
+                <div>
+                  <h3 className="font-mono text-xs text-pink uppercase tracking-widest flex items-center gap-2">
+                    <TrendingUp className="w-4 h-4 text-pink" /> ON-TARGET TRACKING ACCURACY OVER TIME
+                  </h3>
+                  <p className="text-[10px] font-mono text-neutral-400 mt-1">
+                    Timeline graph showing continuous crosshair lock % across session duration
+                  </p>
+                </div>
+                <span className="text-xs font-mono text-neutral-400 bg-[#0d0d0d] px-2.5 py-1 rounded-[8px] border border-[#262626]">
+                  SESSION TIMELINE
+                </span>
+              </div>
 
-            <div className="flex justify-center">
-              <HeatmapChart hitLocations={summary.hitLocations} width={500} height={220} />
+              <div className="h-64 w-full pt-2">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={trackingTimelineData}>
+                    <XAxis
+                      dataKey="timeSec"
+                      stroke="#666666"
+                      fontSize={10}
+                      tickLine={false}
+                      unit="s"
+                    />
+                    <YAxis
+                      domain={[0, 100]}
+                      stroke="#666666"
+                      fontSize={10}
+                      tickLine={false}
+                      unit="%"
+                    />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: '#0d0d0d',
+                        borderColor: themeAccentColor,
+                        borderRadius: '8px',
+                        fontSize: '12px',
+                        fontFamily: 'monospace',
+                        color: '#ffffff',
+                      }}
+                      formatter={(val: any) => [`${val}%`, 'On Target']}
+                      labelFormatter={(label: any) => `Time: ${label}s`}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="onTargetPct"
+                      stroke={themeAccentColor}
+                      strokeWidth={3}
+                      dot={false}
+                      activeDot={{ r: 5, fill: themeAccentColor }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
             </div>
-          </div>
+          ) : (
+            /* CLICKING CATEGORY: SPATIAL HEATMAP & REACTION TIME HISTOGRAM */
+            <>
+              {/* Spatial Heatmap Card */}
+              <div className="bg-[#141414] border border-[#262626] rounded-[12px] p-6 space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-mono text-xs text-pink uppercase tracking-widest">
+                    TARGET WALL HIT MATRIX
+                  </h3>
+                  <span className="text-xs font-mono text-neutral-400">2D SPATIAL ERROR</span>
+                </div>
 
-          {/* Reaction Time Distribution Histogram */}
-          <ReactionTimeHistogram reactionTimesMs={summary.reactionTimesMs || []} />
+                <div className="flex justify-center">
+                  <HeatmapChart hitLocations={summary.hitLocations} width={500} height={220} />
+                </div>
+              </div>
+
+              {/* Reaction Time Distribution Histogram */}
+              <ReactionTimeHistogram reactionTimesMs={summary.reactionTimesMs || []} />
+            </>
+          )}
         </div>
       </div>
     </motion.div>
