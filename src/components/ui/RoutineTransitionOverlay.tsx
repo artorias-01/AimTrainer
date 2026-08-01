@@ -21,10 +21,10 @@ export const RoutineTransitionOverlay: React.FC<RoutineTransitionOverlayProps> =
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.9 }}
-        className="bg-[#141414] border border-[#f5b8c9] rounded-[12px] p-8 max-w-md w-full text-center space-y-6 shadow-2xl"
+        className="bg-[#141414] border border-pink rounded-[12px] p-8 max-w-md w-full text-center space-y-6 shadow-2xl"
       >
-        <div className="flex items-center justify-center gap-2 font-mono text-xs text-[#f5b8c9] uppercase tracking-widest">
-          <Layers className="w-4 h-4 text-[#f5b8c9]" />
+        <div className="flex items-center justify-center gap-2 font-mono text-xs text-pink uppercase tracking-widest">
+          <Layers className="w-4 h-4 text-pink" />
           PLAYLIST SEQUENCE // STEP {currentStep} OF {totalSteps}
         </div>
 

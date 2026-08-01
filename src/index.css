@@ -50,63 +50,104 @@ h1, h2, h3, .font-serif-display {
   text-shadow: none !important;
 }
 
-/* Dynamic Accent Class Overrides for UI Chrome */
-.text-pink, .text-\[\#f5b8c9\] {
+/* Base Semantic Accent Classes (Bound to var(--accent-color)) */
+.text-pink, .text-accent {
   color: var(--accent-color) !important;
 }
 
-.bg-pink, .bg-\[\#f5b8c9\] {
+.bg-pink, .bg-accent {
   background-color: var(--accent-color) !important;
 }
 
-.border-pink, .border-\[\#f5b8c9\] {
+.border-pink, .border-accent {
   border-color: var(--accent-color) !important;
 }
 
-.ring-\[\#f5b8c9\] {
+.ring-pink, .ring-accent {
   --tw-ring-color: var(--accent-color) !important;
 }
 
-.fill-\[\#f5b8c9\] {
+.fill-pink, .fill-accent {
   fill: var(--accent-color) !important;
 }
 
-.stroke-\[\#f5b8c9\] {
+.stroke-pink, .stroke-accent {
   stroke: var(--accent-color) !important;
 }
 
-.accent-\[\#f5b8c9\] {
+.accent-pink, .accent-accent {
   accent-color: var(--accent-color) !important;
 }
 
-/* Opacity variants */
-.border-\[\#f5b8c9\]\/20 {
-  border-color: rgba(var(--accent-color-rgb), 0.2) !important;
+/* Pseudo-Class Hover & Group-Hover Utilities */
+.hover\:text-pink:hover, .hover\:text-accent:hover {
+  color: var(--accent-color) !important;
 }
 
-.border-\[\#f5b8c9\]\/30 {
-  border-color: rgba(var(--accent-color-rgb), 0.3) !important;
+.hover\:bg-pink:hover, .hover\:bg-accent:hover {
+  background-color: var(--accent-color) !important;
 }
 
-.border-\[\#f5b8c9\]\/40 {
-  border-color: rgba(var(--accent-color-rgb), 0.4) !important;
+.hover\:border-pink:hover, .hover\:border-accent:hover {
+  border-color: var(--accent-color) !important;
 }
 
-.border-\[\#f5b8c9\]\/60 {
-  border-color: rgba(var(--accent-color-rgb), 0.6) !important;
+.hover\:border-l-pink:hover, .hover\:border-l-accent:hover {
+  border-left-color: var(--accent-color) !important;
 }
 
-.bg-\[\#f5b8c9\]\/10 {
-  background-color: rgba(var(--accent-color-rgb), 0.1) !important;
+.group:hover .group-hover\:text-pink, .group:hover .group-hover\:text-accent {
+  color: var(--accent-color) !important;
 }
 
-.bg-\[\#f5b8c9\]\/20 {
-  background-color: rgba(var(--accent-color-rgb), 0.2) !important;
+.group:hover .group-hover\:bg-pink, .group:hover .group-hover\:bg-accent {
+  background-color: var(--accent-color) !important;
 }
 
-.bg-\[\#f5b8c9\]\/90 {
-  background-color: rgba(var(--accent-color-rgb), 0.9) !important;
+.group:hover .group-hover\:border-pink, .group:hover .group-hover\:border-accent {
+  border-color: var(--accent-color) !important;
 }
+
+/* Focus & Active States */
+.focus\:border-pink:focus, .focus\:border-accent:focus,
+.focus-visible\:border-pink:focus-visible, .focus-visible\:border-accent:focus-visible {
+  border-color: var(--accent-color) !important;
+}
+
+.focus\:ring-pink:focus, .focus\:ring-accent:focus,
+.focus-visible\:ring-pink:focus-visible, .focus-visible\:ring-accent:focus-visible {
+  --tw-ring-color: var(--accent-color) !important;
+}
+
+::selection {
+  background-color: var(--accent-color) !important;
+  color: #0d0d0d !important;
+}
+
+/* Opacity Variant Utilities */
+.text-pink\/10, .text-accent\/10 { color: rgba(var(--accent-color-rgb), 0.1) !important; }
+.text-pink\/20, .text-accent\/20 { color: rgba(var(--accent-color-rgb), 0.2) !important; }
+.text-pink\/30, .text-accent\/30 { color: rgba(var(--accent-color-rgb), 0.3) !important; }
+.text-pink\/40, .text-accent\/40 { color: rgba(var(--accent-color-rgb), 0.4) !important; }
+.text-pink\/60, .text-accent\/60 { color: rgba(var(--accent-color-rgb), 0.6) !important; }
+
+.bg-pink\/10, .bg-accent\/10 { background-color: rgba(var(--accent-color-rgb), 0.1) !important; }
+.bg-pink\/15, .bg-accent\/15 { background-color: rgba(var(--accent-color-rgb), 0.15) !important; }
+.bg-pink\/20, .bg-accent\/20 { background-color: rgba(var(--accent-color-rgb), 0.2) !important; }
+.bg-pink\/30, .bg-accent\/30 { background-color: rgba(var(--accent-color-rgb), 0.3) !important; }
+.bg-pink\/40, .bg-accent\/40 { background-color: rgba(var(--accent-color-rgb), 0.4) !important; }
+.bg-pink\/90, .bg-accent\/90 { background-color: rgba(var(--accent-color-rgb), 0.9) !important; }
+
+.hover\:bg-pink\/10:hover, .hover\:bg-accent\/10:hover { background-color: rgba(var(--accent-color-rgb), 0.1) !important; }
+.hover\:bg-pink\/20:hover, .hover\:bg-accent\/20:hover { background-color: rgba(var(--accent-color-rgb), 0.2) !important; }
+.group:hover .group-hover\:bg-pink\/10 { background-color: rgba(var(--accent-color-rgb), 0.1) !important; }
+
+.border-pink\/20, .border-accent\/20 { border-color: rgba(var(--accent-color-rgb), 0.2) !important; }
+.border-pink\/30, .border-accent\/30 { border-color: rgba(var(--accent-color-rgb), 0.3) !important; }
+.border-pink\/40, .border-accent\/40 { border-color: rgba(var(--accent-color-rgb), 0.4) !important; }
+.border-pink\/50, .border-accent\/50 { border-color: rgba(var(--accent-color-rgb), 0.5) !important; }
+.border-pink\/60, .border-accent\/60 { border-color: rgba(var(--accent-color-rgb), 0.6) !important; }
+.hover\:border-pink\/50:hover, .hover\:border-accent\/50:hover { border-color: rgba(var(--accent-color-rgb), 0.5) !important; }
 
 /* Inverted / Broadsheet Banding */
 .band-black {
@@ -242,21 +283,6 @@ h1, h2, h3, .font-serif-display {
   box-shadow: 0 0 0 2px #ffffff !important;
 }
 
-.btn-editorial-pink:hover {
-  background-color: #ffffff;
-  color: #0d0d0d;
-  border-color: #ffffff;
-}
-
-.btn-editorial-pink:active {
-  transform: scale(0.97);
-}
-
-.btn-editorial-pink:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 2px #ffffff !important;
-}
-
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
@@ -265,7 +291,7 @@ h1, h2, h3, .font-serif-display {
   background: #0d0d0d;
 }
 ::-webkit-scrollbar-thumb {
-  background: #f5b8c9;
+  background: var(--accent-color);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
@@ -281,11 +307,11 @@ h1, h2, h3, .font-serif-display {
   border-radius: 2px;
 }
 .thin-pink-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(245, 184, 201, 0.4);
+  background: rgba(var(--accent-color-rgb), 0.4);
   border-radius: 2px;
 }
 .thin-pink-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #f5b8c9;
+  background: var(--accent-color);
 }
 
 /* 3D preserve transform */

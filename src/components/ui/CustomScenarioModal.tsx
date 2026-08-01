@@ -73,11 +73,11 @@ export const CustomScenarioModal: React.FC<CustomScenarioModalProps> = ({
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="bg-[#141414] border border-[#f5b8c9]/50 rounded-[12px] p-6 max-w-2xl w-full space-y-6 shadow-2xl my-8 text-left"
+        className="bg-[#141414] border border-pink/50 rounded-[12px] p-6 max-w-2xl w-full space-y-6 shadow-2xl my-8 text-left"
       >
         <div className="flex items-center justify-between border-b border-[#262626] pb-4">
           <div className="flex items-center gap-2">
-            <Target className="w-5 h-5 text-[#f5b8c9]" />
+            <Target className="w-5 h-5 text-pink" />
             <h2 className="font-display font-extrabold text-xl text-white uppercase tracking-wider">
               {initialScenario ? 'EDIT CUSTOM DRILL' : 'CREATE CUSTOM DRILL'}
             </h2>
@@ -99,7 +99,7 @@ export const CustomScenarioModal: React.FC<CustomScenarioModalProps> = ({
                 required
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full bg-[#0d0d0d] border border-[#262626] rounded-[12px] p-3 text-sm text-white font-bold focus:outline-none focus:border-[#f5b8c9]"
+                className="w-full bg-[#0d0d0d] border border-[#262626] rounded-[12px] p-3 text-sm text-white font-bold focus:outline-none focus:border-pink"
               />
             </div>
 
@@ -108,7 +108,7 @@ export const CustomScenarioModal: React.FC<CustomScenarioModalProps> = ({
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value as ScenarioCategory)}
-                className="w-full bg-[#0d0d0d] border border-[#262626] rounded-[12px] p-3 text-sm text-white focus:outline-none focus:border-[#f5b8c9]"
+                className="w-full bg-[#0d0d0d] border border-[#262626] rounded-[12px] p-3 text-sm text-white focus:outline-none focus:border-pink"
               >
                 <option value="clicking">CLICKING / FLICKING</option>
                 <option value="tracking">TRACKING / SMOOTHNESS</option>
@@ -124,7 +124,7 @@ export const CustomScenarioModal: React.FC<CustomScenarioModalProps> = ({
               type="text"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full bg-[#0d0d0d] border border-[#262626] rounded-[12px] p-3 text-xs text-white focus:outline-none focus:border-[#f5b8c9]"
+              className="w-full bg-[#0d0d0d] border border-[#262626] rounded-[12px] p-3 text-xs text-white focus:outline-none focus:border-pink"
             />
           </div>
 
@@ -137,7 +137,7 @@ export const CustomScenarioModal: React.FC<CustomScenarioModalProps> = ({
                 max="180"
                 value={durationSeconds}
                 onChange={(e) => setDurationSeconds(parseInt(e.target.value) || 60)}
-                className="w-full bg-[#0d0d0d] border border-[#262626] rounded-[12px] p-2.5 text-sm text-white focus:outline-none focus:border-[#f5b8c9]"
+                className="w-full bg-[#0d0d0d] border border-[#262626] rounded-[12px] p-2.5 text-sm text-white focus:outline-none focus:border-pink"
               />
             </div>
 
@@ -149,7 +149,7 @@ export const CustomScenarioModal: React.FC<CustomScenarioModalProps> = ({
                 max="10"
                 value={targetCount}
                 onChange={(e) => setTargetCount(parseInt(e.target.value) || 1)}
-                className="w-full bg-[#0d0d0d] border border-[#262626] rounded-[12px] p-2.5 text-sm text-white focus:outline-none focus:border-[#f5b8c9]"
+                className="w-full bg-[#0d0d0d] border border-[#262626] rounded-[12px] p-2.5 text-sm text-white focus:outline-none focus:border-pink"
               />
             </div>
 
@@ -162,7 +162,7 @@ export const CustomScenarioModal: React.FC<CustomScenarioModalProps> = ({
                 step="0.05"
                 value={targetRadius}
                 onChange={(e) => setTargetRadius(parseFloat(e.target.value))}
-                className="w-full accent-[#f5b8c9] bg-[#262626] rounded-lg h-2.5 mt-2"
+                className="w-full accent-pink bg-[#262626] rounded-lg h-2.5 mt-2"
               />
             </div>
 
@@ -175,7 +175,7 @@ export const CustomScenarioModal: React.FC<CustomScenarioModalProps> = ({
                 step="0.2"
                 value={targetSpeed}
                 onChange={(e) => setTargetSpeed(parseFloat(e.target.value))}
-                className="w-full accent-[#f5b8c9] bg-[#262626] rounded-lg h-2.5 mt-2"
+                className="w-full accent-pink bg-[#262626] rounded-lg h-2.5 mt-2"
               />
             </div>
           </div>
@@ -188,7 +188,7 @@ export const CustomScenarioModal: React.FC<CustomScenarioModalProps> = ({
                   type="button"
                   onClick={() => setHasLifetimeLimit(!hasLifetimeLimit)}
                   className={`px-3 py-1 rounded-[8px] text-[10px] font-bold border transition-all ${
-                    hasLifetimeLimit ? 'bg-[#f5b8c9] text-[#0d0d0d] border-[#f5b8c9]' : 'bg-[#141414] text-neutral-500 border-[#262626]'
+                    hasLifetimeLimit ? 'bg-pink text-[#0d0d0d] border-pink' : 'bg-[#141414] text-neutral-500 border-[#262626]'
                   }`}
                 >
                   {hasLifetimeLimit ? 'ENABLED' : 'DISABLED'}
@@ -207,7 +207,7 @@ export const CustomScenarioModal: React.FC<CustomScenarioModalProps> = ({
                     step="50"
                     value={lifetimeMs}
                     onChange={(e) => setLifetimeMs(parseInt(e.target.value))}
-                    className="w-full accent-[#f5b8c9] bg-[#262626] rounded-lg h-2"
+                    className="w-full accent-pink bg-[#262626] rounded-lg h-2"
                   />
                 </div>
               )}
@@ -222,7 +222,7 @@ export const CustomScenarioModal: React.FC<CustomScenarioModalProps> = ({
                     type="button"
                     onClick={() => setPathType(type)}
                     className={`py-1.5 rounded-[8px] text-[9px] font-bold uppercase border transition-all ${
-                      pathType === type ? 'bg-[#f5b8c9] text-[#0d0d0d] border-[#f5b8c9]' : 'bg-[#141414] text-neutral-400 border-[#262626]'
+                      pathType === type ? 'bg-pink text-[#0d0d0d] border-pink' : 'bg-[#141414] text-neutral-400 border-[#262626]'
                     }`}
                   >
                     {type}
@@ -235,7 +235,7 @@ export const CustomScenarioModal: React.FC<CustomScenarioModalProps> = ({
                   type="button"
                   onClick={() => setEnableJukes(!enableJukes)}
                   className={`px-2.5 py-0.5 rounded-[6px] text-[9px] font-bold border transition-all ${
-                    enableJukes ? 'bg-[#f5b8c9] text-[#0d0d0d] border-[#f5b8c9]' : 'bg-[#141414] text-neutral-500 border-[#262626]'
+                    enableJukes ? 'bg-pink text-[#0d0d0d] border-pink' : 'bg-[#141414] text-neutral-500 border-[#262626]'
                   }`}
                 >
                   {enableJukes ? 'ON' : 'OFF'}
@@ -253,7 +253,7 @@ export const CustomScenarioModal: React.FC<CustomScenarioModalProps> = ({
                   step="100"
                   value={directionChangeIntervalMs}
                   onChange={(e) => setDirectionChangeIntervalMs(parseInt(e.target.value))}
-                  className="w-full accent-[#f5b8c9] bg-[#262626] rounded-lg h-2"
+                  className="w-full accent-pink bg-[#262626] rounded-lg h-2"
                 />
               </div>
               {targetSpeed > 0 && (
@@ -269,7 +269,7 @@ export const CustomScenarioModal: React.FC<CustomScenarioModalProps> = ({
                     step="0.05"
                     value={speedVariance}
                     onChange={(e) => setSpeedVariance(parseFloat(e.target.value))}
-                    className="w-full accent-[#f5b8c9] bg-[#262626] rounded-lg h-2"
+                    className="w-full accent-pink bg-[#262626] rounded-lg h-2"
                   />
                 </div>
               )}
@@ -284,7 +284,7 @@ export const CustomScenarioModal: React.FC<CustomScenarioModalProps> = ({
                     type="button"
                     onClick={() => setArenaType(type)}
                     className={`py-2 rounded-[8px] text-[10px] font-bold uppercase border transition-all ${
-                      arenaType === type ? 'bg-[#f5b8c9] text-[#0d0d0d] border-[#f5b8c9]' : 'bg-[#141414] text-neutral-400 border-[#262626]'
+                      arenaType === type ? 'bg-pink text-[#0d0d0d] border-pink' : 'bg-[#141414] text-neutral-400 border-[#262626]'
                     }`}
                   >
                     {type}
@@ -316,7 +316,7 @@ export const CustomScenarioModal: React.FC<CustomScenarioModalProps> = ({
                   step="0.5"
                   value={playerDistance}
                   onChange={(e) => setPlayerDistance(parseFloat(e.target.value))}
-                  className="w-full accent-[#f5b8c9] bg-[#262626] rounded-lg h-2"
+                  className="w-full accent-pink bg-[#262626] rounded-lg h-2"
                 />
               </div>
             </div>

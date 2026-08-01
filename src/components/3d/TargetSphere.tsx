@@ -21,15 +21,6 @@ interface TargetSphereProps {
   onHit: (id: string, hitX: number, hitY: number) => void;
 }
 
-// High-Contrast Editorial Target Colors (Light Pink, Pure White, Bright Blush, Light Silver)
-// Black/Graphite targets removed for maximum visibility against dark arena background
-const TARGET_COLORS = [
-  '#f5b8c9', // Signature Light Pink
-  '#ffffff', // Pure White
-  '#ffc9d6', // Bright Soft Pink
-  '#e2e2e2', // High-Contrast Light Silver Gray
-];
-
 export const TargetSphere: React.FC<TargetSphereProps> = React.memo(({
   id,
   x,
@@ -50,6 +41,14 @@ export const TargetSphere: React.FC<TargetSphereProps> = React.memo(({
   const meshRef = useRef<THREE.Mesh>(null);
   const [hovered, setHovered] = useState(false);
   const targetSpeedMultiplier = useSettingsStore((s) => s.targetSpeedMultiplier) || 1.0;
+  const themeAccentColor = useSettingsStore((s) => s.themeAccentColor) || '#f5b8c9';
+
+  const TARGET_COLORS = [
+    themeAccentColor,
+    '#ffffff',
+    themeAccentColor,
+    '#e2e2e2',
+  ];
 
   // Local movement refs for imperative Three.js position animation without React re-renders
   const posRef = useRef({ x, y, z });
@@ -68,7 +67,6 @@ export const TargetSphere: React.FC<TargetSphereProps> = React.memo(({
     }
   }, [x, y, z, vx, vy, targetSpeed, targetSpeedMultiplier]);
 
-  // Pick deterministic palette color from high-contrast target colors
   const colorIndex =
     Math.abs(id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)) %
     TARGET_COLORS.length;
@@ -101,7 +99,6 @@ export const TargetSphere: React.FC<TargetSphereProps> = React.memo(({
       let curVx = velRef.current.vx;
       let curVy = velRef.current.vy;
 
-      // Periodic heading & speed drift
       if (now - lastChangeRef.current > directionChangeIntervalMs) {
         lastChangeRef.current = now;
         const speedMult = 1 + (Math.random() - 0.5) * (speedVariance * 2);
@@ -124,7 +121,6 @@ export const TargetSphere: React.FC<TargetSphereProps> = React.memo(({
         curY += Math.sin((now - spawnTime) * 0.004 * liveMult + phaseOffsetRef.current) * 0.6 * liveMult * delta;
       }
 
-      // Exact Geometric Wall & Floor Clearance Clamping (Accounts for Target Radius)
       const minX = -10.0 + radius + 0.1;
       const maxX = 10.0 - radius - 0.1;
       const minY = 0.0 + radius + 0.1;
@@ -192,7 +188,7 @@ export const TargetSphere: React.FC<TargetSphereProps> = React.memo(({
           wireframe={isWireframe}
           roughness={0.15}
           metalness={0.1}
-          emissive={activeColor === '#ffffff' ? '#f5b8c9' : activeColor}
+          emissive={activeColor === '#ffffff' ? themeAccentColor : activeColor}
           emissiveIntensity={glowIntensity}
         />
       </mesh>

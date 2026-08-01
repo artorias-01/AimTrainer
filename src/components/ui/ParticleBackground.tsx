@@ -120,7 +120,7 @@ export const ParticleBackground: React.FC = () => {
       window.removeEventListener('resize', handleResize);
       cancelAnimationFrame(animationFrameId);
     };
-  }, [performanceMode]);
+  }, [performanceMode, themeAccentColor]);
 
   if (performanceMode) return null;
 

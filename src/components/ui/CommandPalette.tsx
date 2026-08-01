@@ -70,10 +70,10 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -20 }}
-        className="bg-[#141414] border border-[#f5b8c9] rounded-[12px] max-w-xl w-full overflow-hidden shadow-2xl text-left"
+        className="bg-[#141414] border border-pink rounded-[12px] max-w-xl w-full overflow-hidden shadow-2xl text-left"
       >
         <div className="flex items-center gap-3 p-4 border-b border-[#262626] bg-[#0d0d0d]">
-          <Search className="w-5 h-5 text-[#f5b8c9]" />
+          <Search className="w-5 h-5 text-pink" />
           <input
             type="text"
             autoFocus
@@ -101,10 +101,10 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
                     key={p.id}
                     onClick={() => handleSelectPage(p.id)}
                     onMouseEnter={() => soundManager.playHover()}
-                    className="w-full flex items-center justify-between p-2.5 rounded-[8px] hover:bg-[#f5b8c9]/10 text-neutral-300 hover:text-[#f5b8c9] transition-colors group"
+                    className="w-full flex items-center justify-between p-2.5 rounded-[8px] hover:bg-pink/10 text-neutral-300 hover:text-pink transition-colors group"
                   >
                     <div className="flex items-center gap-2.5">
-                      <Icon className="w-4 h-4 text-[#f5b8c9]" />
+                      <Icon className="w-4 h-4 text-pink" />
                       <span className="font-bold">{p.name}</span>
                     </div>
                     <span className="text-[10px] text-neutral-500 group-hover:text-neutral-300">JUMP TO PAGE</span>
@@ -117,7 +117,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
           {/* Warmup Routines */}
           {filteredRoutines.length > 0 && (
             <div className="py-2 space-y-1">
-              <span className="text-[10px] text-[#f5b8c9] uppercase tracking-widest px-3 block font-bold">
+              <span className="text-[10px] text-pink uppercase tracking-widest px-3 block font-bold">
                 WARMUP ROUTINES
               </span>
               {filteredRoutines.map((r) => (
@@ -125,10 +125,10 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
                   key={r.id}
                   onClick={() => handleSelectRoutine(r)}
                   onMouseEnter={() => soundManager.playHover()}
-                  className="w-full flex items-center justify-between p-2.5 rounded-[8px] hover:bg-[#f5b8c9]/10 text-neutral-300 hover:text-[#f5b8c9] transition-colors group"
+                  className="w-full flex items-center justify-between p-2.5 rounded-[8px] hover:bg-pink/10 text-neutral-300 hover:text-pink transition-colors group"
                 >
                   <div className="flex items-center gap-2.5">
-                    <Layers className="w-4 h-4 text-[#f5b8c9]" />
+                    <Layers className="w-4 h-4 text-pink" />
                     <span className="font-bold">{r.name}</span>
                   </div>
                   <span className="text-[10px] text-neutral-500 group-hover:text-neutral-300">{r.drillIds.length} DRILLS</span>
@@ -148,13 +148,13 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
                   key={sc.id}
                   onClick={() => handleSelectScenario(sc.id)}
                   onMouseEnter={() => soundManager.playHover()}
-                  className="w-full flex items-center justify-between p-2.5 rounded-[8px] hover:bg-[#f5b8c9]/10 text-neutral-300 hover:text-[#f5b8c9] transition-colors group"
+                  className="w-full flex items-center justify-between p-2.5 rounded-[8px] hover:bg-pink/10 text-neutral-300 hover:text-pink transition-colors group"
                 >
                   <div className="flex items-center gap-2.5">
-                    <Target className="w-4 h-4 text-neutral-400 group-hover:text-[#f5b8c9]" />
+                    <Target className="w-4 h-4 text-neutral-400 group-hover:text-pink" />
                     <span className="font-bold">{sc.name}</span>
                     {sc.isCustom && (
-                      <span className="text-[9px] bg-[#f5b8c9] text-[#0d0d0d] font-bold px-1.5 py-0.5 rounded">CUSTOM</span>
+                      <span className="text-[9px] bg-pink text-[#0d0d0d] font-bold px-1.5 py-0.5 rounded">CUSTOM</span>
                     )}
                   </div>
                   <span className="text-[10px] text-neutral-500 group-hover:text-neutral-300 uppercase">

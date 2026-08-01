@@ -74,7 +74,7 @@ export function App() {
   };
 
   return (
-    <div className="relative min-h-screen bg-[#0d0d0d] text-white flex flex-col font-sans-ui selection:bg-[#f5b8c9] selection:text-[#0d0d0d]">
+    <div className="relative min-h-screen bg-[#0d0d0d] text-white flex flex-col font-sans-ui selection:bg-pink selection:text-[#0d0d0d]">
       {/* 3D Intro Transition (played once per session) */}
       {showIntro && <IntroTransition onComplete={() => setShowIntro(false)} />}
 

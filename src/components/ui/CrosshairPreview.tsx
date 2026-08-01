@@ -126,7 +126,7 @@ export const CrosshairPreview: React.FC<CrosshairPreviewProps> = ({
               onClick={() => setBgSwatch(swatch)}
               className={`px-2 py-0.5 rounded-[6px] font-bold uppercase transition-all ${
                 bgSwatch === swatch
-                  ? 'bg-[#f5b8c9] text-[#0d0d0d]'
+                  ? 'bg-pink text-[#0d0d0d]'
                   : 'bg-[#141414] text-neutral-400 hover:text-white'
               }`}
             >

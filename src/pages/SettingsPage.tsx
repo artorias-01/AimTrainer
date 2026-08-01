@@ -149,8 +149,8 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
       <div className="relative z-10">
         {/* Save Confirmation Toast */}
       {saveToast && (
-        <div className="fixed bottom-6 right-6 z-50 bg-[#141414] border border-[#f5b8c9] text-white px-4 py-3 rounded-[12px] text-xs font-mono flex items-center gap-2.5 shadow-xl animate-fade-in">
-          <CheckCircle2 className="w-4 h-4 text-[#f5b8c9]" />
+        <div className="fixed bottom-6 right-6 z-50 bg-[#141414] border border-pink text-white px-4 py-3 rounded-[12px] text-xs font-mono flex items-center gap-2.5 shadow-xl animate-fade-in">
+          <CheckCircle2 className="w-4 h-4 text-pink" />
           <span>{saveToast}</span>
         </div>
       )}
@@ -198,9 +198,9 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
                 OPTIONS
               </h1>
               <div className="flex items-center justify-center gap-3 w-48 mx-auto opacity-75">
-                <div className="h-px bg-gradient-to-r from-transparent to-[#f5b8c9] flex-1" />
-                <span className="text-[#f5b8c9] text-xs font-mono">◆</span>
-                <div className="h-px bg-gradient-to-l from-transparent to-[#f5b8c9] flex-1" />
+                <div className="h-px bg-gradient-to-r from-transparent to-pink flex-1" />
+                <span className="text-pink text-xs font-mono">◆</span>
+                <div className="h-px bg-gradient-to-l from-transparent to-pink flex-1" />
               </div>
             </div>
 
@@ -220,14 +220,14 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
                     setActiveCategory(cat.id as any);
                   }}
                   onMouseEnter={() => soundManager.playHover()}
-                  className="group relative font-display font-extrabold text-xl md:text-3xl tracking-widest text-neutral-300 hover:text-[#f5b8c9] transition-colors duration-200 py-1 flex items-center justify-center gap-3 focus:outline-none"
+                  className="group relative font-display font-extrabold text-xl md:text-3xl tracking-widest text-neutral-300 hover:text-pink transition-colors duration-200 py-1 flex items-center justify-center gap-3 focus:outline-none"
                 >
-                  <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-[#f5b8c9] font-mono text-base">‹</span>
+                  <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-pink font-mono text-base">‹</span>
                   <span className="relative">
                     {cat.label}
-                    <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-[#f5b8c9] group-hover:w-full transition-all duration-250 ease-out" />
+                    <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-pink group-hover:w-full transition-all duration-250 ease-out" />
                   </span>
-                  <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-[#f5b8c9] font-mono text-base">›</span>
+                  <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-pink font-mono text-base">›</span>
                 </button>
               ))}
 
@@ -245,12 +245,12 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
                   onMouseEnter={() => soundManager.playHover()}
                   className="group relative font-display font-bold text-lg md:text-2xl tracking-widest text-neutral-400 hover:text-white transition-colors duration-200 py-1 flex items-center justify-center gap-2 focus:outline-none"
                 >
-                  <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-[#f5b8c9] font-mono text-sm">‹</span>
+                  <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-pink font-mono text-sm">‹</span>
                   <span className="relative">
                     BACK
-                    <span className="absolute bottom-0 left-0 w-0 h-[1.5px] bg-[#f5b8c9] group-hover:w-full transition-all duration-250 ease-out" />
+                    <span className="absolute bottom-0 left-0 w-0 h-[1.5px] bg-pink group-hover:w-full transition-all duration-250 ease-out" />
                   </span>
-                  <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-[#f5b8c9] font-mono text-sm">›</span>
+                  <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-pink font-mono text-sm">›</span>
                 </button>
               </div>
             </div>
@@ -274,7 +274,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
                     setActiveCategory(null);
                   }}
                   onMouseEnter={() => soundManager.playHover()}
-                  className="text-[#f5b8c9] hover:text-white font-bold transition-colors flex items-center gap-1.5 focus:outline-none"
+                  className="text-pink hover:text-white font-bold transition-colors flex items-center gap-1.5 focus:outline-none"
                 >
                   <ArrowLeft className="w-4 h-4" /> OPTIONS
                 </button>
@@ -288,7 +288,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
                   setActiveCategory(null);
                 }}
                 onMouseEnter={() => soundManager.playHover()}
-                className="text-xs font-mono text-neutral-400 hover:text-[#f5b8c9] transition-colors"
+                className="text-xs font-mono text-neutral-400 hover:text-pink transition-colors"
               >
                 RETURN TO CATEGORIES
               </button>
@@ -299,8 +299,8 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
               <div className="space-y-8">
                 {/* User Profile Handle */}
                 <div className="bg-[#141414] border border-[#262626] rounded-[12px] p-8 space-y-4">
-                  <h3 className="font-mono text-xs text-[#f5b8c9] uppercase tracking-widest flex items-center gap-2">
-                    <User className="w-4 h-4 text-[#f5b8c9]" /> PLAYER DISPLAY HANDLE
+                  <h3 className="font-mono text-xs text-pink uppercase tracking-widest flex items-center gap-2">
+                    <User className="w-4 h-4 text-pink" /> PLAYER DISPLAY HANDLE
                   </h3>
                   <div className="space-y-2">
                     <label className="text-xs font-mono text-neutral-400">LOCAL HANDLE (SAVED LOCALLY)</label>
@@ -311,7 +311,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
                         setDisplayName(e.target.value.toUpperCase().replace(/\s+/g, '_'));
                         showSaveConfirmation('HANDLE UPDATED');
                       }}
-                      className="w-full bg-[#0d0d0d] border border-[#262626] rounded-[12px] p-3 text-sm font-mono text-white font-bold tracking-wider focus:outline-none focus:border-[#f5b8c9] focus-visible:ring-2 focus-visible:ring-[#f5b8c9]"
+                      className="w-full bg-[#0d0d0d] border border-[#262626] rounded-[12px] p-3 text-sm font-mono text-white font-bold tracking-wider focus:outline-none focus:border-pink focus-visible:ring-2 focus-visible:ring-pink"
                     />
                   </div>
                 </div>
@@ -319,10 +319,10 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
                 {/* Sensitivity & DPI Calculator */}
                 <div className="bg-[#141414] border border-[#262626] rounded-[12px] p-8 space-y-6">
                   <div className="flex items-center justify-between border-b border-[#262626] pb-4">
-                    <h3 className="font-mono text-xs text-[#f5b8c9] uppercase tracking-widest flex items-center gap-2">
-                      <Sliders className="w-4 h-4 text-[#f5b8c9]" /> SENSITIVITY & DPI CALCULATOR
+                    <h3 className="font-mono text-xs text-pink uppercase tracking-widest flex items-center gap-2">
+                      <Sliders className="w-4 h-4 text-pink" /> SENSITIVITY & DPI CALCULATOR
                     </h3>
-                    <span className="text-xs font-mono bg-[#f5b8c9] text-[#0d0d0d] font-bold px-3 py-1 rounded-[12px]">
+                    <span className="text-xs font-mono bg-pink text-[#0d0d0d] font-bold px-3 py-1 rounded-[12px]">
                       {cm360} CM / 360°
                     </span>
                   </div>
@@ -339,7 +339,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
                           }}
                           className={`py-2.5 rounded-[12px] text-xs font-mono font-bold tracking-wider transition-all border ${
                             settings.engine === eng.id
-                              ? 'bg-[#f5b8c9] text-[#0d0d0d] border-[#f5b8c9]'
+                              ? 'bg-pink text-[#0d0d0d] border-pink'
                               : 'bg-[#0d0d0d] text-neutral-400 border-[#262626] hover:text-white'
                           }`}
                         >
@@ -360,7 +360,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
                           updateSettings({ sensitivity: parseFloat(e.target.value) || 0.1 });
                           showSaveConfirmation('SENSITIVITY UPDATED');
                         }}
-                        className="w-full bg-[#0d0d0d] border border-[#262626] rounded-[12px] p-3 text-sm font-mono text-white focus:outline-none focus:border-[#f5b8c9] focus-visible:ring-2 focus-visible:ring-[#f5b8c9]"
+                        className="w-full bg-[#0d0d0d] border border-[#262626] rounded-[12px] p-3 text-sm font-mono text-white focus:outline-none focus:border-pink focus-visible:ring-2 focus-visible:ring-pink"
                       />
                     </div>
 
@@ -372,7 +372,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
                           updateSettings({ dpi: parseInt(e.target.value) });
                           showSaveConfirmation('DPI UPDATED');
                         }}
-                        className="w-full bg-[#0d0d0d] border border-[#262626] rounded-[12px] p-3 text-sm font-mono text-white focus:outline-none focus:border-[#f5b8c9] focus-visible:ring-2 focus-visible:ring-[#f5b8c9]"
+                        className="w-full bg-[#0d0d0d] border border-[#262626] rounded-[12px] p-3 text-sm font-mono text-white focus:outline-none focus:border-pink focus-visible:ring-2 focus-visible:ring-pink"
                       >
                         <option value={400}>400 DPI</option>
                         <option value={800}>800 DPI</option>
@@ -397,7 +397,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
                           showSaveConfirmation('CM/360 UPDATED');
                         }
                       }}
-                      className="w-full bg-[#0d0d0d] border border-[#262626] rounded-[12px] p-3 text-sm font-mono text-[#f5b8c9] font-bold focus:outline-none focus:border-[#f5b8c9] focus-visible:ring-2 focus-visible:ring-[#f5b8c9]"
+                      className="w-full bg-[#0d0d0d] border border-[#262626] rounded-[12px] p-3 text-sm font-mono text-pink font-bold focus:outline-none focus:border-pink focus-visible:ring-2 focus-visible:ring-pink"
                     />
                   </div>
                 </div>
@@ -405,8 +405,8 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
                 {/* Global Target Pacing Multiplier */}
                 <div className="bg-[#141414] border border-[#262626] rounded-[12px] p-8 space-y-4">
                   <div className="flex items-center justify-between border-b border-[#262626] pb-4">
-                    <h3 className="font-mono text-xs text-[#f5b8c9] uppercase tracking-widest flex items-center gap-2">
-                      <Gauge className="w-4 h-4 text-[#f5b8c9]" /> GLOBAL TARGET PACING MULTIPLIER
+                    <h3 className="font-mono text-xs text-pink uppercase tracking-widest flex items-center gap-2">
+                      <Gauge className="w-4 h-4 text-pink" /> GLOBAL TARGET PACING MULTIPLIER
                     </h3>
                     <span className="text-xs font-mono text-white font-bold bg-[#0d0d0d] px-3 py-1 rounded-[12px] border border-[#262626]">
                       {targetSpeedMultiplier}x PACING
@@ -425,7 +425,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
                         }}
                         className={`py-2 rounded-[12px] text-xs font-mono font-bold transition-all border ${
                           targetSpeedMultiplier === p.value
-                            ? 'bg-[#f5b8c9] text-[#0d0d0d] border-[#f5b8c9]'
+                            ? 'bg-pink text-[#0d0d0d] border-pink'
                             : 'bg-[#0d0d0d] text-neutral-400 border-[#262626] hover:text-white'
                         }`}
                       >
@@ -459,8 +459,8 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
             {activeCategory === 'audio' && (
               <div className="bg-[#141414] border border-[#262626] rounded-[12px] p-8 space-y-6">
                 <div className="flex items-center justify-between border-b border-[#262626] pb-4">
-                  <h3 className="font-mono text-xs text-[#f5b8c9] uppercase tracking-widest flex items-center gap-2">
-                    <Volume2 className="w-4 h-4 text-[#f5b8c9]" /> AUDIO & SOUND EFFECTS
+                  <h3 className="font-mono text-xs text-pink uppercase tracking-widest flex items-center gap-2">
+                    <Volume2 className="w-4 h-4 text-pink" /> AUDIO & SOUND EFFECTS
                   </h3>
                   <button
                     onClick={() => {
@@ -469,7 +469,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
                     }}
                     className={`px-3 py-1.5 rounded-[12px] text-xs font-mono font-bold flex items-center gap-2 border transition-all ${
                       soundEnabled
-                        ? 'bg-[#f5b8c9] text-[#0d0d0d] border-[#f5b8c9]'
+                        ? 'bg-pink text-[#0d0d0d] border-pink'
                         : 'bg-[#0d0d0d] text-neutral-500 border-[#262626]'
                     }`}
                   >
@@ -491,7 +491,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
                       step="0.05"
                       value={masterVolume}
                       onChange={(e) => setMasterVolume(parseFloat(e.target.value))}
-                      className="w-full accent-[#f5b8c9] bg-[#262626] rounded-lg h-2"
+                      className="w-full accent-pink bg-[#262626] rounded-lg h-2"
                     />
                   </div>
 
@@ -507,7 +507,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
                       step="0.05"
                       value={hitVolume}
                       onChange={(e) => setHitVolume(parseFloat(e.target.value))}
-                      className="w-full accent-[#f5b8c9] bg-[#262626] rounded-lg h-2"
+                      className="w-full accent-pink bg-[#262626] rounded-lg h-2"
                     />
                   </div>
                 </div>
@@ -518,8 +518,8 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
             {activeCategory === 'video' && (
               <div className="bg-[#141414] border border-[#262626] rounded-[12px] p-8 space-y-4">
                 <div className="flex items-center justify-between border-b border-[#262626] pb-4">
-                  <h3 className="font-mono text-xs text-[#f5b8c9] uppercase tracking-widest flex items-center gap-2">
-                    <Tv className="w-4 h-4 text-[#f5b8c9]" /> VIDEO & PERFORMANCE MODE
+                  <h3 className="font-mono text-xs text-pink uppercase tracking-widest flex items-center gap-2">
+                    <Tv className="w-4 h-4 text-pink" /> VIDEO & PERFORMANCE MODE
                   </h3>
                   <button
                     onClick={() => {
@@ -528,7 +528,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
                     }}
                     className={`px-3.5 py-1.5 rounded-[12px] text-xs font-mono font-bold flex items-center gap-2 border transition-all ${
                       performanceMode
-                        ? 'bg-[#f5b8c9] text-[#0d0d0d] border-[#f5b8c9]'
+                        ? 'bg-pink text-[#0d0d0d] border-pink'
                         : 'bg-[#0d0d0d] text-neutral-400 border-[#262626] hover:text-white'
                     }`}
                   >
@@ -543,7 +543,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
                 {/* UI Theme Accent Color Customizer */}
                 <div className="space-y-4 bg-[#0d0d0d] p-5 rounded-[12px] border border-[#262626]">
                   <div className="flex justify-between items-center border-b border-[#262626] pb-3">
-                    <label className="text-[10px] font-mono text-[#f5b8c9] uppercase tracking-widest block font-bold">
+                    <label className="text-[10px] font-mono text-pink uppercase tracking-widest block font-bold">
                       UI THEME ACCENT COLOR
                     </label>
                     <div className="flex items-center gap-2">
@@ -642,7 +642,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
                 {/* Target Shape & Parameter Studio */}
                 <div className="space-y-4 bg-[#0d0d0d] p-5 rounded-[12px] border border-[#262626]">
                   <div className="flex justify-between items-center border-b border-[#262626] pb-3">
-                    <label className="text-[10px] font-mono text-[#f5b8c9] uppercase tracking-widest block font-bold">
+                    <label className="text-[10px] font-mono text-pink uppercase tracking-widest block font-bold">
                       TARGET GEOMETRY & PARAMETER STUDIO
                     </label>
                   </div>
@@ -673,7 +673,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
                           }}
                           className={`py-2 rounded-[12px] text-xs font-mono font-bold transition-all border ${
                             targetShapeConfig.shape === s.id
-                              ? 'bg-[#f5b8c9] text-[#0d0d0d] border-[#f5b8c9]'
+                              ? 'bg-pink text-[#0d0d0d] border-pink'
                               : 'bg-[#141414] text-neutral-400 border-[#262626] hover:text-white'
                           }`}
                         >
@@ -698,7 +698,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
                         step="0.05"
                         value={targetShapeConfig.scale ?? 1.0}
                         onChange={(e) => setTargetShapeConfig({ scale: parseFloat(e.target.value) })}
-                        className="w-full accent-[#f5b8c9] bg-[#262626] rounded-lg h-2"
+                        className="w-full accent-pink bg-[#262626] rounded-lg h-2"
                       />
                     </div>
 
@@ -715,7 +715,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
                         step="0.05"
                         value={targetShapeConfig.emissiveIntensity ?? 0.65}
                         onChange={(e) => setTargetShapeConfig({ emissiveIntensity: parseFloat(e.target.value) })}
-                        className="w-full accent-[#f5b8c9] bg-[#262626] rounded-lg h-2"
+                        className="w-full accent-pink bg-[#262626] rounded-lg h-2"
                       />
                     </div>
 
@@ -727,7 +727,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
                         onClick={() => setTargetShapeConfig({ wireframe: !targetShapeConfig.wireframe })}
                         className={`px-3 py-1 rounded-[8px] text-[10px] font-bold border transition-all ${
                           targetShapeConfig.wireframe
-                            ? 'bg-[#f5b8c9] text-[#0d0d0d] border-[#f5b8c9]'
+                            ? 'bg-pink text-[#0d0d0d] border-pink'
                             : 'bg-[#0d0d0d] text-neutral-400 border-[#262626]'
                         }`}
                       >
@@ -743,7 +743,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
                         onClick={() => setTargetShapeConfig({ idleRotation: !targetShapeConfig.idleRotation })}
                         className={`px-3 py-1 rounded-[8px] text-[10px] font-bold border transition-all ${
                           targetShapeConfig.idleRotation !== false
-                            ? 'bg-[#f5b8c9] text-[#0d0d0d] border-[#f5b8c9]'
+                            ? 'bg-pink text-[#0d0d0d] border-pink'
                             : 'bg-[#0d0d0d] text-neutral-400 border-[#262626]'
                         }`}
                       >
@@ -778,7 +778,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
                           setTargetColor(val);
                         }}
                         placeholder="#f5b8c9"
-                        className="flex-1 bg-[#141414] border border-[#262626] rounded-[12px] p-2.5 text-xs text-white font-mono uppercase focus:outline-none focus:border-[#f5b8c9]"
+                        className="flex-1 bg-[#141414] border border-[#262626] rounded-[12px] p-2.5 text-xs text-white font-mono uppercase focus:outline-none focus:border-pink"
                       />
                       <button
                         onClick={() => {
@@ -803,7 +803,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
 
                 {/* Cosmetic Arena Backdrops & Wall Color */}
                 <div className="space-y-4 bg-[#0d0d0d] p-5 rounded-[12px] border border-[#262626]">
-                  <label className="text-[10px] font-mono text-[#f5b8c9] uppercase tracking-widest block font-bold">
+                  <label className="text-[10px] font-mono text-pink uppercase tracking-widest block font-bold">
                     COSMETIC ARENA BACKDROP & WALL COLOR
                   </label>
                   <div className="grid grid-cols-3 gap-2">
@@ -820,7 +820,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
                         }}
                         className={`py-2 rounded-[12px] text-xs font-mono font-bold transition-all border ${
                           arenaBackdrop === backdrop.id
-                            ? 'bg-[#f5b8c9] text-[#0d0d0d] border-[#f5b8c9]'
+                            ? 'bg-pink text-[#0d0d0d] border-pink'
                             : 'bg-[#141414] text-neutral-400 border-[#262626] hover:text-white'
                         }`}
                       >
@@ -852,7 +852,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
                         value={arenaColor || '#121212'}
                         onChange={(e) => setArenaColor(e.target.value)}
                         placeholder="#121212"
-                        className="flex-1 bg-[#141414] border border-[#262626] rounded-[12px] p-2.5 text-xs text-white font-mono uppercase focus:outline-none focus:border-[#f5b8c9]"
+                        className="flex-1 bg-[#141414] border border-[#262626] rounded-[12px] p-2.5 text-xs text-white font-mono uppercase focus:outline-none focus:border-pink"
                       />
                       <button
                         onClick={() => {
@@ -873,8 +873,8 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
             {activeCategory === 'controls' && (
               <div className="bg-[#141414] border border-[#262626] rounded-[12px] p-8 space-y-6">
                 <div className="flex items-center justify-between border-b border-[#262626] pb-4">
-                  <h3 className="font-mono text-xs text-[#f5b8c9] uppercase tracking-widest flex items-center gap-2">
-                    <Gamepad2 className="w-4 h-4 text-[#f5b8c9]" /> KEYBIND REBINDING STUDIO
+                  <h3 className="font-mono text-xs text-pink uppercase tracking-widest flex items-center gap-2">
+                    <Gamepad2 className="w-4 h-4 text-pink" /> KEYBIND REBINDING STUDIO
                   </h3>
                   <span className="text-xs font-mono text-neutral-400">CUSTOM HOTKEYS</span>
                 </div>
@@ -889,8 +889,8 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
                       onClick={() => setListeningKeyFor('pause')}
                       className={`px-4 py-2 rounded-[12px] font-mono text-xs font-bold border transition-all ${
                         listeningKeyFor === 'pause'
-                          ? 'bg-[#f5b8c9] text-[#0d0d0d] border-[#f5b8c9] animate-pulse'
-                          : 'bg-[#1a1a1a] text-white border-[#2d2d2d] hover:border-[#f5b8c9]'
+                          ? 'bg-pink text-[#0d0d0d] border-pink animate-pulse'
+                          : 'bg-[#1a1a1a] text-white border-[#2d2d2d] hover:border-pink'
                       }`}
                     >
                       {listeningKeyFor === 'pause' ? 'PRESS ANY KEY...' : pauseKey}
@@ -906,8 +906,8 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
                       onClick={() => setListeningKeyFor('restart')}
                       className={`px-4 py-2 rounded-[12px] font-mono text-xs font-bold border transition-all ${
                         listeningKeyFor === 'restart'
-                          ? 'bg-[#f5b8c9] text-[#0d0d0d] border-[#f5b8c9] animate-pulse'
-                          : 'bg-[#1a1a1a] text-white border-[#2d2d2d] hover:border-[#f5b8c9]'
+                          ? 'bg-pink text-[#0d0d0d] border-pink animate-pulse'
+                          : 'bg-[#1a1a1a] text-white border-[#2d2d2d] hover:border-pink'
                       }`}
                     >
                       {listeningKeyFor === 'restart' ? 'PRESS ANY KEY...' : restartKey}

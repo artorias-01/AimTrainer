@@ -32,12 +32,12 @@ export const OnboardingOverlay: React.FC<OnboardingOverlayProps> = ({ onDismiss 
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="bg-[#141414] border border-[#f5b8c9] rounded-[12px] p-8 max-w-lg w-full space-y-6 shadow-2xl text-left"
+        className="bg-[#141414] border border-pink rounded-[12px] p-8 max-w-lg w-full space-y-6 shadow-2xl text-left"
       >
         <div className="flex items-center justify-between border-b border-[#262626] pb-4">
           <div className="flex items-center gap-2">
-            <Crosshair className="w-5 h-5 text-[#f5b8c9]" />
-            <span className="font-mono text-xs text-[#f5b8c9] font-bold tracking-widest uppercase">
+            <Crosshair className="w-5 h-5 text-pink" />
+            <span className="font-mono text-xs text-pink font-bold tracking-widest uppercase">
               WELCOME TO AIM // TT — STEP {step} OF 3
             </span>
           </div>
@@ -59,14 +59,14 @@ export const OnboardingOverlay: React.FC<OnboardingOverlayProps> = ({ onDismiss 
               transition={{ duration: 0.2 }}
               className="space-y-4"
             >
-              <div className="w-12 h-12 rounded-[12px] bg-[#0d0d0d] border border-[#262626] flex items-center justify-center text-[#f5b8c9]">
+              <div className="w-12 h-12 rounded-[12px] bg-[#0d0d0d] border border-[#262626] flex items-center justify-center text-pink">
                 <Sliders className="w-6 h-6" />
               </div>
               <h2 className="font-display font-extrabold text-2xl text-white">
                 SENSITIVITY & CM/360 CALIBRATION
               </h2>
               <p className="font-sans-ui text-xs text-neutral-400 leading-relaxed">
-                AIM // TT supports exact sensitivity engine scaling across Valorant, CS2, Overwatch 2, and Apex Legends. Calibrate your DPI and game multiplier in <span className="text-[#f5b8c9] font-bold">Options</span> for 1:1 muscle memory transfer.
+                AIM // TT supports exact sensitivity engine scaling across Valorant, CS2, Overwatch 2, and Apex Legends. Calibrate your DPI and game multiplier in <span className="text-pink font-bold">Options</span> for 1:1 muscle memory transfer.
               </p>
             </motion.div>
           )}
@@ -80,7 +80,7 @@ export const OnboardingOverlay: React.FC<OnboardingOverlayProps> = ({ onDismiss 
               transition={{ duration: 0.2 }}
               className="space-y-4"
             >
-              <div className="w-12 h-12 rounded-[12px] bg-[#0d0d0d] border border-[#262626] flex items-center justify-center text-[#f5b8c9]">
+              <div className="w-12 h-12 rounded-[12px] bg-[#0d0d0d] border border-[#262626] flex items-center justify-center text-pink">
                 <MousePointer className="w-6 h-6" />
               </div>
               <h2 className="font-display font-extrabold text-2xl text-white">
@@ -101,14 +101,14 @@ export const OnboardingOverlay: React.FC<OnboardingOverlayProps> = ({ onDismiss 
               transition={{ duration: 0.2 }}
               className="space-y-4"
             >
-              <div className="w-12 h-12 rounded-[12px] bg-[#0d0d0d] border border-[#262626] flex items-center justify-center text-[#f5b8c9]">
+              <div className="w-12 h-12 rounded-[12px] bg-[#0d0d0d] border border-[#262626] flex items-center justify-center text-pink">
                 <ShieldAlert className="w-6 h-6" />
               </div>
               <h2 className="font-display font-extrabold text-2xl text-white">
                 CONTROLS & REBINDING
               </h2>
               <p className="font-sans-ui text-xs text-neutral-400 leading-relaxed">
-                Left click to shoot targets. Press <span className="text-[#f5b8c9] font-bold">[Escape]</span> at any point to pause and unlock your mouse cursor. Rebind controls anytime under <span className="text-[#f5b8c9] font-bold">Options / Controls</span>.
+                Left click to shoot targets. Press <span className="text-pink font-bold">[Escape]</span> at any point to pause and unlock your mouse cursor. Rebind controls anytime under <span className="text-pink font-bold">Options / Controls</span>.
               </p>
             </motion.div>
           )}
@@ -120,7 +120,7 @@ export const OnboardingOverlay: React.FC<OnboardingOverlayProps> = ({ onDismiss 
               <div
                 key={i}
                 className={`h-1.5 rounded-full transition-all ${
-                  step === i ? 'w-6 bg-[#f5b8c9]' : 'w-2 bg-[#262626]'
+                  step === i ? 'w-6 bg-pink' : 'w-2 bg-[#262626]'
                 }`}
               />
             ))}

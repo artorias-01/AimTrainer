@@ -55,7 +55,7 @@ export const LibraryPage: React.FC<LibraryPageProps> = ({ onNavigate }) => {
     e.stopPropagation();
     soundManager.playClick();
     deleteCustomScenario(id);
-    setActiveCategory(activeCategory); // Trigger re-render
+    setActiveCategory(activeCategory);
   };
 
   const handleDeleteRoutine = (e: React.MouseEvent, id: string) => {
@@ -112,7 +112,7 @@ export const LibraryPage: React.FC<LibraryPageProps> = ({ onNavigate }) => {
       {/* Header */}
       <div className="max-w-7xl mx-auto space-y-4 border-b border-[#262626] pb-8 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
         <div className="space-y-3">
-          <div className="flex items-center gap-2 font-mono text-xs text-[#f5b8c9] uppercase tracking-widest">
+          <div className="flex items-center gap-2 font-mono text-xs text-pink uppercase tracking-widest">
             <Filter className="w-3.5 h-3.5" />
             DRILL CATALOG // {allScenarios.length} DRILLS AVAILABLE
           </div>
@@ -140,9 +140,9 @@ export const LibraryPage: React.FC<LibraryPageProps> = ({ onNavigate }) => {
               soundManager.playClick();
               setShowRoutineModal(true);
             }}
-            className="px-4 py-2.5 rounded-[12px] bg-[#1a1a1a] hover:bg-[#262626] text-white border border-[#262626] hover:border-[#f5b8c9] text-xs font-mono font-bold flex items-center gap-2 transition-all"
+            className="px-4 py-2.5 rounded-[12px] bg-[#1a1a1a] hover:bg-[#262626] text-white border border-[#262626] hover:border-pink text-xs font-mono font-bold flex items-center gap-2 transition-all"
           >
-            <Layers className="w-4 h-4 text-[#f5b8c9]" /> NEW ROUTINE
+            <Layers className="w-4 h-4 text-pink" /> NEW ROUTINE
           </button>
         </div>
       </div>
@@ -154,7 +154,7 @@ export const LibraryPage: React.FC<LibraryPageProps> = ({ onNavigate }) => {
             onClick={() => setActiveTab('drills')}
             className={`pb-2 font-bold uppercase tracking-widest transition-all ${
               activeTab === 'drills'
-                ? 'text-[#f5b8c9] border-b-2 border-[#f5b8c9]'
+                ? 'text-pink border-b-2 border-pink'
                 : 'text-neutral-400 hover:text-white'
             }`}
           >
@@ -164,7 +164,7 @@ export const LibraryPage: React.FC<LibraryPageProps> = ({ onNavigate }) => {
             onClick={() => setActiveTab('routines')}
             className={`pb-2 font-bold uppercase tracking-widest transition-all ${
               activeTab === 'routines'
-                ? 'text-[#f5b8c9] border-b-2 border-[#f5b8c9]'
+                ? 'text-pink border-b-2 border-pink'
                 : 'text-neutral-400 hover:text-white'
             }`}
           >
@@ -174,7 +174,7 @@ export const LibraryPage: React.FC<LibraryPageProps> = ({ onNavigate }) => {
             onClick={() => setActiveTab('benchmark')}
             className={`pb-2 font-bold uppercase tracking-widest transition-all ${
               activeTab === 'benchmark'
-                ? 'text-[#f5b8c9] border-b-2 border-[#f5b8c9]'
+                ? 'text-pink border-b-2 border-pink'
                 : 'text-neutral-400 hover:text-white'
             }`}
           >
@@ -196,10 +196,10 @@ export const LibraryPage: React.FC<LibraryPageProps> = ({ onNavigate }) => {
                   setActiveCategory(cat.id);
                 }}
                 onMouseEnter={() => soundManager.playHover()}
-                className={`px-5 py-2.5 rounded-[12px] text-xs font-mono font-bold tracking-wider transition-all duration-150 active:scale-95 border focus-visible:ring-2 focus-visible:ring-[#f5b8c9] ${
+                className={`px-5 py-2.5 rounded-[12px] text-xs font-mono font-bold tracking-wider transition-all duration-150 active:scale-95 border focus-visible:ring-2 focus-visible:ring-pink ${
                   activeCategory === cat.id
-                    ? 'bg-[#f5b8c9] text-[#0d0d0d] border-[#f5b8c9]'
-                    : 'bg-[#141414] text-neutral-400 border-[#262626] hover:text-white hover:border-[#f5b8c9]/50'
+                    ? 'bg-pink text-[#0d0d0d] border-pink'
+                    : 'bg-[#141414] text-neutral-400 border-[#262626] hover:text-white hover:border-pink/50'
                 }`}
               >
                 {cat.label}
@@ -219,12 +219,12 @@ export const LibraryPage: React.FC<LibraryPageProps> = ({ onNavigate }) => {
                     setSelectedModalScenario(sc);
                   }}
                   onMouseEnter={() => soundManager.playHover()}
-                  className="bg-[#141414] border border-[#262626] rounded-[12px] p-8 flex flex-col justify-between space-y-6 hover:border-[#f5b8c9] transition-all duration-200 group active:scale-[0.99] relative"
+                  className="bg-[#141414] border border-[#262626] rounded-[12px] p-8 flex flex-col justify-between space-y-6 hover:border-pink transition-all duration-200 group active:scale-[0.99] relative"
                 >
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-mono font-bold text-[#0d0d0d] bg-[#f5b8c9] px-2.5 py-1 rounded-[6px]">
+                        <span className="text-[10px] font-mono font-bold text-[#0d0d0d] bg-pink px-2.5 py-1 rounded-[6px]">
                           {sc.category.toUpperCase()}
                         </span>
                         {sc.isCustom && (
@@ -239,7 +239,7 @@ export const LibraryPage: React.FC<LibraryPageProps> = ({ onNavigate }) => {
                     </div>
 
                     <div className="space-y-2">
-                      <h3 className="font-display font-bold text-2xl text-white group-hover:text-[#f5b8c9] transition-colors">
+                      <h3 className="font-display font-bold text-2xl text-white group-hover:text-pink transition-colors">
                         {sc.name}
                       </h3>
                       <p className="font-sans-ui text-sm text-neutral-400 leading-relaxed">
@@ -251,7 +251,7 @@ export const LibraryPage: React.FC<LibraryPageProps> = ({ onNavigate }) => {
                   <div className="space-y-4 pt-4 border-t border-[#262626]">
                     {pb ? (
                       <div className="flex items-center justify-between text-xs font-mono text-neutral-300 bg-[#0d0d0d] p-3 rounded-[12px] border border-[#262626]">
-                        <span className="flex items-center gap-1.5 text-[#f5b8c9] font-bold">
+                        <span className="flex items-center gap-1.5 text-pink font-bold">
                           <Trophy className="w-3.5 h-3.5" /> PB: {pb.highScore.toLocaleString()}
                         </span>
                         <span className="text-neutral-400">{pb.bestAccuracy}% ACC</span>
@@ -303,11 +303,11 @@ export const LibraryPage: React.FC<LibraryPageProps> = ({ onNavigate }) => {
           {routinesList.map((r) => (
             <div
               key={r.id}
-              className="bg-[#141414] border border-[#262626] rounded-[12px] p-8 flex flex-col justify-between space-y-6 hover:border-[#f5b8c9] transition-all"
+              className="bg-[#141414] border border-[#262626] rounded-[12px] p-8 flex flex-col justify-between space-y-6 hover:border-pink transition-all"
             >
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-mono font-bold text-[#0d0d0d] bg-[#f5b8c9] px-2.5 py-1 rounded-[6px]">
+                  <span className="text-[10px] font-mono font-bold text-[#0d0d0d] bg-pink px-2.5 py-1 rounded-[6px]">
                     PLAYLIST ROUTINE
                   </span>
                   <span className="text-xs font-mono text-neutral-400">
@@ -330,7 +330,7 @@ export const LibraryPage: React.FC<LibraryPageProps> = ({ onNavigate }) => {
                     const sc = allScenarios.find((s) => s.id === did);
                     return (
                       <div key={idx} className="flex items-center gap-2 text-neutral-300">
-                        <span className="text-[#f5b8c9] font-bold">#{idx + 1}</span>
+                        <span className="text-pink font-bold">#{idx + 1}</span>
                         <span>{sc?.name || did}</span>
                       </div>
                     );
@@ -361,8 +361,8 @@ export const LibraryPage: React.FC<LibraryPageProps> = ({ onNavigate }) => {
 
       {/* TAB 3: BENCHMARK TEST */}
       {activeTab === 'benchmark' && (
-        <div className="max-w-3xl mx-auto bg-[#141414] border border-[#f5b8c9] rounded-[12px] p-8 space-y-6 text-center">
-          <div className="w-14 h-14 rounded-full bg-[#f5b8c9] text-[#0d0d0d] flex items-center justify-center mx-auto shadow-lg shadow-[#f5b8c9]/20">
+        <div className="max-w-3xl mx-auto bg-[#141414] border border-pink rounded-[12px] p-8 space-y-6 text-center">
+          <div className="w-14 h-14 rounded-full bg-pink text-[#0d0d0d] flex items-center justify-center mx-auto shadow-lg">
             <Award className="w-7 h-7" />
           </div>
 
@@ -406,9 +406,9 @@ export const LibraryPage: React.FC<LibraryPageProps> = ({ onNavigate }) => {
       {/* Scenario Detail Drawer Modal */}
       {selectedModalScenario && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-6">
-          <div className="bg-[#0d0d0d] border border-[#f5b8c9] rounded-[12px] text-white p-8 max-w-lg w-full space-y-6">
+          <div className="bg-[#0d0d0d] border border-pink rounded-[12px] text-white p-8 max-w-lg w-full space-y-6">
             <div className="flex items-center justify-between border-b border-[#262626] pb-4">
-              <span className="text-xs font-mono text-[#f5b8c9] uppercase tracking-widest">
+              <span className="text-xs font-mono text-pink uppercase tracking-widest">
                 DRILL SPECIFICATION
               </span>
               <button
@@ -443,7 +443,7 @@ export const LibraryPage: React.FC<LibraryPageProps> = ({ onNavigate }) => {
               </div>
               <div>
                 <span className="text-neutral-500 block">RECOMMENDED SENS</span>
-                <span className="text-[#f5b8c9] font-bold">{selectedModalScenario.recommendedCm360}</span>
+                <span className="text-pink font-bold">{selectedModalScenario.recommendedCm360}</span>
               </div>
             </div>
 

@@ -19,7 +19,7 @@ export const PauseModal: React.FC<PauseModalProps> = ({ onNavigate, onResume }) 
         {/* Header */}
         <div className="flex items-center justify-between border-b border-[#262626] pb-4">
           <div>
-            <span className="text-[10px] font-mono text-[#f5b8c9] tracking-widest uppercase">
+            <span className="text-[10px] font-mono text-pink tracking-widest uppercase">
               SESSION PAUSED
             </span>
             <h2 className="font-display font-extrabold text-2xl text-white">
@@ -35,9 +35,9 @@ export const PauseModal: React.FC<PauseModalProps> = ({ onNavigate, onResume }) 
         <div className="space-y-4 bg-[#141414] p-5 rounded-[12px] border border-[#262626]">
           <div className="flex items-center justify-between">
             <span className="text-xs font-mono text-neutral-300 font-bold flex items-center gap-2">
-              <Sliders className="w-3.5 h-3.5 text-[#f5b8c9]" /> LIVE SENSITIVITY PRESET
+              <Sliders className="w-3.5 h-3.5 text-pink" /> LIVE SENSITIVITY PRESET
             </span>
-            <span className="text-xs font-mono text-[#f5b8c9] font-bold">
+            <span className="text-xs font-mono text-pink font-bold">
               {cm360} cm / 360°
             </span>
           </div>
@@ -53,7 +53,7 @@ export const PauseModal: React.FC<PauseModalProps> = ({ onNavigate, onResume }) 
                 step="0.01"
                 value={settings.sensitivity}
                 onChange={(e) => updateSettings({ sensitivity: parseFloat(e.target.value) })}
-                className="w-full accent-[#f5b8c9] bg-[#262626] rounded-lg h-2"
+                className="w-full accent-pink bg-[#262626] rounded-lg h-2"
               />
               <div className="flex justify-between text-[10px] font-mono text-neutral-400">
                 <span>0.05</span>
@@ -68,7 +68,7 @@ export const PauseModal: React.FC<PauseModalProps> = ({ onNavigate, onResume }) 
               <select
                 value={settings.dpi}
                 onChange={(e) => updateSettings({ dpi: parseInt(e.target.value) })}
-                className="w-full bg-[#0d0d0d] border border-[#262626] rounded-[12px] p-2 text-xs font-mono text-white focus:outline-none focus:border-[#f5b8c9]"
+                className="w-full bg-[#0d0d0d] border border-[#262626] rounded-[12px] p-2 text-xs font-mono text-white focus:outline-none focus:border-pink"
               >
                 <option value={400}>400 DPI</option>
                 <option value={800}>800 DPI</option>
@@ -89,7 +89,7 @@ export const PauseModal: React.FC<PauseModalProps> = ({ onNavigate, onResume }) 
                   onClick={() => updateSettings({ engine: eng })}
                   className={`py-1.5 rounded-[12px] text-[10px] font-mono uppercase font-bold transition-all border ${
                     settings.engine === eng
-                      ? 'bg-[#f5b8c9] text-[#0d0d0d] border-[#f5b8c9]'
+                      ? 'bg-pink text-[#0d0d0d] border-pink'
                       : 'bg-[#0d0d0d] text-neutral-400 border-[#262626] hover:text-white'
                   }`}
                 >
@@ -105,7 +105,7 @@ export const PauseModal: React.FC<PauseModalProps> = ({ onNavigate, onResume }) 
               onClick={toggleSound}
               className="flex items-center gap-2 text-xs font-mono text-neutral-300 hover:text-white"
             >
-              {soundEnabled ? <Volume2 className="w-4 h-4 text-[#f5b8c9]" /> : <VolumeX className="w-4 h-4 text-neutral-500" />}
+              {soundEnabled ? <Volume2 className="w-4 h-4 text-pink" /> : <VolumeX className="w-4 h-4 text-neutral-500" />}
               <span>AUDIO</span>
             </button>
             <input
@@ -115,7 +115,7 @@ export const PauseModal: React.FC<PauseModalProps> = ({ onNavigate, onResume }) 
               step="0.05"
               value={masterVolume}
               onChange={(e) => setMasterVolume(parseFloat(e.target.value))}
-              className="w-36 accent-[#f5b8c9] bg-[#262626] rounded-lg h-1.5"
+              className="w-36 accent-pink bg-[#262626] rounded-lg h-1.5"
             />
           </div>
         </div>

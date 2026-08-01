@@ -1,12 +1,15 @@
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { Clock } from 'lucide-react';
+import { useSettingsStore } from '../../store/useSettingsStore';
 
 interface ReactionTimeHistogramProps {
-  reactionTimesMs: number[]; // e.g. [220, 240, 310, 190, 280, ...]
+  reactionTimesMs: number[];
 }
 
 export const ReactionTimeHistogram: React.FC<ReactionTimeHistogramProps> = ({ reactionTimesMs }) => {
+  const themeAccentColor = useSettingsStore((s) => s.themeAccentColor) || '#f5b8c9';
+
   if (!reactionTimesMs || reactionTimesMs.length === 0) {
     return (
       <div className="bg-[#141414] border border-[#262626] rounded-[12px] p-6 text-center text-xs font-mono text-neutral-500">
@@ -15,13 +18,12 @@ export const ReactionTimeHistogram: React.FC<ReactionTimeHistogramProps> = ({ re
     );
   }
 
-  // Bin reaction times into 50ms buckets (e.g. 150-200ms, 200-250ms, 250-300ms...)
   const bins = [
     { label: '<200ms', min: 0, max: 200, count: 0 },
     { label: '200-250ms', min: 200, max: 250, count: 0 },
     { label: '250-300ms', min: 250, max: 300, count: 0 },
     { label: '300-350ms', min: 300, max: 350, count: 0 },
-    { label: '350-400ms', min: 350, max: 400, count: 0 },
+    { label: '350-400ms', min: 400, max: 400, count: 0 },
     { label: '400ms+', min: 400, max: 9999, count: 0 },
   ];
 
@@ -35,8 +37,8 @@ export const ReactionTimeHistogram: React.FC<ReactionTimeHistogramProps> = ({ re
   return (
     <div className="bg-[#141414] border border-[#262626] rounded-[12px] p-6 space-y-4 text-left">
       <div className="flex items-center justify-between border-b border-[#262626] pb-3">
-        <h3 className="font-mono text-xs text-[#f5b8c9] uppercase tracking-widest flex items-center gap-2">
-          <Clock className="w-4 h-4 text-[#f5b8c9]" /> REACTION TIME DISTRIBUTION (HISTOGRAM)
+        <h3 className="font-mono text-xs text-pink uppercase tracking-widest flex items-center gap-2">
+          <Clock className="w-4 h-4 text-pink" /> REACTION TIME DISTRIBUTION (HISTOGRAM)
         </h3>
         <span className="text-xs font-mono text-white font-bold bg-[#0d0d0d] px-3 py-1 rounded-[12px] border border-[#262626]">
           AVG TTK: {avgTtk} MS
@@ -63,7 +65,7 @@ export const ReactionTimeHistogram: React.FC<ReactionTimeHistogramProps> = ({ re
             <Tooltip
               contentStyle={{
                 backgroundColor: '#0d0d0d',
-                borderColor: '#f5b8c9',
+                borderColor: themeAccentColor,
                 borderRadius: '8px',
                 fontSize: '11px',
                 color: '#fff',
@@ -75,7 +77,7 @@ export const ReactionTimeHistogram: React.FC<ReactionTimeHistogramProps> = ({ re
               {bins.map((_, index) => (
                 <Cell
                   key={`cell-${index}`}
-                  fill={index === 1 || index === 2 ? '#f5b8c9' : '#333'}
+                  fill={index === 1 || index === 2 ? themeAccentColor : '#333'}
                 />
               ))}
             </Bar>

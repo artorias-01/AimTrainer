@@ -53,7 +53,6 @@ export const LiveHUD: React.FC = () => {
   const totalShots = hits + misses;
   const accuracy = totalShots > 0 ? Math.round((hits / totalShots) * 100) : 100;
 
-  // Format seconds to MM:SS
   const formatTime = (secs: number) => {
     const m = Math.floor(secs / 60);
     const s = secs % 60;
@@ -68,7 +67,7 @@ export const LiveHUD: React.FC = () => {
         <div className="flex flex-col gap-2.5 max-w-xs">
           {/* Current Scenario Header */}
           <div className="flex flex-col bg-[#0d0d0d]/90 text-white px-5 py-3 rounded-[12px] border border-[#262626] backdrop-blur-md">
-            <div className="flex items-center justify-between font-mono text-[10px] tracking-widest text-[#f5b8c9] uppercase">
+            <div className="flex items-center justify-between font-mono text-[10px] tracking-widest text-pink uppercase">
               <span>CURRENT SCENARIO</span>
               <span className="text-[9px] text-neutral-500 font-bold bg-[#141414] px-2 py-0.5 rounded-[6px] border border-[#262626]">
                 {pauseKey} to pause
@@ -79,12 +78,12 @@ export const LiveHUD: React.FC = () => {
             </span>
           </div>
 
-          {/* Compact Floating Stats Card (Motion-inspired Card) */}
+          {/* Compact Floating Stats Card */}
           <motion.div
             initial={performanceMode ? false : { opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.35, ease: 'easeOut' }}
-            className="bg-[#0d0d0d]/95 backdrop-blur-md border border-[#262626] border-l-2 border-l-[#f5b8c9] rounded-[12px] p-3.5 flex items-center justify-between gap-3 text-xs font-mono shadow-lg"
+            className="bg-[#0d0d0d]/95 backdrop-blur-md border border-[#262626] border-l-2 border-l-pink rounded-[12px] p-3.5 flex items-center justify-between gap-3 text-xs font-mono shadow-lg"
           >
             <div className="flex flex-col">
               <span className="text-[9px] text-neutral-400 font-bold uppercase">HITS</span>
@@ -105,8 +104,8 @@ export const LiveHUD: React.FC = () => {
             <div className="h-6 w-px bg-[#262626]" />
 
             <div className="flex flex-col">
-              <span className="text-[9px] text-[#f5b8c9] font-bold uppercase">ACCURACY</span>
-              <span className="font-extrabold text-[#f5b8c9] text-sm">
+              <span className="text-[9px] text-pink font-bold uppercase">ACCURACY</span>
+              <span className="font-extrabold text-pink text-sm">
                 <AnimatedNumber value={accuracy} />%
               </span>
             </div>
@@ -116,8 +115,8 @@ export const LiveHUD: React.FC = () => {
         {/* Top-Right Prominent Metrics Grid */}
         <div className="flex items-center gap-3">
           {/* Timer - Primary Prominent */}
-          <div className="flex items-center gap-2.5 bg-[#0d0d0d]/90 backdrop-blur-md text-white px-4 py-2.5 rounded-[12px] border border-[#f5b8c9]/40 shadow-sm">
-            <Timer className="w-4 h-4 text-[#f5b8c9]" />
+          <div className="flex items-center gap-2.5 bg-[#0d0d0d]/90 backdrop-blur-md text-white px-4 py-2.5 rounded-[12px] border border-pink/40 shadow-sm">
+            <Timer className="w-4 h-4 text-pink" />
             <div className="flex flex-col">
               <span className="text-[9px] font-mono text-neutral-400">TIME</span>
               <span className="font-mono font-extrabold text-lg text-white">{formatTime(timeLeft)}</span>
@@ -125,10 +124,10 @@ export const LiveHUD: React.FC = () => {
           </div>
 
           {/* Live Score - Primary Prominent */}
-          <div className="flex items-center gap-2.5 bg-[#0d0d0d]/90 backdrop-blur-md text-white px-5 py-2.5 rounded-[12px] border border-[#f5b8c9] shadow-sm">
-            <Zap className="w-4 h-4 text-[#f5b8c9]" />
+          <div className="flex items-center gap-2.5 bg-[#0d0d0d]/90 backdrop-blur-md text-white px-5 py-2.5 rounded-[12px] border border-pink shadow-sm">
+            <Zap className="w-4 h-4 text-pink" />
             <div className="flex flex-col">
-              <span className="text-[9px] font-mono text-[#f5b8c9]">SCORE</span>
+              <span className="text-[9px] font-mono text-pink">SCORE</span>
               <span className="font-mono font-extrabold text-xl text-white tracking-wider">
                 <AnimatedNumber value={score} />
               </span>
@@ -137,7 +136,7 @@ export const LiveHUD: React.FC = () => {
 
           {/* Streak Combo */}
           {streak > 2 && (
-            <div className="flex items-center justify-center bg-[#f5b8c9] text-[#0d0d0d] px-3.5 py-2.5 rounded-[12px] font-mono font-extrabold text-xs tracking-wider animate-bounce">
+            <div className="flex items-center justify-center bg-pink text-[#0d0d0d] px-3.5 py-2.5 rounded-[12px] font-mono font-extrabold text-xs tracking-wider animate-bounce">
               <span>{streak}X STREAK</span>
             </div>
           )}
@@ -150,7 +149,7 @@ export const LiveHUD: React.FC = () => {
                 pauseSession();
               }}
               onMouseEnter={() => soundManager.playHover()}
-              className="pointer-events-auto bg-[#0d0d0d]/90 hover:bg-[#f5b8c9] hover:text-[#0d0d0d] text-white p-3 rounded-[12px] border border-[#262626] hover:border-[#f5b8c9] transition-all duration-150 active:scale-95 backdrop-blur-md"
+              className="pointer-events-auto bg-[#0d0d0d]/90 hover:bg-pink hover:text-[#0d0d0d] text-white p-3 rounded-[12px] border border-[#262626] hover:border-pink transition-all duration-150 active:scale-95 backdrop-blur-md"
             >
               <Pause className="w-4 h-4" />
             </button>
@@ -158,11 +157,11 @@ export const LiveHUD: React.FC = () => {
         </div>
       </div>
 
-      {/* Countdown Overlay (3, 2, 1, GO) with smooth 150-250ms backdrop blur transition */}
+      {/* Countdown Overlay */}
       {status === 'countdown' && (
         <div className="absolute inset-0 flex items-center justify-center bg-black/80 backdrop-blur-sm z-30 transition-all duration-200">
           <div className="flex flex-col items-center gap-4">
-            <span className="font-display text-8xl md:text-9xl font-extrabold text-[#f5b8c9] animate-pulse drop-shadow-lg">
+            <span className="font-display text-8xl md:text-9xl font-extrabold text-pink animate-pulse drop-shadow-lg">
               {countdown}
             </span>
             <span className="font-mono text-sm tracking-widest text-white uppercase">
@@ -172,7 +171,7 @@ export const LiveHUD: React.FC = () => {
         </div>
       )}
 
-      {/* Center Screen Crosshair (Visually static & clean) */}
+      {/* Center Screen Crosshair */}
       {status === 'playing' && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-30">
           <CrosshairPreview config={crosshair} sizePx={80} transparent={true} />

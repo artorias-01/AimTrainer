@@ -6,7 +6,8 @@ import { useSettingsStore } from '../../store/useSettingsStore';
 function TargetMeshPreview() {
   const meshRef = useRef<THREE.Mesh>(null);
   const targetShapeConfig = useSettingsStore((s) => s.targetShapeConfig);
-  const targetColor = useSettingsStore((s) => s.targetColor) || '#f5b8c9';
+  const themeAccentColor = useSettingsStore((s) => s.themeAccentColor) || '#f5b8c9';
+  const targetColor = useSettingsStore((s) => s.targetColor) || themeAccentColor;
 
   useFrame(({ clock }) => {
     if (meshRef.current && targetShapeConfig.idleRotation !== false) {
@@ -44,7 +45,7 @@ function TargetMeshPreview() {
           wireframe={wireframe}
           roughness={0.15}
           metalness={0.1}
-          emissive={targetColor === '#ffffff' ? '#f5b8c9' : targetColor}
+          emissive={targetColor === '#ffffff' ? themeAccentColor : targetColor}
           emissiveIntensity={emissiveIntensity ?? 0.65}
         />
       </mesh>
@@ -53,9 +54,14 @@ function TargetMeshPreview() {
 }
 
 export const TargetPreview3D: React.FC = () => {
+  const themeAccentColor = useSettingsStore((s) => s.themeAccentColor) || '#f5b8c9';
+
   return (
     <div className="w-full h-44 bg-[#0d0d0d] border border-[#262626] rounded-[12px] overflow-hidden relative flex items-center justify-center">
-      <div className="absolute inset-0 z-0 opacity-20 bg-[radial-gradient(#f5b8c9_1px,transparent_1px)] [background-size:16px_16px]" />
+      <div
+        className="absolute inset-0 z-0 opacity-20"
+        style={{ backgroundImage: `radial-gradient(${themeAccentColor} 1px, transparent 1px)`, backgroundSize: '16px 16px' }}
+      />
       <div className="relative z-10 w-full h-full">
         <Canvas camera={{ position: [0, 0, 3.2], fov: 50 }}>
           <TargetMeshPreview />

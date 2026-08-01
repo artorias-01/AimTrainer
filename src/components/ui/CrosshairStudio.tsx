@@ -128,14 +128,14 @@ export const CrosshairStudio: React.FC = () => {
   return (
     <div className="bg-[#141414] border border-[#262626] rounded-[12px] p-8 space-y-6">
       <div className="flex items-center justify-between border-b border-[#262626] pb-4">
-        <h3 className="font-mono text-xs text-[#f5b8c9] uppercase tracking-widest flex items-center gap-2">
-          <Crosshair className="w-4 h-4 text-[#f5b8c9]" /> VALORANT-STYLE CROSSHAIR STUDIO
+        <h3 className="font-mono text-xs text-pink uppercase tracking-widest flex items-center gap-2">
+          <Crosshair className="w-4 h-4 text-pink" /> VALORANT-STYLE CROSSHAIR STUDIO
         </h3>
         <span className="text-xs font-mono text-neutral-400">MULTI-LAYER ENGINE</span>
       </div>
 
       {saveConfirmation && (
-        <div className="bg-[#141414] border border-[#f5b8c9] text-[#f5b8c9] p-3 rounded-[12px] font-mono text-xs font-bold text-center">
+        <div className="bg-[#141414] border border-pink text-pink p-3 rounded-[12px] font-mono text-xs font-bold text-center">
           {saveConfirmation}
         </div>
       )}
@@ -147,7 +147,7 @@ export const CrosshairStudio: React.FC = () => {
 
       {/* Saved Named Crosshair Presets Manager */}
       <div className="space-y-3 bg-[#0d0d0d] p-5 rounded-[12px] border border-[#262626]">
-        <label className="text-[10px] font-mono text-[#f5b8c9] uppercase tracking-widest block font-bold">
+        <label className="text-[10px] font-mono text-pink uppercase tracking-widest block font-bold">
           SAVED NAMED CROSSHAIR PRESETS
         </label>
 
@@ -162,7 +162,7 @@ export const CrosshairStudio: React.FC = () => {
                 handleLoadPreset(found);
               }
             }}
-            className="flex-1 bg-[#141414] border border-[#262626] rounded-[12px] px-4 py-2 text-xs font-mono text-white focus:outline-none focus:border-[#f5b8c9]"
+            className="flex-1 bg-[#141414] border border-[#262626] rounded-[12px] px-4 py-2 text-xs font-mono text-white focus:outline-none focus:border-pink"
           >
             <option value="">-- SELECT SAVED PRESET ({savedPresets.length}) --</option>
             {savedPresets.map((p) => (
@@ -189,7 +189,7 @@ export const CrosshairStudio: React.FC = () => {
             placeholder="e.g. My Precision X or Dot Only"
             value={presetNameInput}
             onChange={(e) => setPresetNameInput(e.target.value)}
-            className="flex-1 bg-[#141414] border border-[#262626] rounded-[12px] px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-[#f5b8c9]"
+            className="flex-1 bg-[#141414] border border-[#262626] rounded-[12px] px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-pink"
           />
           <button
             onClick={handleSavePreset}
@@ -203,7 +203,7 @@ export const CrosshairStudio: React.FC = () => {
 
       {/* Per-Scenario Crosshair Profile Assignment */}
       <div className="space-y-3 bg-[#0d0d0d] p-5 rounded-[12px] border border-[#262626]">
-        <label className="text-[10px] font-mono text-[#f5b8c9] uppercase tracking-widest block font-bold">
+        <label className="text-[10px] font-mono text-pink uppercase tracking-widest block font-bold">
           ASSIGN CROSSHAIR PRESET TO SPECIFIC DRILL OR CATEGORY
         </label>
         <p className="font-sans-ui text-xs text-neutral-400">
@@ -212,7 +212,7 @@ export const CrosshairStudio: React.FC = () => {
         <div className="flex gap-2">
           <select
             id="scenario-crosshair-select-studio"
-            className="flex-1 bg-[#141414] border border-[#262626] rounded-[12px] px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-[#f5b8c9]"
+            className="flex-1 bg-[#141414] border border-[#262626] rounded-[12px] px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-pink"
           >
             <option value="tracking">CATEGORY: TRACKING</option>
             <option value="clicking">CATEGORY: CLICKING</option>
@@ -272,14 +272,14 @@ export const CrosshairStudio: React.FC = () => {
       {/* 1. INNER LINES LAYER CONTROLS */}
       <div className="space-y-4 bg-[#0d0d0d] p-5 rounded-[12px] border border-[#262626]">
         <div className="flex items-center justify-between border-b border-[#262626] pb-3">
-          <span className="text-[10px] font-mono text-[#f5b8c9] font-bold uppercase tracking-widest">
+          <span className="text-[10px] font-mono text-pink font-bold uppercase tracking-widest">
             1. INNER LINES
           </span>
           <button
             type="button"
             onClick={() => updateInner({ show: !c.innerLines.show })}
             className={`px-3 py-1 rounded-[8px] text-[10px] font-mono font-bold border transition-all ${
-              c.innerLines.show ? 'bg-[#f5b8c9] text-[#0d0d0d] border-[#f5b8c9]' : 'bg-[#141414] text-neutral-500 border-[#262626]'
+              c.innerLines.show ? 'bg-pink text-[#0d0d0d] border-pink' : 'bg-[#141414] text-neutral-500 border-[#262626]'
             }`}
           >
             {c.innerLines.show ? 'SHOW: ON' : 'SHOW: OFF'}
@@ -300,7 +300,7 @@ export const CrosshairStudio: React.FC = () => {
                   max="20"
                   value={c.innerLines.length}
                   onChange={(e) => updateInner({ length: parseInt(e.target.value) })}
-                  className="w-full accent-[#f5b8c9] bg-[#262626] rounded-lg h-2"
+                  className="w-full accent-pink bg-[#262626] rounded-lg h-2"
                 />
               </div>
 
@@ -315,7 +315,7 @@ export const CrosshairStudio: React.FC = () => {
                   max="10"
                   value={c.innerLines.thickness}
                   onChange={(e) => updateInner({ thickness: parseInt(e.target.value) })}
-                  className="w-full accent-[#f5b8c9] bg-[#262626] rounded-lg h-2"
+                  className="w-full accent-pink bg-[#262626] rounded-lg h-2"
                 />
               </div>
 
@@ -330,7 +330,7 @@ export const CrosshairStudio: React.FC = () => {
                   max="20"
                   value={c.innerLines.offset}
                   onChange={(e) => updateInner({ offset: parseInt(e.target.value) })}
-                  className="w-full accent-[#f5b8c9] bg-[#262626] rounded-lg h-2"
+                  className="w-full accent-pink bg-[#262626] rounded-lg h-2"
                 />
               </div>
 
@@ -346,7 +346,7 @@ export const CrosshairStudio: React.FC = () => {
                   step="0.05"
                   value={c.innerLines.opacity}
                   onChange={(e) => updateInner({ opacity: parseFloat(e.target.value) })}
-                  className="w-full accent-[#f5b8c9] bg-[#262626] rounded-lg h-2"
+                  className="w-full accent-pink bg-[#262626] rounded-lg h-2"
                 />
               </div>
             </div>
@@ -373,14 +373,14 @@ export const CrosshairStudio: React.FC = () => {
       {/* 2. OUTER LINES LAYER CONTROLS */}
       <div className="space-y-4 bg-[#0d0d0d] p-5 rounded-[12px] border border-[#262626]">
         <div className="flex items-center justify-between border-b border-[#262626] pb-3">
-          <span className="text-[10px] font-mono text-[#f5b8c9] font-bold uppercase tracking-widest">
+          <span className="text-[10px] font-mono text-pink font-bold uppercase tracking-widest">
             2. OUTER LINES
           </span>
           <button
             type="button"
             onClick={() => updateOuter({ show: !c.outerLines.show })}
             className={`px-3 py-1 rounded-[8px] text-[10px] font-mono font-bold border transition-all ${
-              c.outerLines.show ? 'bg-[#f5b8c9] text-[#0d0d0d] border-[#f5b8c9]' : 'bg-[#141414] text-neutral-500 border-[#262626]'
+              c.outerLines.show ? 'bg-pink text-[#0d0d0d] border-pink' : 'bg-[#141414] text-neutral-500 border-[#262626]'
             }`}
           >
             {c.outerLines.show ? 'SHOW: ON' : 'SHOW: OFF'}
@@ -401,7 +401,7 @@ export const CrosshairStudio: React.FC = () => {
                   max="20"
                   value={c.outerLines.length}
                   onChange={(e) => updateOuter({ length: parseInt(e.target.value) })}
-                  className="w-full accent-[#f5b8c9] bg-[#262626] rounded-lg h-2"
+                  className="w-full accent-pink bg-[#262626] rounded-lg h-2"
                 />
               </div>
 
@@ -416,7 +416,7 @@ export const CrosshairStudio: React.FC = () => {
                   max="10"
                   value={c.outerLines.thickness}
                   onChange={(e) => updateOuter({ thickness: parseInt(e.target.value) })}
-                  className="w-full accent-[#f5b8c9] bg-[#262626] rounded-lg h-2"
+                  className="w-full accent-pink bg-[#262626] rounded-lg h-2"
                 />
               </div>
 
@@ -431,7 +431,7 @@ export const CrosshairStudio: React.FC = () => {
                   max="30"
                   value={c.outerLines.offset}
                   onChange={(e) => updateOuter({ offset: parseInt(e.target.value) })}
-                  className="w-full accent-[#f5b8c9] bg-[#262626] rounded-lg h-2"
+                  className="w-full accent-pink bg-[#262626] rounded-lg h-2"
                 />
               </div>
 
@@ -447,7 +447,7 @@ export const CrosshairStudio: React.FC = () => {
                   step="0.05"
                   value={c.outerLines.opacity}
                   onChange={(e) => updateOuter({ opacity: parseFloat(e.target.value) })}
-                  className="w-full accent-[#f5b8c9] bg-[#262626] rounded-lg h-2"
+                  className="w-full accent-pink bg-[#262626] rounded-lg h-2"
                 />
               </div>
             </div>
@@ -474,14 +474,14 @@ export const CrosshairStudio: React.FC = () => {
       {/* 3. CENTER DOT CONTROLS */}
       <div className="space-y-4 bg-[#0d0d0d] p-5 rounded-[12px] border border-[#262626]">
         <div className="flex items-center justify-between border-b border-[#262626] pb-3">
-          <span className="text-[10px] font-mono text-[#f5b8c9] font-bold uppercase tracking-widest">
+          <span className="text-[10px] font-mono text-pink font-bold uppercase tracking-widest">
             3. CENTER DOT
           </span>
           <button
             type="button"
             onClick={() => updateDotConfig({ show: !c.dot.show })}
             className={`px-3 py-1 rounded-[8px] text-[10px] font-mono font-bold border transition-all ${
-              c.dot.show ? 'bg-[#f5b8c9] text-[#0d0d0d] border-[#f5b8c9]' : 'bg-[#141414] text-neutral-500 border-[#262626]'
+              c.dot.show ? 'bg-pink text-[#0d0d0d] border-pink' : 'bg-[#141414] text-neutral-500 border-[#262626]'
             }`}
           >
             {c.dot.show ? 'SHOW: ON' : 'SHOW: OFF'}
@@ -502,7 +502,7 @@ export const CrosshairStudio: React.FC = () => {
                   max="10"
                   value={c.dot.size}
                   onChange={(e) => updateDotConfig({ size: parseInt(e.target.value) })}
-                  className="w-full accent-[#f5b8c9] bg-[#262626] rounded-lg h-2"
+                  className="w-full accent-pink bg-[#262626] rounded-lg h-2"
                 />
               </div>
 
@@ -518,7 +518,7 @@ export const CrosshairStudio: React.FC = () => {
                   step="0.05"
                   value={c.dot.opacity}
                   onChange={(e) => updateDotConfig({ opacity: parseFloat(e.target.value) })}
-                  className="w-full accent-[#f5b8c9] bg-[#262626] rounded-lg h-2"
+                  className="w-full accent-pink bg-[#262626] rounded-lg h-2"
                 />
               </div>
             </div>
@@ -545,14 +545,14 @@ export const CrosshairStudio: React.FC = () => {
       {/* 4. OUTLINE CONTROLS */}
       <div className="space-y-4 bg-[#0d0d0d] p-5 rounded-[12px] border border-[#262626]">
         <div className="flex items-center justify-between border-b border-[#262626] pb-3">
-          <span className="text-[10px] font-mono text-[#f5b8c9] font-bold uppercase tracking-widest">
+          <span className="text-[10px] font-mono text-pink font-bold uppercase tracking-widest">
             4. ELEMENT OUTLINES
           </span>
           <button
             type="button"
             onClick={() => updateOutlineConfig({ show: !c.outline.show })}
             className={`px-3 py-1 rounded-[8px] text-[10px] font-mono font-bold border transition-all ${
-              c.outline.show ? 'bg-[#f5b8c9] text-[#0d0d0d] border-[#f5b8c9]' : 'bg-[#141414] text-neutral-500 border-[#262626]'
+              c.outline.show ? 'bg-pink text-[#0d0d0d] border-pink' : 'bg-[#141414] text-neutral-500 border-[#262626]'
             }`}
           >
             {c.outline.show ? 'SHOW: ON' : 'SHOW: OFF'}
@@ -574,7 +574,7 @@ export const CrosshairStudio: React.FC = () => {
                   step="0.5"
                   value={c.outline.thickness}
                   onChange={(e) => updateOutlineConfig({ thickness: parseFloat(e.target.value) })}
-                  className="w-full accent-[#f5b8c9] bg-[#262626] rounded-lg h-2"
+                  className="w-full accent-pink bg-[#262626] rounded-lg h-2"
                 />
               </div>
 
@@ -590,7 +590,7 @@ export const CrosshairStudio: React.FC = () => {
                   step="0.05"
                   value={c.outline.opacity}
                   onChange={(e) => updateOutlineConfig({ opacity: parseFloat(e.target.value) })}
-                  className="w-full accent-[#f5b8c9] bg-[#262626] rounded-lg h-2"
+                  className="w-full accent-pink bg-[#262626] rounded-lg h-2"
                 />
               </div>
             </div>
@@ -616,7 +616,7 @@ export const CrosshairStudio: React.FC = () => {
 
       {/* JSON Config Import & Export */}
       <div className="space-y-3 bg-[#0d0d0d] p-4 rounded-[12px] border border-[#262626]">
-        <label className="text-[10px] font-mono text-[#f5b8c9] uppercase tracking-widest block font-bold">
+        <label className="text-[10px] font-mono text-pink uppercase tracking-widest block font-bold">
           GENERIC JSON CONFIG IMPORT & EXPORT
         </label>
         <div className="flex gap-2">
@@ -625,7 +625,7 @@ export const CrosshairStudio: React.FC = () => {
             placeholder='Paste JSON config e.g. {"innerLines":{"show":true,"length":6},"dot":{"show":true}}'
             value={importCodeInput}
             onChange={(e) => setImportCodeInput(e.target.value)}
-            className="flex-1 bg-[#141414] border border-[#262626] rounded-[12px] px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-[#f5b8c9]"
+            className="flex-1 bg-[#141414] border border-[#262626] rounded-[12px] px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-pink"
           />
           <button
             onClick={handleImportJsonCode}
@@ -645,7 +645,7 @@ export const CrosshairStudio: React.FC = () => {
           onClick={handleExportCode}
           className="w-full py-2 bg-[#1a1a1a] hover:bg-[#262626] text-white border border-[#2d2d2d] rounded-[12px] text-xs font-mono font-bold flex items-center justify-center gap-2 transition-all"
         >
-          <Copy className="w-3.5 h-3.5 text-[#f5b8c9]" />
+          <Copy className="w-3.5 h-3.5 text-pink" />
           {copiedMsg ? 'COPIED TO CLIPBOARD!' : 'EXPORT CURRENT CONFIG (JSON)'}
         </button>
       </div>

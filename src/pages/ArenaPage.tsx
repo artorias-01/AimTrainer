@@ -119,8 +119,8 @@ export const ArenaPage: React.FC<ArenaPageProps> = ({ onNavigate }) => {
     <div className="relative w-full h-screen bg-[#050505] overflow-hidden">
       {/* Touch Device Banner */}
       {isTouchDevice && (
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50 bg-[#0d0d0d] border border-[#f5b8c9] text-white px-5 py-2.5 rounded-[12px] text-xs font-mono flex items-center gap-3 backdrop-blur-md shadow-none">
-          <Smartphone className="w-4 h-4 text-[#f5b8c9]" />
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50 bg-[#0d0d0d] border border-pink text-white px-5 py-2.5 rounded-[12px] text-xs font-mono flex items-center gap-3 backdrop-blur-md shadow-none">
+          <Smartphone className="w-4 h-4 text-pink" />
           <span>TOUCH MODE ACTIVE :: DRAG SCREEN TO AIM & TAP TO SHOOT</span>
           <Monitor className="w-4 h-4 text-neutral-400" />
         </div>

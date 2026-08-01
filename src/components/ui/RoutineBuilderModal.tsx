@@ -54,11 +54,11 @@ export const RoutineBuilderModal: React.FC<RoutineBuilderModalProps> = ({ onClos
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="bg-[#141414] border border-[#f5b8c9]/50 rounded-[12px] p-6 max-w-xl w-full space-y-6 shadow-2xl my-8 text-left"
+        className="bg-[#141414] border border-pink/50 rounded-[12px] p-6 max-w-xl w-full space-y-6 shadow-2xl my-8 text-left"
       >
         <div className="flex items-center justify-between border-b border-[#262626] pb-4">
           <div className="flex items-center gap-2">
-            <Layers className="w-5 h-5 text-[#f5b8c9]" />
+            <Layers className="w-5 h-5 text-pink" />
             <h2 className="font-display font-extrabold text-xl text-white uppercase tracking-wider">
               CREATE WARMUP ROUTINE
             </h2>
@@ -76,7 +76,7 @@ export const RoutineBuilderModal: React.FC<RoutineBuilderModalProps> = ({ onClos
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full bg-[#0d0d0d] border border-[#262626] rounded-[12px] p-3 text-sm text-white font-bold focus:outline-none focus:border-[#f5b8c9]"
+              className="w-full bg-[#0d0d0d] border border-[#262626] rounded-[12px] p-3 text-sm text-white font-bold focus:outline-none focus:border-pink"
             />
           </div>
 
@@ -86,7 +86,7 @@ export const RoutineBuilderModal: React.FC<RoutineBuilderModalProps> = ({ onClos
               type="text"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full bg-[#0d0d0d] border border-[#262626] rounded-[12px] p-3 text-xs text-white focus:outline-none focus:border-[#f5b8c9]"
+              className="w-full bg-[#0d0d0d] border border-[#262626] rounded-[12px] p-3 text-xs text-white focus:outline-none focus:border-pink"
             />
           </div>
 
@@ -94,7 +94,7 @@ export const RoutineBuilderModal: React.FC<RoutineBuilderModalProps> = ({ onClos
           <div className="space-y-2">
             <label className="text-neutral-400 font-bold flex justify-between">
               <span>PLAYLIST SEQUENCE ({selectedDrills.length} DRILLS)</span>
-              <span className="text-[#f5b8c9]">ORDERED SEQUENTIAL</span>
+              <span className="text-pink">ORDERED SEQUENTIAL</span>
             </label>
 
             <div className="space-y-2 max-h-[160px] overflow-y-auto pr-1">
@@ -106,7 +106,7 @@ export const RoutineBuilderModal: React.FC<RoutineBuilderModalProps> = ({ onClos
                     className="flex items-center justify-between bg-[#0d0d0d] border border-[#262626] p-2.5 rounded-[12px]"
                   >
                     <div className="flex items-center gap-3">
-                      <span className="font-mono text-xs font-bold text-[#f5b8c9]">#{idx + 1}</span>
+                      <span className="font-mono text-xs font-bold text-pink">#{idx + 1}</span>
                       <span className="font-display font-bold text-sm text-white">{sc?.name || drillId}</span>
                     </div>
                     <button
@@ -131,10 +131,10 @@ export const RoutineBuilderModal: React.FC<RoutineBuilderModalProps> = ({ onClos
                   key={sc.id}
                   type="button"
                   onClick={() => handleAddDrill(sc.id)}
-                  className="flex items-center justify-between p-2 rounded-[8px] bg-[#0d0d0d] hover:bg-[#1a1a1a] border border-[#262626] hover:border-[#f5b8c9] text-left transition-all group"
+                  className="flex items-center justify-between p-2 rounded-[8px] bg-[#0d0d0d] hover:bg-[#1a1a1a] border border-[#262626] hover:border-pink text-left transition-all group"
                 >
                   <span className="font-display font-bold text-xs text-white truncate">{sc.name}</span>
-                  <Plus className="w-3.5 h-3.5 text-[#f5b8c9] shrink-0" />
+                  <Plus className="w-3.5 h-3.5 text-pink shrink-0" />
                 </button>
               ))}
             </div>

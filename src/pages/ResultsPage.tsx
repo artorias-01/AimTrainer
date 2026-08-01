@@ -29,7 +29,8 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ onNavigate }) => {
   } = useGameStore();
 
   const { refreshStats } = useStatsStore();
-  const { displayName } = useSettingsStore();
+  const displayName = useSettingsStore((s) => s.displayName);
+  const themeAccentColor = useSettingsStore((s) => s.themeAccentColor) || '#f5b8c9';
 
   useEffect(() => {
     refreshStats();
@@ -38,10 +39,10 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ onNavigate }) => {
         particleCount: 80,
         spread: 70,
         origin: { y: 0.6 },
-        colors: ['#f5b8c9', '#ffffff', '#0d0d0d'],
+        colors: [themeAccentColor, '#ffffff', '#0d0d0d'],
       });
     }
-  }, [isNewPB, refreshStats]);
+  }, [isNewPB, refreshStats, themeAccentColor]);
 
   const summary = lastSessionSummary || {
     id: 'demo',
@@ -72,7 +73,7 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ onNavigate }) => {
     ctx.fillStyle = '#0d0d0d';
     ctx.fillRect(0, 0, 1200, 630);
 
-    ctx.strokeStyle = '#f5b8c9';
+    ctx.strokeStyle = themeAccentColor;
     ctx.lineWidth = 4;
     ctx.strokeRect(20, 20, 1160, 590);
 
@@ -80,7 +81,7 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ onNavigate }) => {
     ctx.font = '900 48px Georgia';
     ctx.fillText('AIM // TT PERFORMANCE REPORT', 60, 100);
 
-    ctx.fillStyle = '#f5b8c9';
+    ctx.fillStyle = themeAccentColor;
     ctx.font = 'bold 24px monospace';
     ctx.fillText(`DRILL: ${summary.scenarioName.toUpperCase()}`, 60, 150);
 
@@ -91,7 +92,7 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ onNavigate }) => {
     ctx.fillStyle = '#888888';
     ctx.fillText('SCORE', 60, 320);
 
-    ctx.fillStyle = '#f5b8c9';
+    ctx.fillStyle = themeAccentColor;
     ctx.fillRect(900, 80, 220, 220);
     ctx.fillStyle = '#0d0d0d';
     ctx.font = '900 120px Georgia';
@@ -130,11 +131,11 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ onNavigate }) => {
       transition={{ duration: 0.3 }}
       className="w-full bg-[#0d0d0d] text-white min-h-screen py-12 px-6 md:px-16 space-y-12 select-none text-left"
     >
-      {/* Benchmark Rank Summary Overlay Card if finished benchmark */}
+      {/* Benchmark Rank Summary Overlay Card */}
       {isBenchmarkMode && lastBenchmarkSummary && (
-        <div className="max-w-7xl mx-auto bg-[#141414] border border-[#f5b8c9] rounded-[12px] p-8 space-y-6 text-center">
-          <div className="flex justify-center items-center gap-3 text-[#f5b8c9] font-mono text-xs uppercase tracking-widest font-bold">
-            <Award className="w-5 h-5 text-[#f5b8c9]" /> BENCHMARK TEST COMPLETED
+        <div className="max-w-7xl mx-auto bg-[#141414] border border-pink rounded-[12px] p-8 space-y-6 text-center">
+          <div className="flex justify-center items-center gap-3 text-pink font-mono text-xs uppercase tracking-widest font-bold">
+            <Award className="w-5 h-5 text-pink" /> BENCHMARK TEST COMPLETED
           </div>
           <div className="flex items-center justify-center gap-6">
             <div className="text-left">
@@ -143,7 +144,7 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ onNavigate }) => {
                 {lastBenchmarkSummary.compositeScore}
               </span>
             </div>
-            <div className="w-20 h-20 bg-[#f5b8c9] text-[#0d0d0d] rounded-[12px] flex items-center justify-center font-display font-extrabold text-4xl">
+            <div className="w-20 h-20 bg-pink text-[#0d0d0d] rounded-[12px] flex items-center justify-center font-display font-extrabold text-4xl">
               {lastBenchmarkSummary.grade}
             </div>
           </div>
@@ -152,19 +153,19 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ onNavigate }) => {
               <div key={idx} className="space-y-1 text-left">
                 <span className="text-neutral-500 text-[10px] block">{ds.scenarioName}</span>
                 <span className="font-bold text-white block">{ds.score.toLocaleString()} SCORE</span>
-                <span className="text-[#f5b8c9] block">{ds.accuracy}% ACC</span>
+                <span className="text-pink block">{ds.accuracy}% ACC</span>
               </div>
             ))}
           </div>
         </div>
       )}
 
-      {/* Routine Summary Card if routine active */}
+      {/* Routine Summary Card */}
       {activeRoutine && routineResults.length > 0 && (
         <div className="max-w-7xl mx-auto bg-[#141414] border border-[#262626] rounded-[12px] p-6 space-y-4">
           <div className="flex items-center justify-between border-b border-[#262626] pb-3">
-            <span className="font-mono text-xs text-[#f5b8c9] uppercase tracking-widest flex items-center gap-2 font-bold">
-              <Layers className="w-4 h-4 text-[#f5b8c9]" /> ROUTINE: {activeRoutine.name}
+            <span className="font-mono text-xs text-pink uppercase tracking-widest flex items-center gap-2 font-bold">
+              <Layers className="w-4 h-4 text-pink" /> ROUTINE: {activeRoutine.name}
             </span>
             <span className="text-xs font-mono text-neutral-400">
               {routineResults.length} / {activeRoutine.drillIds.length} DRILLS COMPLETED
@@ -176,7 +177,7 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ onNavigate }) => {
               <div key={idx} className="bg-[#0d0d0d] p-3.5 rounded-[12px] border border-[#262626] space-y-1">
                 <span className="text-neutral-500 text-[10px] block">#{idx + 1} {r.scenarioName}</span>
                 <span className="font-bold text-white text-base block">{r.score.toLocaleString()}</span>
-                <span className="text-[#f5b8c9] text-xs font-bold block">{r.accuracy}% ACC</span>
+                <span className="text-pink text-xs font-bold block">{r.accuracy}% ACC</span>
               </div>
             ))}
           </div>
@@ -186,7 +187,7 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ onNavigate }) => {
       {/* Header */}
       <div className="max-w-7xl mx-auto space-y-4 border-b border-[#262626] pb-8 flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div className="space-y-2">
-          <div className="flex items-center gap-2 font-mono text-xs text-[#f5b8c9] uppercase tracking-widest">
+          <div className="flex items-center gap-2 font-mono text-xs text-pink uppercase tracking-widest">
             <User className="w-3.5 h-3.5" />
             PLAYER: {displayName} // SESSION SUMMARY: {summary.scenarioName}
           </div>
@@ -197,7 +198,7 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ onNavigate }) => {
 
         <div className="flex flex-wrap gap-3">
           {isNewPB && (
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-[12px] bg-[#f5b8c9] text-[#0d0d0d] font-mono font-extrabold text-sm uppercase tracking-wider animate-bounce">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-[12px] bg-pink text-[#0d0d0d] font-mono font-extrabold text-sm uppercase tracking-wider animate-bounce">
               <Trophy className="w-4 h-4 fill-[#0d0d0d]" />
               NEW PB RECORD!
             </div>
@@ -205,9 +206,9 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ onNavigate }) => {
 
           <button
             onClick={handleDownloadShareCard}
-            className="px-4 py-2.5 rounded-[12px] bg-[#1a1a1a] hover:bg-[#262626] text-white border border-[#262626] hover:border-[#f5b8c9] text-xs font-mono font-bold flex items-center gap-2 transition-all"
+            className="px-4 py-2.5 rounded-[12px] bg-[#1a1a1a] hover:bg-[#262626] text-white border border-[#262626] hover:border-pink text-xs font-mono font-bold flex items-center gap-2 transition-all"
           >
-            <Download className="w-4 h-4 text-[#f5b8c9]" />
+            <Download className="w-4 h-4 text-pink" />
             DOWNLOAD RESULT CARD (PNG)
           </button>
         </div>
@@ -229,42 +230,42 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ onNavigate }) => {
               </span>
             </div>
 
-            <div className="w-24 h-24 rounded-[12px] bg-[#f5b8c9] text-[#0d0d0d] flex items-center justify-center font-display font-extrabold text-5xl shrink-0">
+            <div className="w-24 h-24 rounded-[12px] bg-pink text-[#0d0d0d] flex items-center justify-center font-display font-extrabold text-5xl shrink-0">
               {summary.grade}
             </div>
           </div>
 
           {/* Detailed Metrics Table */}
           <div className="bg-[#141414] border border-[#262626] rounded-[12px] p-6 space-y-4">
-            <h3 className="font-mono text-xs text-[#f5b8c9] uppercase tracking-widest">
+            <h3 className="font-mono text-xs text-pink uppercase tracking-widest">
               METRIC BREAKDOWN
             </h3>
 
             <div className="grid grid-cols-2 gap-4 text-xs font-mono">
               <div className="bg-[#0d0d0d] p-4 rounded-[12px] border border-[#262626] space-y-1">
                 <span className="text-neutral-400 flex items-center gap-1.5">
-                  <Target className="w-3.5 h-3.5 text-[#f5b8c9]" /> ACCURACY
+                  <Target className="w-3.5 h-3.5 text-pink" /> ACCURACY
                 </span>
                 <span className="font-bold text-2xl text-white">{summary.accuracy}%</span>
               </div>
 
               <div className="bg-[#0d0d0d] p-4 rounded-[12px] border border-[#262626] space-y-1">
                 <span className="text-neutral-400 flex items-center gap-1.5">
-                  <Clock className="w-3.5 h-3.5 text-[#f5b8c9]" /> AVG TTK
+                  <Clock className="w-3.5 h-3.5 text-pink" /> AVG TTK
                 </span>
                 <span className="font-bold text-2xl text-white">{summary.avgTtkMs} ms</span>
               </div>
 
               <div className="bg-[#0d0d0d] p-4 rounded-[12px] border border-[#262626] space-y-1">
                 <span className="text-neutral-400 flex items-center gap-1.5">
-                  <Flame className="w-3.5 h-3.5 text-[#f5b8c9]" /> MAX STREAK
+                  <Flame className="w-3.5 h-3.5 text-pink" /> MAX STREAK
                 </span>
                 <span className="font-bold text-2xl text-white">{summary.maxCombo}X</span>
               </div>
 
               <div className="bg-[#0d0d0d] p-4 rounded-[12px] border border-[#262626] space-y-1">
                 <span className="text-neutral-400 flex items-center gap-1.5">
-                  <Zap className="w-3.5 h-3.5 text-[#f5b8c9]" /> TOTAL SHOTS
+                  <Zap className="w-3.5 h-3.5 text-pink" /> TOTAL SHOTS
                 </span>
                 <span className="font-bold text-2xl text-white">{summary.hits + summary.misses}</span>
               </div>
@@ -311,7 +312,7 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ onNavigate }) => {
                   onNavigate('arena');
                 }}
                 onMouseEnter={() => soundManager.playHover()}
-                className="btn-editorial-secondary flex-1 py-3 text-xs font-bold uppercase tracking-wider text-white border-[#262626] hover:bg-[#262626] hover:border-[#f5b8c9] flex items-center justify-center gap-2 active:scale-95 transition-all"
+                className="btn-editorial-secondary flex-1 py-3 text-xs font-bold uppercase tracking-wider text-white border-[#262626] hover:bg-[#262626] hover:border-pink flex items-center justify-center gap-2 active:scale-95 transition-all"
               >
                 <RotateCcw className="w-4 h-4" />
                 RETRY DRILL
@@ -322,7 +323,7 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ onNavigate }) => {
                   onNavigate('library');
                 }}
                 onMouseEnter={() => soundManager.playHover()}
-                className="btn-editorial-secondary flex-1 py-3 text-xs font-bold uppercase tracking-wider text-white border-[#262626] hover:bg-[#262626] hover:border-[#f5b8c9] flex items-center justify-center gap-2 active:scale-95 transition-all"
+                className="btn-editorial-secondary flex-1 py-3 text-xs font-bold uppercase tracking-wider text-white border-[#262626] hover:bg-[#262626] hover:border-pink flex items-center justify-center gap-2 active:scale-95 transition-all"
               >
                 <Library className="w-4 h-4" />
                 LIBRARY
@@ -336,7 +337,7 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ onNavigate }) => {
           {/* Spatial Heatmap Card */}
           <div className="bg-[#141414] border border-[#262626] rounded-[12px] p-6 space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="font-mono text-xs text-[#f5b8c9] uppercase tracking-widest">
+              <h3 className="font-mono text-xs text-pink uppercase tracking-widest">
                 TARGET WALL HIT MATRIX
               </h3>
               <span className="text-xs font-mono text-neutral-400">2D SPATIAL ERROR</span>
