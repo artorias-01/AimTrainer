@@ -16,6 +16,7 @@
 
 * {
   box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent !important;
 }
 
 body {
@@ -109,6 +110,10 @@ h1, h2, h3, .font-serif-display {
 }
 
 /* Focus & Active States */
+.focus\:outline-none:focus, .focus-visible\:outline-none:focus-visible, *:focus {
+  outline: none !important;
+}
+
 .focus\:border-pink:focus, .focus\:border-accent:focus,
 .focus-visible\:border-pink:focus-visible, .focus-visible\:border-accent:focus-visible {
   border-color: var(--accent-color) !important;
@@ -120,13 +125,9 @@ h1, h2, h3, .font-serif-display {
   box-shadow: 0 0 0 1px var(--accent-color) !important;
 }
 
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible,
 .focus-visible\:outline-accent:focus-visible, .focus-visible\:outline-pink:focus-visible {
   outline: 2px solid var(--accent-color) !important;
-  outline-offset: 2px !important;
-}
-
-.focus\:outline-none:focus, .focus-visible\:outline-none:focus-visible {
-  outline: 2px solid transparent !important;
   outline-offset: 2px !important;
 }
 

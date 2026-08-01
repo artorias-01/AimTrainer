@@ -48,10 +48,11 @@ export const LiveHUD: React.FC = () => {
     timeOnTargetMs,
     totalSessionTimeMs,
     currentTrackingStreakMs,
+    trackingHp,
     pauseSession,
   } = useGameStore();
 
-  const { crosshair, pauseKey, performanceMode } = useSettingsStore();
+  const { crosshair, pauseKey, performanceMode, infinitePracticeMode } = useSettingsStore();
 
   const isTrackingMode = activeScenario.category === 'tracking';
 
@@ -76,7 +77,7 @@ export const LiveHUD: React.FC = () => {
         <div className="flex flex-col gap-2.5 max-w-xs">
           {/* Current Scenario Header */}
           <div className="flex flex-col bg-[#0d0d0d]/90 text-white px-5 py-3 rounded-[12px] border border-[#262626] backdrop-blur-md">
-            <div className="flex items-center justify-between font-mono text-[10px] tracking-widest text-pink uppercase">
+            <div className="flex items-center justify-between font-mono text-[10px] tracking-widest text-accent uppercase">
               <span>CURRENT SCENARIO</span>
               <span className="text-[9px] text-neutral-500 font-bold bg-[#141414] px-2 py-0.5 rounded-[6px] border border-[#262626]">
                 {pauseKey} to pause
@@ -92,7 +93,7 @@ export const LiveHUD: React.FC = () => {
             initial={performanceMode ? false : { opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.35, ease: 'easeOut' }}
-            className="bg-[#0d0d0d]/95 backdrop-blur-md border border-[#262626] border-l-2 border-l-pink rounded-[12px] p-3.5 flex items-center justify-between gap-3 text-xs font-mono shadow-lg"
+            className="bg-[#0d0d0d]/95 backdrop-blur-md border border-[#262626] border-l-2 border-l-accent rounded-[12px] p-3.5 flex items-center justify-between gap-3 text-xs font-mono shadow-lg"
           >
             {isTrackingMode ? (
               <>
@@ -115,8 +116,8 @@ export const LiveHUD: React.FC = () => {
                 <div className="h-6 w-px bg-[#262626]" />
 
                 <div className="flex flex-col">
-                  <span className="text-[9px] text-pink font-bold uppercase">TARGET LOCK</span>
-                  <span className="font-extrabold text-pink text-sm">
+                  <span className="text-[9px] text-accent font-bold uppercase">TARGET LOCK</span>
+                  <span className="font-extrabold text-accent text-sm">
                     <AnimatedNumber value={liveTrackingAcc} />%
                   </span>
                 </div>
@@ -142,14 +143,36 @@ export const LiveHUD: React.FC = () => {
                 <div className="h-6 w-px bg-[#262626]" />
 
                 <div className="flex flex-col">
-                  <span className="text-[9px] text-pink font-bold uppercase">ACCURACY</span>
-                  <span className="font-extrabold text-pink text-sm">
+                  <span className="text-[9px] text-accent font-bold uppercase">ACCURACY</span>
+                  <span className="font-extrabold text-accent text-sm">
                     <AnimatedNumber value={accuracy} />%
                   </span>
                 </div>
               </>
             )}
           </motion.div>
+
+          {/* Aim Labs-Style Tracking Health / HP Bar */}
+          {isTrackingMode && (
+            <motion.div
+              initial={performanceMode ? false : { opacity: 0, y: -5 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-[#0d0d0d]/95 backdrop-blur-md border border-[#262626] rounded-[12px] p-3 space-y-1.5 shadow-lg font-mono text-xs"
+            >
+              <div className="flex items-center justify-between text-[9px] text-neutral-400 font-bold uppercase">
+                <span className="flex items-center gap-1.5 text-accent">
+                  TRACKING HP {infinitePracticeMode ? '(NO FAIL)' : ''}
+                </span>
+                <span className="text-white font-extrabold">{Math.round(trackingHp)}%</span>
+              </div>
+              <div className="w-full bg-[#141414] border border-[#262626] rounded-full h-2 overflow-hidden">
+                <div
+                  className="bg-accent h-full rounded-full transition-all duration-100"
+                  style={{ width: `${Math.max(0, Math.min(100, trackingHp))}%` }}
+                />
+              </div>
+            </motion.div>
+          )}
         </div>
 
         {/* Top-Right Prominent Metrics Grid */}

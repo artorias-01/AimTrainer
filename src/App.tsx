@@ -49,20 +49,33 @@ export function App() {
     };
   }, []);
 
-  // Global keyboard listener for Ctrl+K / Cmd+K Command Palette
+  // Global keyboard listener for Ctrl+K Command Palette and app-wide ESC navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
         setShowCommandPalette((prev) => !prev);
-      } else if (e.key === 'Escape') {
-        setShowCommandPalette(false);
+        return;
+      }
+
+      if (e.key === 'Escape') {
+        if (showCommandPalette) {
+          setShowCommandPalette(false);
+          return;
+        }
+
+        // Do not interfere with Arena in-game pause or Landing drill-menu listeners
+        if (activePage === 'arena' || activePage === 'landing') return;
+
+        // Navigate back to Landing page from top-level views (library, dashboard, results, settings)
+        e.preventDefault();
+        handleNavigate('landing');
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [showCommandPalette, activePage]);
 
   const handleNavigate = (page: string, scenarioId?: string) => {
     if (scenarioId) {

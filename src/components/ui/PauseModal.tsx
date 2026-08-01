@@ -153,7 +153,7 @@ export const PauseModal: React.FC<PauseModalProps> = ({ onNavigate, onResume }) 
               }
               onNavigate('landing');
             }}
-            className="w-full py-3.5 rounded-[12px] bg-[#1a1a1a] hover:bg-[#b91c1c] text-white hover:text-white font-mono text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 border border-[#262626] transition-all"
+            className="w-full py-3.5 rounded-[12px] bg-[#1a1a1a] hover:bg-accent text-white hover:text-[#0d0d0d] font-mono text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 border border-[#262626] hover:border-accent transition-all focus:outline-none focus-visible:outline-accent"
           >
             <Home className="w-4 h-4" />
             EXIT DRILL (QUIT TO MAIN MENU)

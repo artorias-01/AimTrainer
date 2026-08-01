@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { HeroScene } from '../components/3d/HeroScene';
 import { useSettingsStore } from '../store/useSettingsStore';
@@ -92,6 +92,21 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
   const [listeningKeyFor, setListeningKeyFor] = useState<'pause' | 'restart' | null>(null);
   const [saveToast, setSaveToast] = useState<string | null>(null);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
+
+  useEffect(() => {
+    if (!activeCategory) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        e.stopPropagation();
+        setActiveCategory(null);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown, true);
+    return () => window.removeEventListener('keydown', handleKeyDown, true);
+  }, [activeCategory]);
 
   const showSaveConfirmation = (msg: string) => {
     setSaveToast(msg);

@@ -65,6 +65,7 @@ interface GameState {
   totalSessionTimeMs: number;
   currentTrackingStreakMs: number;
   longestTrackingStreakMs: number;
+  trackingHp: number;
   trackingTimeline: { timeSec: number; onTargetPct: number }[];
 
   setScenario: (scenarioId: string) => void;
@@ -105,6 +106,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   totalSessionTimeMs: 0,
   currentTrackingStreakMs: 0,
   longestTrackingStreakMs: 0,
+  trackingHp: 100,
   trackingTimeline: [],
 
   activeRoutine: null,
@@ -223,6 +225,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       totalSessionTimeMs: 0,
       currentTrackingStreakMs: 0,
       longestTrackingStreakMs: 0,
+      trackingHp: 100,
       trackingTimeline: [],
     });
 
@@ -257,7 +260,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   },
 
   recordTrackingTick: (frameMs, isOnTarget) => {
-    const { status, timeOnTargetMs, totalSessionTimeMs, currentTrackingStreakMs, longestTrackingStreakMs, score } = get();
+    const { status, timeOnTargetMs, totalSessionTimeMs, currentTrackingStreakMs, longestTrackingStreakMs, score, trackingHp } = get();
     if (status !== 'playing' || frameMs <= 0) return;
 
     const newTotalTime = totalSessionTimeMs + frameMs;
@@ -265,6 +268,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     let newCurrentStreak = currentTrackingStreakMs;
     let newLongestStreak = longestTrackingStreakMs;
     let scoreDelta = 0;
+    let newHp = trackingHp;
 
     if (isOnTarget) {
       newTimeOnTarget += frameMs;
@@ -272,8 +276,24 @@ export const useGameStore = create<GameState>((set, get) => ({
       newLongestStreak = Math.max(longestTrackingStreakMs, newCurrentStreak);
       const streakMult = Math.min(2.0, 1.0 + newCurrentStreak / 5000);
       scoreDelta = frameMs * 1.25 * streakMult;
+      newHp = Math.min(100, trackingHp + (frameMs * 0.02));
     } else {
       newCurrentStreak = 0;
+      newHp = Math.max(0, trackingHp - (frameMs * 0.035));
+    }
+
+    const infinitePracticeMode = useSettingsStore.getState().infinitePracticeMode;
+
+    if (newHp <= 0 && !infinitePracticeMode) {
+      set({
+        totalSessionTimeMs: newTotalTime,
+        timeOnTargetMs: newTimeOnTarget,
+        currentTrackingStreakMs: 0,
+        longestTrackingStreakMs: newLongestStreak,
+        trackingHp: 0,
+      });
+      get().stopSession();
+      return;
     }
 
     set({
@@ -281,6 +301,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       timeOnTargetMs: newTimeOnTarget,
       currentTrackingStreakMs: newCurrentStreak,
       longestTrackingStreakMs: newLongestStreak,
+      trackingHp: newHp,
       score: Math.round(score + scoreDelta),
     });
   },
