@@ -117,6 +117,17 @@ h1, h2, h3, .font-serif-display {
 .focus\:ring-pink:focus, .focus\:ring-accent:focus,
 .focus-visible\:ring-pink:focus-visible, .focus-visible\:ring-accent:focus-visible {
   --tw-ring-color: var(--accent-color) !important;
+  box-shadow: 0 0 0 1px var(--accent-color) !important;
+}
+
+.focus-visible\:outline-accent:focus-visible, .focus-visible\:outline-pink:focus-visible {
+  outline: 2px solid var(--accent-color) !important;
+  outline-offset: 2px !important;
+}
+
+.focus\:outline-none:focus, .focus-visible\:outline-none:focus-visible {
+  outline: 2px solid transparent !important;
+  outline-offset: 2px !important;
 }
 
 ::selection {
