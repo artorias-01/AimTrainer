@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { useGameStore } from '../../store/useGameStore';
 import { useSettingsStore } from '../../store/useSettingsStore';
 import { CrosshairPreview } from './CrosshairPreview';
-import { Timer, Zap, Flame, Pause } from 'lucide-react';
+import { Timer, Zap, Pause } from 'lucide-react';
 import { soundManager } from '../../utils/audio';
 
 const AnimatedNumber: React.FC<{ value: number }> = ({ value }) => {
@@ -137,8 +137,7 @@ export const LiveHUD: React.FC = () => {
 
           {/* Streak Combo */}
           {streak > 2 && (
-            <div className="flex items-center gap-1.5 bg-[#f5b8c9] text-[#0d0d0d] px-3.5 py-2.5 rounded-[12px] font-mono font-extrabold text-xs tracking-wider animate-bounce">
-              <Flame className="w-4 h-4 fill-[#0d0d0d]" />
+            <div className="flex items-center justify-center bg-[#f5b8c9] text-[#0d0d0d] px-3.5 py-2.5 rounded-[12px] font-mono font-extrabold text-xs tracking-wider animate-bounce">
               <span>{streak}X STREAK</span>
             </div>
           )}

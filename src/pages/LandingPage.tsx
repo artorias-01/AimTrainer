@@ -5,7 +5,7 @@ import { SCENARIOS } from '../utils/scenarios';
 import { getDailyStreak } from '../utils/storage';
 import { useGameStore } from '../store/useGameStore';
 import { soundManager } from '../utils/audio';
-import { Target, Flame } from 'lucide-react';
+import { Target } from 'lucide-react';
 
 interface LandingPageProps {
   onNavigate: (page: string, scenarioId?: string) => void;
@@ -55,8 +55,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
 
         {/* Daily Streak Indicator Badge */}
         <div className="flex justify-center">
-          <div className="px-4 py-1.5 rounded-[12px] bg-[#141414]/90 border border-[#f5b8c9]/30 text-xs font-mono font-bold flex items-center gap-2 text-[#f5b8c9] backdrop-blur-sm shadow-md">
-            <Flame className="w-4 h-4 fill-current text-orange-500" />
+          <div className="px-4 py-1.5 rounded-[12px] bg-[#141414]/90 border border-[#f5b8c9]/30 text-xs font-mono font-bold flex items-center justify-center gap-2 text-[#f5b8c9] backdrop-blur-sm shadow-md tracking-wider">
             <span>
               {dailyStreak.streakCount > 0
                 ? `${dailyStreak.streakCount} DAY STREAK ACTIVE`

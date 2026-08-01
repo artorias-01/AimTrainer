@@ -15,8 +15,36 @@ import {
 import type { CrosshairConfig } from '../utils/storage';
 import { soundManager } from '../utils/audio';
 
-export type TargetShape = 'sphere' | 'torus' | 'cube';
+export type TargetShapeType = 'sphere' | 'torus' | 'cube' | 'octahedron' | 'cylinder' | 'cone' | 'capsule';
 export type ArenaBackdrop = 'grid-room' | 'minimal-void' | 'gradient-room';
+
+export interface TargetShapeConfig {
+  shape: TargetShapeType;
+  scale: number;
+  wireframe: boolean;
+  emissiveIntensity: number;
+  idleRotation: boolean;
+}
+
+export const DEFAULT_TARGET_SHAPE_CONFIG: TargetShapeConfig = {
+  shape: 'sphere',
+  scale: 1.0,
+  wireframe: false,
+  emissiveIntensity: 0.65,
+  idleRotation: true,
+};
+
+function getStoredTargetShapeConfig(): TargetShapeConfig {
+  try {
+    const raw = localStorage.getItem('aimtt_target_shape_config_v1');
+    if (raw) return { ...DEFAULT_TARGET_SHAPE_CONFIG, ...JSON.parse(raw) };
+    const legacyShape = localStorage.getItem('aimtt_target_shape_v1') as TargetShapeType;
+    if (legacyShape) return { ...DEFAULT_TARGET_SHAPE_CONFIG, shape: legacyShape };
+    return DEFAULT_TARGET_SHAPE_CONFIG;
+  } catch {
+    return DEFAULT_TARGET_SHAPE_CONFIG;
+  }
+}
 
 interface SettingsState {
   settings: SensitivityProfile;
@@ -30,7 +58,7 @@ interface SettingsState {
   displayName: string;
   pauseKey: string;
   restartKey: string;
-  targetShape: TargetShape;
+  targetShapeConfig: TargetShapeConfig;
   targetColor: string;
   arenaBackdrop: ArenaBackdrop;
   arenaColor: string;
@@ -45,7 +73,7 @@ interface SettingsState {
   toggleSound: () => void;
   setDisplayName: (name: string) => void;
   setKeybinds: (pause: string, restart: string) => void;
-  setTargetShape: (shape: TargetShape) => void;
+  setTargetShapeConfig: (partial: Partial<TargetShapeConfig>) => void;
   setTargetColor: (color: string) => void;
   setArenaBackdrop: (backdrop: ArenaBackdrop) => void;
   setArenaColor: (color: string) => void;
@@ -61,7 +89,7 @@ const initialPauseKey = localStorage.getItem('aimtt_pause_key') || 'Escape';
 const initialRestartKey = localStorage.getItem('aimtt_restart_key') || 'KeyR';
 const initialSpeedMult = parseFloat(localStorage.getItem('aimtt_speed_mult_v1') || '1.0');
 const initialPerfMode = localStorage.getItem('aimtt_perf_mode_v1') === 'true';
-const initialShape = (localStorage.getItem('aimtt_target_shape_v1') as TargetShape) || 'sphere';
+const initialShapeConfig = getStoredTargetShapeConfig();
 const initialTargetColor = localStorage.getItem('aimtt_target_color_v1') || '#f5b8c9';
 const initialBackdrop = (localStorage.getItem('aimtt_arena_backdrop_v1') as ArenaBackdrop) || 'grid-room';
 const initialArenaColor = localStorage.getItem('aimtt_arena_color_v1') || '#121212';
@@ -87,7 +115,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
   displayName: initialHandle,
   pauseKey: initialPauseKey,
   restartKey: initialRestartKey,
-  targetShape: initialShape,
+  targetShapeConfig: initialShapeConfig,
   targetColor: initialTargetColor,
   arenaBackdrop: initialBackdrop,
   arenaColor: initialArenaColor,
@@ -159,9 +187,10 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     set({ pauseKey: pause, restartKey: restart });
   },
 
-  setTargetShape: (shape) => {
-    localStorage.setItem('aimtt_target_shape_v1', shape);
-    set({ targetShape: shape });
+  setTargetShapeConfig: (partial) => {
+    const updated = { ...get().targetShapeConfig, ...partial };
+    localStorage.setItem('aimtt_target_shape_config_v1', JSON.stringify(updated));
+    set({ targetShapeConfig: updated });
   },
 
   setTargetColor: (color) => {

@@ -1,5 +1,5 @@
 import type { CrosshairConfig } from './storage';
-import { DEFAULT_CROSSHAIR } from './storage';
+import { migrateCrosshairConfig } from './storage';
 
 /**
  * Validates whether an input string is a valid 3-digit or 6-digit hex color code.
@@ -30,24 +30,10 @@ export function parseGenericCrosshairCode(input: string): CrosshairConfig | null
     const trimmed = input.trim();
     if (!trimmed) return null;
 
-    if (trimmed.startsWith('{') || trimmed.endsWith('}')) {
+    if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
       const parsedJson = JSON.parse(trimmed);
       if (parsedJson && typeof parsedJson === 'object') {
-        const mappedConfig: Partial<CrosshairConfig> = {};
-        if (parsedJson.type) mappedConfig.type = parsedJson.type;
-        if (parsedJson.color && isValidHexColor(parsedJson.color)) {
-          mappedConfig.color = normalizeHexColor(parsedJson.color);
-        }
-        if (parsedJson.size || parsedJson.length) {
-          mappedConfig.size = Math.min(20, Math.max(2, parsedJson.size || parsedJson.length));
-        }
-        if (parsedJson.thickness) mappedConfig.thickness = Math.min(6, Math.max(1, parsedJson.thickness));
-        if (parsedJson.gap || parsedJson.offset) mappedConfig.gap = Math.min(12, Math.max(0, parsedJson.gap || parsedJson.offset));
-        if (parsedJson.dotSize) mappedConfig.dotSize = parsedJson.dotSize;
-        if (parsedJson.opacity !== undefined) mappedConfig.opacity = parsedJson.opacity;
-        if (parsedJson.outline !== undefined) mappedConfig.outline = parsedJson.outline;
-
-        return { ...DEFAULT_CROSSHAIR, ...mappedConfig };
+        return migrateCrosshairConfig(parsedJson);
       }
     }
   } catch {

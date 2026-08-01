@@ -10,7 +10,7 @@ import {
   importAllDataJSON,
   exportSessionsCSV,
 } from '../utils/storage';
-import { Trophy, Target, Activity, Calendar, User, Play, Flame, AlertTriangle, Download, Upload } from 'lucide-react';
+import { Trophy, Target, Activity, Calendar, User, Play, AlertTriangle, Download, Upload } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
 import { soundManager } from '../utils/audio';
 
@@ -252,7 +252,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
 
         <div className="bg-[#141414] border border-[#262626] rounded-[12px] p-6 space-y-2">
           <span className="text-neutral-400 font-mono text-xs flex items-center gap-1.5">
-            <Flame className="w-3.5 h-3.5 text-orange-400" /> DAILY STREAK
+            <Calendar className="w-3.5 h-3.5 text-[#f5b8c9]" /> DAILY STREAK
           </span>
           <div className="font-display font-bold text-4xl text-white">
             {dailyStreak.streakCount} DAYS

@@ -1,18 +1,34 @@
 import type { SensitivityProfile } from './sensitivity';
 
+export interface CrosshairLineConfig {
+  show: boolean;
+  color: string;
+  opacity: number;
+  length: number;
+  thickness: number;
+  offset: number;
+}
+
+export interface CrosshairDotConfig {
+  show: boolean;
+  color: string;
+  opacity: number;
+  size: number;
+}
+
+export interface CrosshairOutlineConfig {
+  show: boolean;
+  color: string;
+  opacity: number;
+  thickness: number;
+}
+
 export interface CrosshairConfig {
-  type: 'dot' | 'cross' | 'circle' | 'cross-dot' | 't-shape' | 'x-shape';
-  color: string; // '#f5b8c9' (pink), '#ffffff', '#0d0d0d'
-  size: number; // 4 to 30
-  thickness: number; // 1 to 10
-  gap: number; // 0 to 20
-  outline: boolean;
-  dotSize: number; // 1 to 10
-  opacity?: number;
-  outlineColor?: string;
-  outlineThickness?: number;
-  showDot?: boolean;
-  dotColor?: string;
+  color: string;
+  innerLines: CrosshairLineConfig;
+  outerLines: CrosshairLineConfig;
+  dot: CrosshairDotConfig;
+  outline: CrosshairOutlineConfig;
 }
 
 export interface SavedCrosshairPreset {
@@ -102,16 +118,85 @@ export const DEFAULT_SETTINGS: SensitivityProfile = {
 };
 
 export const DEFAULT_CROSSHAIR: CrosshairConfig = {
-  type: 'cross-dot',
   color: '#f5b8c9',
-  size: 10,
-  thickness: 2,
-  gap: 4,
-  outline: true,
-  dotSize: 3,
-  opacity: 1.0,
-  outlineColor: '#000000',
+  innerLines: {
+    show: true,
+    color: '#f5b8c9',
+    opacity: 1.0,
+    length: 6,
+    thickness: 2,
+    offset: 3,
+  },
+  outerLines: {
+    show: false,
+    color: '#f5b8c9',
+    opacity: 0.5,
+    length: 10,
+    thickness: 2,
+    offset: 10,
+  },
+  dot: {
+    show: true,
+    color: '#f5b8c9',
+    opacity: 1.0,
+    size: 2,
+  },
+  outline: {
+    show: true,
+    color: '#000000',
+    opacity: 1.0,
+    thickness: 1.5,
+  },
 };
+
+export function migrateCrosshairConfig(raw: any): CrosshairConfig {
+  if (raw && raw.innerLines && raw.outerLines && raw.dot && raw.outline) {
+    return {
+      color: raw.color || '#f5b8c9',
+      innerLines: { ...DEFAULT_CROSSHAIR.innerLines, ...raw.innerLines },
+      outerLines: { ...DEFAULT_CROSSHAIR.outerLines, ...raw.outerLines },
+      dot: { ...DEFAULT_CROSSHAIR.dot, ...raw.dot },
+      outline: { ...DEFAULT_CROSSHAIR.outline, ...raw.outline },
+    };
+  }
+
+  const legacyColor = raw?.color || '#f5b8c9';
+  const legacySize = raw?.size ?? 6;
+  const legacyThickness = raw?.thickness ?? 2;
+  const legacyGap = raw?.gap ?? 3;
+
+  return {
+    color: legacyColor,
+    innerLines: {
+      show: raw?.type !== 'dot',
+      color: legacyColor,
+      opacity: raw?.opacity ?? 1.0,
+      length: legacySize,
+      thickness: legacyThickness,
+      offset: legacyGap,
+    },
+    outerLines: {
+      show: false,
+      color: legacyColor,
+      opacity: 0.5,
+      length: legacySize * 1.5,
+      thickness: legacyThickness,
+      offset: legacyGap + legacySize + 2,
+    },
+    dot: {
+      show: raw?.showDot ?? (raw?.type === 'dot' || raw?.type === 'cross-dot'),
+      color: raw?.dotColor || legacyColor,
+      opacity: 1.0,
+      size: raw?.dotSize ?? 2,
+    },
+    outline: {
+      show: raw?.outline ?? true,
+      color: raw?.outlineColor || '#000000',
+      opacity: 1.0,
+      thickness: raw?.outlineThickness ?? 1.5,
+    },
+  };
+}
 
 export const DEFAULT_AUDIO: AudioSettings = {
   masterVolume: 0.8,
@@ -135,7 +220,7 @@ export function saveStoredSettings(settings: SensitivityProfile) {
 export function getStoredCrosshair(): CrosshairConfig {
   try {
     const raw = localStorage.getItem(CROSSHAIR_KEY);
-    return raw ? { ...DEFAULT_CROSSHAIR, ...JSON.parse(raw) } : DEFAULT_CROSSHAIR;
+    return raw ? migrateCrosshairConfig(JSON.parse(raw)) : DEFAULT_CROSSHAIR;
   } catch {
     return DEFAULT_CROSSHAIR;
   }
@@ -224,15 +309,19 @@ export function getSavedCrosshairPresets(): SavedCrosshairPreset[] {
   }
 }
 
+export function saveSavedCrosshairPresets(presets: SavedCrosshairPreset[]) {
+  localStorage.setItem(PRESETS_KEY, JSON.stringify(presets));
+}
+
 export function saveCrosshairPreset(name: string, config: CrosshairConfig): SavedCrosshairPreset[] {
   const current = getSavedCrosshairPresets();
   const newPreset: SavedCrosshairPreset = {
-    id: 'preset-' + Date.now(),
-    name: name.trim() || 'Custom Crosshair',
-    config: { ...config },
+    id: `preset_${Date.now()}`,
+    name: name.toUpperCase(),
+    config,
   };
   const updated = [newPreset, ...current];
-  localStorage.setItem(PRESETS_KEY, JSON.stringify(updated));
+  saveSavedCrosshairPresets(updated);
   return updated;
 }
 

@@ -3,35 +3,57 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { motion, AnimatePresence } from 'framer-motion';
 import * as THREE from 'three';
 import { soundManager } from '../../utils/audio';
+import { useSettingsStore } from '../../store/useSettingsStore';
 
 function AnimatedIntroScene() {
   const meshRef = React.useRef<THREE.Mesh>(null);
-  const groupRef = React.useRef<THREE.Group>(null);
   const ringRef = React.useRef<THREE.Mesh>(null);
+  const targetShapeConfig = useSettingsStore((s) => s.targetShapeConfig);
 
-  useFrame(({ clock }) => {
+  useFrame(({ clock, camera }) => {
     const t = clock.getElapsedTime();
+
+    // 1. Slow, elegant camera dolly-in over duration (Z: 7.5 -> 4.8)
+    const dollyProgress = Math.min(t / 2.2, 1.0);
+    camera.position.z = 7.5 - dollyProgress * 2.7;
+
+    // 2. Core geometry: smooth scale reveal + single deliberate Y-axis rotation
     if (meshRef.current) {
-      meshRef.current.rotation.x = t * 0.8;
-      meshRef.current.rotation.y = t * 1.2;
+      const scaleProgress = Math.min(t / 0.6, 1.0);
+      meshRef.current.scale.setScalar(scaleProgress);
+      meshRef.current.rotation.y = t * 0.45;
     }
+
+    // 3. Outer orbital ring: slow reverse rotation
     if (ringRef.current) {
-      ringRef.current.rotation.z = -t * 0.5;
-      ringRef.current.rotation.y = t * 0.3;
-    }
-    if (groupRef.current) {
-      groupRef.current.position.z = Math.sin(t * 1.5) * 0.4;
+      ringRef.current.rotation.y = -t * 0.25;
     }
   });
 
+  const shapeType = targetShapeConfig?.shape || 'sphere';
+
   return (
-    <group ref={groupRef}>
+    <group position={[0, 0, 0]}>
       <ambientLight intensity={0.6} />
       <pointLight position={[5, 5, 5]} intensity={2.0} color="#f5b8c9" />
 
-      {/* Core Glowing Geometric Wireframe */}
+      {/* Core Geometry (Scaled from 0, slow single-axis spin, pink emissive) */}
       <mesh ref={meshRef}>
-        <icosahedronGeometry args={[1.4, 1]} />
+        {shapeType === 'torus' ? (
+          <torusGeometry args={[1.2, 0.4, 16, 32]} />
+        ) : shapeType === 'cube' ? (
+          <boxGeometry args={[1.6, 1.6, 1.6]} />
+        ) : shapeType === 'octahedron' ? (
+          <octahedronGeometry args={[1.5, 0]} />
+        ) : shapeType === 'cylinder' ? (
+          <cylinderGeometry args={[1.0, 1.0, 1.8, 32]} />
+        ) : shapeType === 'cone' ? (
+          <coneGeometry args={[1.2, 2.0, 32]} />
+        ) : shapeType === 'capsule' ? (
+          <capsuleGeometry args={[0.8, 1.2, 16, 32]} />
+        ) : (
+          <icosahedronGeometry args={[1.4, 1]} />
+        )}
         <meshStandardMaterial
           color="#f5b8c9"
           wireframe
@@ -40,13 +62,15 @@ function AnimatedIntroScene() {
         />
       </mesh>
 
-      {/* Outer Orbital Ring */}
+      {/* Outer Orbital Ring (Translucent silver, visually distinct) */}
       <mesh ref={ringRef}>
-        <torusGeometry args={[2.2, 0.04, 16, 100]} />
+        <torusGeometry args={[2.5, 0.03, 16, 100]} />
         <meshStandardMaterial
           color="#ffffff"
-          emissive="#f5b8c9"
-          emissiveIntensity={0.5}
+          transparent
+          opacity={0.35}
+          emissive="#ffffff"
+          emissiveIntensity={0.2}
         />
       </mesh>
 
@@ -108,7 +132,7 @@ export const IntroTransition: React.FC<IntroTransitionProps> = ({ onComplete }) 
         >
           {/* 3D Canvas Background */}
           <div className="absolute inset-0 z-0">
-            <Canvas camera={{ position: [0, 0, 5], fov: 60 }}>
+            <Canvas camera={{ position: [0, 0, 7.5], fov: 60 }}>
               <AnimatedIntroScene />
             </Canvas>
           </div>

@@ -1,10 +1,13 @@
 import React, { useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
+import { useSettingsStore } from '../../store/useSettingsStore';
 
 const OrbCluster: React.FC = () => {
   const groupRef = useRef<THREE.Group>(null);
   const targetRef = useRef<THREE.Mesh>(null);
+  const targetShapeConfig = useSettingsStore((s) => s.targetShapeConfig);
+  const targetColor = useSettingsStore((s) => s.targetColor) || '#f5b8c9';
 
   useFrame(({ clock, pointer }) => {
     const t = clock.getElapsedTime();
@@ -15,20 +18,42 @@ const OrbCluster: React.FC = () => {
     if (targetRef.current) {
       targetRef.current.position.x = Math.sin(t * 1.5) * 1.8;
       targetRef.current.position.y = Math.cos(t * 2) * 1.0;
+      if (targetShapeConfig?.idleRotation !== false) {
+        targetRef.current.rotation.y = t * 0.8;
+        targetRef.current.rotation.x = t * 0.4;
+      }
     }
   });
 
+  const { shape, scale, wireframe, emissiveIntensity } = targetShapeConfig;
+  const radius = 0.95 * (scale || 1.0);
+
   return (
     <group ref={groupRef}>
-      {/* Central Hero Pink Target Sphere */}
+      {/* Central Hero Dynamic Target Geometry */}
       <mesh ref={targetRef} position={[0, 0, 0]}>
-        <sphereGeometry args={[0.95, 32, 32]} />
+        {shape === 'torus' ? (
+          <torusGeometry args={[radius * 0.8, radius * 0.3, 16, 32]} />
+        ) : shape === 'cube' ? (
+          <boxGeometry args={[radius * 1.4, radius * 1.4, radius * 1.4]} />
+        ) : shape === 'octahedron' ? (
+          <octahedronGeometry args={[radius * 1.2, 0]} />
+        ) : shape === 'cylinder' ? (
+          <cylinderGeometry args={[radius * 0.8, radius * 0.8, radius * 1.6, 32]} />
+        ) : shape === 'cone' ? (
+          <coneGeometry args={[radius, radius * 1.8, 32]} />
+        ) : shape === 'capsule' ? (
+          <capsuleGeometry args={[radius * 0.7, radius * 1.0, 16, 32]} />
+        ) : (
+          <sphereGeometry args={[radius, 32, 32]} />
+        )}
         <meshStandardMaterial
-          color="#f5b8c9"
+          color={targetColor}
+          wireframe={wireframe}
           roughness={0.15}
           metalness={0.3}
-          emissive="#f5b8c9"
-          emissiveIntensity={0.6}
+          emissive={targetColor === '#ffffff' ? '#f5b8c9' : targetColor}
+          emissiveIntensity={emissiveIntensity ?? 0.6}
         />
       </mesh>
 

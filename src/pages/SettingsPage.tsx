@@ -3,36 +3,26 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { HeroScene } from '../components/3d/HeroScene';
 import { useSettingsStore } from '../store/useSettingsStore';
 import { useStatsStore } from '../store/useStatsStore';
-import { CrosshairPreview } from '../components/ui/CrosshairPreview';
 import { calculateSensFromCm360 } from '../utils/sensitivity';
 import type { GameEngine } from '../utils/sensitivity';
-import { isValidHexColor, normalizeHexColor, parseGenericCrosshairCode, exportCrosshairConfigToJSON } from '../utils/crosshairImporter';
-import {
-  getSavedCrosshairPresets,
-  saveCrosshairPreset,
-  deleteCrosshairPreset,
-} from '../utils/storage';
-import type { SavedCrosshairPreset } from '../utils/storage';
 import { soundManager } from '../utils/audio';
 import {
   Sliders,
-  Crosshair,
-  Check,
   Volume2,
   VolumeX,
   User,
-  Download,
-  Copy,
   Trash2,
   CheckCircle2,
   Gauge,
   AlertCircle,
-  Save,
   Zap,
   ArrowLeft,
   Tv,
   Gamepad2,
 } from 'lucide-react';
+
+import { TargetPreview3D } from '../components/ui/TargetPreview3D';
+import { CrosshairStudio } from '../components/ui/CrosshairStudio';
 
 function getHexLuminance(hex: string): number {
   let c = hex.replace('#', '').trim();
@@ -62,8 +52,6 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
   const {
     settings,
     updateSettings,
-    crosshair,
-    updateCrosshair,
     masterVolume,
     setMasterVolume,
     hitVolume,
@@ -80,15 +68,14 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
     pauseKey,
     restartKey,
     setKeybinds,
-    targetShape,
-    setTargetShape,
+    targetShapeConfig,
+    setTargetShapeConfig,
     targetColor,
     setTargetColor,
     arenaBackdrop,
     setArenaBackdrop,
     arenaColor,
     setArenaColor,
-    setScenarioCrosshair,
   } = useSettingsStore();
 
   const { clearHistory } = useStatsStore();
@@ -98,48 +85,12 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
   >(null);
 
   const [listeningKeyFor, setListeningKeyFor] = useState<'pause' | 'restart' | null>(null);
-  const [hexInput, setHexInput] = useState(crosshair.color || '#F5B8C9');
-  const [hexError, setHexError] = useState<string | null>(null);
-  const [dotHexInput, setDotHexInput] = useState(crosshair.dotColor || crosshair.color || '#F5B8C9');
-  const [outlineHexInput, setOutlineHexInput] = useState(crosshair.outlineColor || '#000000');
-  const [importCodeInput, setImportCodeInput] = useState('');
-  const [importStatusMsg, setImportStatusMsg] = useState<string | null>(null);
-  const [copiedMsg, setCopiedMsg] = useState(false);
   const [saveToast, setSaveToast] = useState<string | null>(null);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
-
-  const [savedPresets, setSavedPresets] = useState<SavedCrosshairPreset[]>(getSavedCrosshairPresets);
-  const [presetNameInput, setPresetNameInput] = useState('');
-  const [selectedPresetId, setSelectedPresetId] = useState<string>('');
 
   const showSaveConfirmation = (msg: string) => {
     setSaveToast(msg);
     setTimeout(() => setSaveToast(null), 2000);
-  };
-
-  const handleSavePreset = () => {
-    if (!presetNameInput.trim()) return;
-    const updated = saveCrosshairPreset(presetNameInput, crosshair);
-    setSavedPresets(updated);
-    setPresetNameInput('');
-    showSaveConfirmation(`SAVED PRESET: ${presetNameInput.toUpperCase()}`);
-  };
-
-  const handleDeletePreset = (id: string) => {
-    const updated = deleteCrosshairPreset(id);
-    setSavedPresets(updated);
-    if (selectedPresetId === id) setSelectedPresetId('');
-    showSaveConfirmation('PRESET DELETED');
-  };
-
-  const handleLoadPreset = (preset: SavedCrosshairPreset) => {
-    updateCrosshair(preset.config);
-    setHexInput(preset.config.color || '#F5B8C9');
-    setDotHexInput(preset.config.dotColor || preset.config.color || '#F5B8C9');
-    setOutlineHexInput(preset.config.outlineColor || '#000000');
-    setHexError(null);
-    setSelectedPresetId(preset.id);
-    showSaveConfirmation(`LOADED PRESET: ${preset.name.toUpperCase()}`);
   };
 
   const engines: { id: GameEngine; label: string }[] = [
@@ -147,14 +98,6 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
     { id: 'cs2', label: 'CS2 / SOURCE' },
     { id: 'overwatch', label: 'OVERWATCH 2' },
     { id: 'apex', label: 'APEX LEGENDS' },
-  ];
-
-  const presetSwatches = [
-    { name: 'EDITORIAL PINK', hex: '#F5B8C9' },
-    { name: 'PURE WHITE', hex: '#FFFFFF' },
-    { name: 'NEON LIME', hex: '#39FF14' },
-    { name: 'CYAN GLOW', hex: '#00FFFF' },
-    { name: 'VIBRANT ORANGE', hex: '#FF6600' },
   ];
 
   const speedPacingPresets = [
@@ -177,60 +120,6 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
     }
     setListeningKeyFor(null);
     showSaveConfirmation('KEYBIND SAVED');
-  };
-
-  const handleHexChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = e.target.value;
-    setHexInput(val);
-
-    if (!val.trim()) {
-      setHexError('PLEASE ENTER A HEX COLOR CODE (E.G. #39FF14)');
-      return;
-    }
-
-    if (isValidHexColor(val)) {
-      setHexError(null);
-      const normalized = normalizeHexColor(val);
-      updateCrosshair({ color: normalized });
-      showSaveConfirmation(`COLOR SET TO ${normalized}`);
-    } else {
-      setHexError('INVALID HEX COLOR — USE FORMAT #RRGGBB OR #RGB (E.G. #39FF14)');
-    }
-  };
-
-  const handleSelectPresetColor = (hex: string, name: string) => {
-    setHexInput(hex);
-    setHexError(null);
-    updateCrosshair({ color: hex });
-    showSaveConfirmation(`COLOR SET TO ${name}`);
-  };
-
-  const handleImportJsonCode = () => {
-    if (!importCodeInput.trim()) {
-      setImportStatusMsg('PLEASE PASTE A VALID JSON CROSSHAIR CONFIG');
-      return;
-    }
-    const parsed = parseGenericCrosshairCode(importCodeInput);
-    if (parsed) {
-      updateCrosshair(parsed);
-      setHexInput(parsed.color || '#F5B8C9');
-      setDotHexInput(parsed.dotColor || parsed.color || '#F5B8C9');
-      setOutlineHexInput(parsed.outlineColor || '#000000');
-      setHexError(null);
-      setImportStatusMsg('SUCCESSFULLY IMPORTED CROSSHAIR CONFIG!');
-      showSaveConfirmation('CROSSHAIR CONFIG IMPORTED');
-      setTimeout(() => setImportStatusMsg(null), 3000);
-    } else {
-      setImportStatusMsg('INVALID JSON FORMAT — COULD NOT PARSE CONFIG');
-    }
-  };
-
-  const handleExportCode = () => {
-    const jsonStr = exportCrosshairConfigToJSON(crosshair);
-    navigator.clipboard.writeText(jsonStr);
-    setCopiedMsg(true);
-    showSaveConfirmation('JSON COPIED TO CLIPBOARD');
-    setTimeout(() => setCopiedMsg(false), 2500);
   };
 
   const handleClearHistoryConfirm = () => {
@@ -561,405 +450,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
             )}
 
             {/* CATEGORY 2: CROSSHAIR */}
-            {activeCategory === 'crosshair' && (
-              <div className="bg-[#141414] border border-[#262626] rounded-[12px] p-8 space-y-6">
-                <div className="flex items-center justify-between border-b border-[#262626] pb-4">
-                  <h3 className="font-mono text-xs text-[#f5b8c9] uppercase tracking-widest flex items-center gap-2">
-                    <Crosshair className="w-4 h-4 text-[#f5b8c9]" /> CUSTOM CROSSHAIR STUDIO
-                  </h3>
-                  <span className="text-xs font-mono text-neutral-400">REAL-TIME PREVIEW</span>
-                </div>
-
-                <div className="flex justify-center py-4">
-                  <CrosshairPreview config={crosshair} sizePx={200} />
-                </div>
-
-                {/* Saved Named Crosshair Presets Manager */}
-                <div className="space-y-3 bg-[#0d0d0d] p-5 rounded-[12px] border border-[#262626]">
-                  <label className="text-[10px] font-mono text-[#f5b8c9] uppercase tracking-widest block">
-                    SAVED NAMED CROSSHAIR PRESETS
-                  </label>
-
-                  <div className="flex gap-2">
-                    <select
-                      value={selectedPresetId}
-                      onChange={(e) => {
-                        const presetId = e.target.value;
-                        if (!presetId) return;
-                        const found = savedPresets.find((p) => p.id === presetId);
-                        if (found) {
-                          handleLoadPreset(found);
-                        }
-                      }}
-                      className="flex-1 bg-[#141414] border border-[#262626] rounded-[12px] px-4 py-2 text-xs font-mono text-white focus:outline-none focus:border-[#f5b8c9]"
-                    >
-                      <option value="">-- SELECT SAVED PRESET ({savedPresets.length}) --</option>
-                      {savedPresets.map((p) => (
-                        <option key={p.id} value={p.id}>
-                          {p.name}
-                        </option>
-                      ))}
-                    </select>
-
-                    {selectedPresetId && (
-                      <button
-                        onClick={() => handleDeletePreset(selectedPresetId)}
-                        className="px-3 bg-red-950/60 hover:bg-red-900/80 text-red-300 border border-red-800/80 rounded-[12px] text-xs font-mono font-bold flex items-center justify-center gap-1 transition-all"
-                        title="Delete Selected Preset"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    )}
-                  </div>
-
-                  <div className="flex gap-2 pt-1">
-                    <input
-                      type="text"
-                      placeholder="e.g. My Precision X or Dot Only"
-                      value={presetNameInput}
-                      onChange={(e) => setPresetNameInput(e.target.value)}
-                      className="flex-1 bg-[#141414] border border-[#262626] rounded-[12px] px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-[#f5b8c9]"
-                    />
-                    <button
-                      onClick={handleSavePreset}
-                      disabled={!presetNameInput.trim()}
-                      className="btn-editorial-pink px-4 py-2 text-xs font-bold uppercase flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      <Save className="w-3.5 h-3.5" /> SAVE PRESET
-                    </button>
-                  </div>
-                </div>
-
-                {/* Per-Scenario Crosshair Profile Assignment */}
-                <div className="space-y-3 bg-[#0d0d0d] p-5 rounded-[12px] border border-[#262626]">
-                  <label className="text-[10px] font-mono text-[#f5b8c9] uppercase tracking-widest block font-bold">
-                    ASSIGN CROSSHAIR PRESET TO SPECIFIC DRILL OR CATEGORY
-                  </label>
-                  <p className="font-sans-ui text-xs text-neutral-400">
-                    Automatically override active crosshair when launching specific scenarios (e.g. dot for precision, cross for clicking).
-                  </p>
-                  <div className="flex gap-2">
-                    <select
-                      id="scenario-crosshair-select"
-                      className="flex-1 bg-[#141414] border border-[#262626] rounded-[12px] px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-[#f5b8c9]"
-                    >
-                      <option value="tracking">CATEGORY: TRACKING</option>
-                      <option value="clicking">CATEGORY: CLICKING</option>
-                      <option value="precision">CATEGORY: PRECISION</option>
-                      <option value="switching">CATEGORY: SWITCHING</option>
-                    </select>
-
-                    <button
-                      onClick={() => {
-                        const sel = document.getElementById('scenario-crosshair-select') as HTMLSelectElement;
-                        if (sel && selectedPresetId) {
-                          setScenarioCrosshair(sel.value, selectedPresetId);
-                          showSaveConfirmation(`ASSIGNED PRESET TO ${sel.value.toUpperCase()}`);
-                        } else {
-                          showSaveConfirmation('PLEASE SELECT A SAVED PRESET FIRST');
-                        }
-                      }}
-                      className="btn-editorial-pink px-4 py-2 text-xs font-bold uppercase"
-                    >
-                      LINK PRESET
-                    </button>
-                  </div>
-                </div>
-
-                {/* Line Color Hex Input */}
-                <div className="space-y-3 bg-[#0d0d0d] p-5 rounded-[12px] border border-[#262626]">
-                  <label className="text-[10px] font-mono text-[#f5b8c9] uppercase tracking-widest block">
-                    LINE COLOR (HEX CODE)
-                  </label>
-                  <div className="flex items-center gap-3">
-                    <div
-                      className="w-9 h-9 rounded-[8px] border border-[#333] shrink-0"
-                      style={{ backgroundColor: crosshair.color || '#f5b8c9' }}
-                    />
-                    <input
-                      type="text"
-                      placeholder="#F5B8C9 or #FFF"
-                      value={hexInput}
-                      onChange={handleHexChange}
-                      className="flex-1 bg-[#141414] border border-[#262626] rounded-[12px] px-4 py-2.5 text-xs font-mono text-white font-bold uppercase focus:outline-none focus:border-[#f5b8c9] focus-visible:ring-2 focus-visible:ring-[#f5b8c9]"
-                    />
-                  </div>
-
-                  {hexError && (
-                    <div className="text-[10px] font-mono text-red-400 font-bold flex items-center gap-1.5 pt-1">
-                      <AlertCircle className="w-3.5 h-3.5 shrink-0 text-red-400" />
-                      <span>{hexError}</span>
-                    </div>
-                  )}
-                </div>
-
-                {/* Preset Color Swatches */}
-                <div className="space-y-2">
-                  <label className="text-xs font-mono text-neutral-400">PRESET COLOR SWATCHES</label>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-                    {presetSwatches.map((swatch) => (
-                      <button
-                        key={swatch.hex}
-                        onClick={() => handleSelectPresetColor(swatch.hex, swatch.name)}
-                        className={`py-2 px-3 rounded-[12px] text-xs font-mono font-bold flex items-center justify-center gap-2 border transition-all ${
-                          crosshair.color?.toUpperCase() === swatch.hex.toUpperCase()
-                            ? 'border-[#f5b8c9] ring-1 ring-[#f5b8c9]'
-                            : 'border-[#262626]'
-                        }`}
-                        style={{
-                          backgroundColor: swatch.hex,
-                          color: swatch.hex === '#FFFFFF' || swatch.hex === '#F5B8C9' || swatch.hex === '#39FF14' || swatch.hex === '#00FFFF' ? '#0d0d0d' : '#ffffff',
-                        }}
-                      >
-                        {crosshair.color?.toUpperCase() === swatch.hex.toUpperCase() && <Check className="w-3.5 h-3.5 stroke-[3]" />}
-                        <span>{swatch.name}</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Shape Selector */}
-                <div className="space-y-2">
-                  <label className="text-xs font-mono text-neutral-400">CROSSHAIR SHAPE</label>
-                  <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
-                    {(['cross-dot', 'cross', 'dot', 'circle', 't-shape', 'x-shape'] as const).map((shape) => (
-                      <button
-                        key={shape}
-                        onClick={() => {
-                          updateCrosshair({ type: shape });
-                          showSaveConfirmation(`SHAPE SET TO ${shape.toUpperCase()}`);
-                        }}
-                        className={`py-2 rounded-[12px] text-[10px] font-mono uppercase font-bold transition-all border ${
-                          crosshair.type === shape
-                            ? 'bg-[#f5b8c9] text-[#0d0d0d] border-[#f5b8c9]'
-                            : 'bg-[#0d0d0d] text-neutral-400 border-[#262626] hover:text-white'
-                        }`}
-                      >
-                        {shape}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Fine Geometry Tuning Sliders */}
-                <div className="space-y-4 pt-2 border-t border-[#262626]">
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-xs font-mono text-neutral-400">
-                      <span>LINE LENGTH / SIZE</span>
-                      <span className="text-white font-bold">{crosshair.size} PX</span>
-                    </div>
-                    <input
-                      type="range"
-                      min="2"
-                      max="30"
-                      step="1"
-                      value={crosshair.size}
-                      onChange={(e) => updateCrosshair({ size: parseInt(e.target.value, 10) })}
-                      className="w-full accent-[#f5b8c9] bg-[#262626] rounded-lg h-2"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-xs font-mono text-neutral-400">
-                      <span>LINE THICKNESS</span>
-                      <span className="text-white font-bold">{crosshair.thickness} PX</span>
-                    </div>
-                    <input
-                      type="range"
-                      min="1"
-                      max="10"
-                      step="1"
-                      value={crosshair.thickness}
-                      onChange={(e) => updateCrosshair({ thickness: parseInt(e.target.value, 10) })}
-                      className="w-full accent-[#f5b8c9] bg-[#262626] rounded-lg h-2"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-xs font-mono text-neutral-400">
-                      <span>CENTER GAP / OFFSET</span>
-                      <span className="text-white font-bold">{crosshair.gap} PX</span>
-                    </div>
-                    <input
-                      type="range"
-                      min="0"
-                      max="20"
-                      step="1"
-                      value={crosshair.gap}
-                      onChange={(e) => updateCrosshair({ gap: parseInt(e.target.value, 10) })}
-                      className="w-full accent-[#f5b8c9] bg-[#262626] rounded-lg h-2"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-xs font-mono text-neutral-400">
-                      <span>OVERALL OPACITY</span>
-                      <span className="text-white font-bold">{Math.round((crosshair.opacity || 1.0) * 100)}%</span>
-                    </div>
-                    <input
-                      type="range"
-                      min="0.1"
-                      max="1.0"
-                      step="0.05"
-                      value={crosshair.opacity || 1.0}
-                      onChange={(e) => updateCrosshair({ opacity: parseFloat(e.target.value) })}
-                      className="w-full accent-[#f5b8c9] bg-[#262626] rounded-lg h-2"
-                    />
-                  </div>
-                </div>
-
-                {/* Center Dot Controls Card */}
-                <div className="space-y-3 bg-[#0d0d0d] p-4 rounded-[12px] border border-[#262626]">
-                  <div className="flex items-center justify-between">
-                    <label className="text-[10px] font-mono text-[#f5b8c9] uppercase tracking-widest">
-                      CENTER DOT CONTROLS
-                    </label>
-                    <button
-                      onClick={() => {
-                        const currentShowDot = crosshair.showDot !== undefined ? crosshair.showDot : (crosshair.type === 'dot' || crosshair.type === 'cross-dot');
-                        updateCrosshair({ showDot: !currentShowDot });
-                      }}
-                      className={`px-3 py-1 rounded-[8px] text-[10px] font-mono font-bold border transition-all ${
-                        (crosshair.showDot !== undefined ? crosshair.showDot : (crosshair.type === 'dot' || crosshair.type === 'cross-dot'))
-                          ? 'bg-[#f5b8c9] text-[#0d0d0d] border-[#f5b8c9]'
-                          : 'bg-[#141414] text-neutral-500 border-[#262626]'
-                      }`}
-                    >
-                      {(crosshair.showDot !== undefined ? crosshair.showDot : (crosshair.type === 'dot' || crosshair.type === 'cross-dot')) ? 'DOT: ON' : 'DOT: OFF'}
-                    </button>
-                  </div>
-
-                  {(crosshair.showDot !== undefined ? crosshair.showDot : (crosshair.type === 'dot' || crosshair.type === 'cross-dot')) && (
-                    <div className="space-y-3 pt-2">
-                      <div className="space-y-1">
-                        <div className="flex justify-between text-xs font-mono text-neutral-400">
-                          <span>DOT SIZE</span>
-                          <span className="text-white font-bold">{crosshair.dotSize} PX</span>
-                        </div>
-                        <input
-                          type="range"
-                          min="1"
-                          max="10"
-                          step="1"
-                          value={crosshair.dotSize}
-                          onChange={(e) => updateCrosshair({ dotSize: parseInt(e.target.value, 10) })}
-                          className="w-full accent-[#f5b8c9] bg-[#262626] rounded-lg h-2"
-                        />
-                      </div>
-
-                      <div className="space-y-1">
-                        <span className="text-[10px] font-mono text-neutral-400 block">DOT COLOR (HEX)</span>
-                        <input
-                          type="text"
-                          placeholder="#F5B8C9"
-                          value={dotHexInput}
-                          onChange={(e) => {
-                            const val = e.target.value;
-                            setDotHexInput(val);
-                            if (isValidHexColor(val)) {
-                              updateCrosshair({ dotColor: normalizeHexColor(val) });
-                            }
-                          }}
-                          className="w-full bg-[#141414] border border-[#262626] rounded-[8px] px-3 py-1.5 text-xs font-mono text-white font-bold uppercase focus:outline-none focus:border-[#f5b8c9]"
-                        />
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Outline Controls Card */}
-                <div className="space-y-3 bg-[#0d0d0d] p-4 rounded-[12px] border border-[#262626]">
-                  <div className="flex items-center justify-between">
-                    <label className="text-[10px] font-mono text-[#f5b8c9] uppercase tracking-widest">
-                      OUTLINE CONTROLS
-                    </label>
-                    <button
-                      onClick={() => updateCrosshair({ outline: !crosshair.outline })}
-                      className={`px-3 py-1 rounded-[8px] text-[10px] font-mono font-bold border transition-all ${
-                        crosshair.outline
-                          ? 'bg-[#f5b8c9] text-[#0d0d0d] border-[#f5b8c9]'
-                          : 'bg-[#141414] text-neutral-500 border-[#262626]'
-                      }`}
-                    >
-                      {crosshair.outline ? 'OUTLINE: ON' : 'OUTLINE: OFF'}
-                    </button>
-                  </div>
-
-                  {crosshair.outline && (
-                    <div className="space-y-3 pt-2">
-                      <div className="space-y-1">
-                        <div className="flex justify-between text-xs font-mono text-neutral-400">
-                          <span>OUTLINE THICKNESS</span>
-                          <span className="text-white font-bold">{crosshair.outlineThickness || 1.5} PX</span>
-                        </div>
-                        <input
-                          type="range"
-                          min="0.5"
-                          max="4"
-                          step="0.5"
-                          value={crosshair.outlineThickness || 1.5}
-                          onChange={(e) => updateCrosshair({ outlineThickness: parseFloat(e.target.value) })}
-                          className="w-full accent-[#f5b8c9] bg-[#262626] rounded-lg h-2"
-                        />
-                      </div>
-
-                      <div className="space-y-1">
-                        <span className="text-[10px] font-mono text-neutral-400 block">OUTLINE COLOR (HEX)</span>
-                        <input
-                          type="text"
-                          placeholder="#000000"
-                          value={outlineHexInput}
-                          onChange={(e) => {
-                            const val = e.target.value;
-                            setOutlineHexInput(val);
-                            if (isValidHexColor(val)) {
-                              updateCrosshair({ outlineColor: normalizeHexColor(val) });
-                            }
-                          }}
-                          className="w-full bg-[#141414] border border-[#262626] rounded-[8px] px-3 py-1.5 text-xs font-mono text-white font-bold uppercase focus:outline-none focus:border-[#f5b8c9]"
-                        />
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* JSON Config Import & Export */}
-                <div className="space-y-3 bg-[#0d0d0d] p-4 rounded-[12px] border border-[#262626]">
-                  <label className="text-[10px] font-mono text-[#f5b8c9] uppercase tracking-widest block">
-                    GENERIC JSON CONFIG IMPORT & EXPORT
-                  </label>
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      placeholder='Paste JSON config e.g. {"type":"cross","size":12,"color":"#39FF14"}'
-                      value={importCodeInput}
-                      onChange={(e) => setImportCodeInput(e.target.value)}
-                      className="flex-1 bg-[#141414] border border-[#262626] rounded-[12px] px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-[#f5b8c9]"
-                    />
-                    <button
-                      onClick={handleImportJsonCode}
-                      className="btn-editorial-pink px-4 py-2 text-xs font-bold uppercase flex items-center gap-1.5"
-                    >
-                      <Download className="w-3.5 h-3.5" /> IMPORT
-                    </button>
-                  </div>
-
-                  {importStatusMsg && (
-                    <p className={`text-[10px] font-mono font-bold ${importStatusMsg.includes('SUCCESS') ? 'text-green-400' : 'text-red-400'}`}>
-                      {importStatusMsg}
-                    </p>
-                  )}
-
-                  <button
-                    onClick={handleExportCode}
-                    className="w-full py-2 bg-[#1a1a1a] hover:bg-[#262626] text-white border border-[#2d2d2d] rounded-[12px] text-xs font-mono font-bold flex items-center justify-center gap-2 transition-all"
-                  >
-                    <Copy className="w-3.5 h-3.5 text-[#f5b8c9]" />
-                    {copiedMsg ? 'COPIED TO CLIPBOARD!' : 'EXPORT CURRENT CONFIG (JSON)'}
-                  </button>
-                </div>
-              </div>
-            )}
+            {activeCategory === 'crosshair' && <CrosshairStudio />}
 
             {/* CATEGORY 3: AUDIO */}
             {activeCategory === 'audio' && (
@@ -1045,32 +536,117 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
                 <p className="font-sans-ui text-xs text-neutral-400 leading-relaxed">
                   Disables ambient background particle fields, caps 3D Canvas resolution to 1.0 DPR, and disables non-essential animations to maximize frame rate and eliminate input latency on low-spec hardware.
                 </p>
-                {/* Cosmetic Target Shapes & Color */}
+                {/* Target Shape & Parameter Studio */}
                 <div className="space-y-4 bg-[#0d0d0d] p-5 rounded-[12px] border border-[#262626]">
-                  <label className="text-[10px] font-mono text-[#f5b8c9] uppercase tracking-widest block font-bold">
-                    TARGET GEOMETRY & COLOR
-                  </label>
-                  <div className="grid grid-cols-3 gap-2">
-                    {[
-                      { id: 'sphere', label: 'SPHERE' },
-                      { id: 'torus', label: 'TORUS' },
-                      { id: 'cube', label: 'CUBE' },
-                    ].map((shape) => (
+                  <div className="flex justify-between items-center border-b border-[#262626] pb-3">
+                    <label className="text-[10px] font-mono text-[#f5b8c9] uppercase tracking-widest block font-bold">
+                      TARGET GEOMETRY & PARAMETER STUDIO
+                    </label>
+                  </div>
+
+                  {/* 3D Live Target Preview */}
+                  <TargetPreview3D />
+
+                  {/* Base Shape Selection (7 Geometries) */}
+                  <div className="space-y-2 pt-2">
+                    <span className="text-xs font-mono text-neutral-400 font-bold block uppercase">
+                      BASE SHAPE TYPE
+                    </span>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                      {[
+                        { id: 'sphere', label: 'SPHERE' },
+                        { id: 'torus', label: 'TORUS' },
+                        { id: 'cube', label: 'CUBE' },
+                        { id: 'octahedron', label: 'OCTAHEDRON' },
+                        { id: 'cylinder', label: 'CYLINDER' },
+                        { id: 'cone', label: 'CONE' },
+                        { id: 'capsule', label: 'CAPSULE' },
+                      ].map((s) => (
+                        <button
+                          key={s.id}
+                          onClick={() => {
+                            setTargetShapeConfig({ shape: s.id as any });
+                            showSaveConfirmation(`TARGET SHAPE SET TO ${s.label}`);
+                          }}
+                          className={`py-2 rounded-[12px] text-xs font-mono font-bold transition-all border ${
+                            targetShapeConfig.shape === s.id
+                              ? 'bg-[#f5b8c9] text-[#0d0d0d] border-[#f5b8c9]'
+                              : 'bg-[#141414] text-neutral-400 border-[#262626] hover:text-white'
+                          }`}
+                        >
+                          {s.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Adjustable Parameters (Scale, Wireframe, Glow, Rotation) */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-3 border-t border-[#262626]/60 font-mono text-xs">
+                    {/* Size / Scale Multiplier */}
+                    <div className="space-y-1 bg-[#141414] p-3 rounded-[10px] border border-[#262626]">
+                      <div className="flex justify-between text-neutral-400">
+                        <span>SCALE MULTIPLIER</span>
+                        <span className="text-white font-bold">{(targetShapeConfig.scale ?? 1.0).toFixed(2)}X</span>
+                      </div>
+                      <input
+                        type="range"
+                        min="0.5"
+                        max="2.0"
+                        step="0.05"
+                        value={targetShapeConfig.scale ?? 1.0}
+                        onChange={(e) => setTargetShapeConfig({ scale: parseFloat(e.target.value) })}
+                        className="w-full accent-[#f5b8c9] bg-[#262626] rounded-lg h-2"
+                      />
+                    </div>
+
+                    {/* Emissive Glow Intensity */}
+                    <div className="space-y-1 bg-[#141414] p-3 rounded-[10px] border border-[#262626]">
+                      <div className="flex justify-between text-neutral-400">
+                        <span>GLOW INTENSITY</span>
+                        <span className="text-white font-bold">{Math.round((targetShapeConfig.emissiveIntensity ?? 0.65) * 100)}%</span>
+                      </div>
+                      <input
+                        type="range"
+                        min="0.0"
+                        max="2.0"
+                        step="0.05"
+                        value={targetShapeConfig.emissiveIntensity ?? 0.65}
+                        onChange={(e) => setTargetShapeConfig({ emissiveIntensity: parseFloat(e.target.value) })}
+                        className="w-full accent-[#f5b8c9] bg-[#262626] rounded-lg h-2"
+                      />
+                    </div>
+
+                    {/* Wireframe Toggle */}
+                    <div className="flex items-center justify-between bg-[#141414] p-3 rounded-[10px] border border-[#262626]">
+                      <span className="text-neutral-400 font-bold">WIREFRAME MODE</span>
                       <button
-                        key={shape.id}
-                        onClick={() => {
-                          setTargetShape(shape.id as any);
-                          showSaveConfirmation(`TARGET SHAPE SET TO ${shape.label}`);
-                        }}
-                        className={`py-2 rounded-[12px] text-xs font-mono font-bold transition-all border ${
-                          targetShape === shape.id
+                        type="button"
+                        onClick={() => setTargetShapeConfig({ wireframe: !targetShapeConfig.wireframe })}
+                        className={`px-3 py-1 rounded-[8px] text-[10px] font-bold border transition-all ${
+                          targetShapeConfig.wireframe
                             ? 'bg-[#f5b8c9] text-[#0d0d0d] border-[#f5b8c9]'
-                            : 'bg-[#141414] text-neutral-400 border-[#262626] hover:text-white'
+                            : 'bg-[#0d0d0d] text-neutral-400 border-[#262626]'
                         }`}
                       >
-                        {shape.label}
+                        {targetShapeConfig.wireframe ? 'ACTIVE' : 'SOLID'}
                       </button>
-                    ))}
+                    </div>
+
+                    {/* Idle Rotation Toggle */}
+                    <div className="flex items-center justify-between bg-[#141414] p-3 rounded-[10px] border border-[#262626]">
+                      <span className="text-neutral-400 font-bold">IDLE ROTATION</span>
+                      <button
+                        type="button"
+                        onClick={() => setTargetShapeConfig({ idleRotation: !targetShapeConfig.idleRotation })}
+                        className={`px-3 py-1 rounded-[8px] text-[10px] font-bold border transition-all ${
+                          targetShapeConfig.idleRotation !== false
+                            ? 'bg-[#f5b8c9] text-[#0d0d0d] border-[#f5b8c9]'
+                            : 'bg-[#0d0d0d] text-neutral-400 border-[#262626]'
+                        }`}
+                      >
+                        {targetShapeConfig.idleRotation !== false ? 'ENABLED' : 'STATIC'}
+                      </button>
+                    </div>
                   </div>
 
                   {/* Target Color Picker with Contrast Safety Alert */}

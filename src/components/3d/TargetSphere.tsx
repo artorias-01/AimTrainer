@@ -81,8 +81,11 @@ export const TargetSphere: React.FC<TargetSphereProps> = React.memo(({
 
     // 1. Mesh rotation & hover scale pulse
     if (meshRef.current) {
-      meshRef.current.rotation.y = t * 0.8;
-      meshRef.current.rotation.x = t * 0.4;
+      const liveConfig = useSettingsStore.getState().targetShapeConfig;
+      if (liveConfig?.idleRotation !== false) {
+        meshRef.current.rotation.y = t * 0.8;
+        meshRef.current.rotation.x = t * 0.4;
+      }
       if (isTracking && hovered) {
         meshRef.current.scale.setScalar(1.1 + Math.sin(t * 10) * 0.06);
       }
@@ -152,9 +155,15 @@ export const TargetSphere: React.FC<TargetSphereProps> = React.memo(({
     }
   });
 
-  const targetShape = useSettingsStore((s) => s.targetShape) || 'sphere';
+  const shapeConfig = useSettingsStore((s) => s.targetShapeConfig);
   const customTargetColor = useSettingsStore((s) => s.targetColor);
   const activeColor = customTargetColor || baseColor;
+
+  const shape = shapeConfig?.shape || 'sphere';
+  const scaleMult = shapeConfig?.scale ?? 1.0;
+  const isWireframe = shapeConfig?.wireframe ?? false;
+  const glowIntensity = hovered ? 0.95 : (shapeConfig?.emissiveIntensity ?? 0.65);
+  const effRadius = radius * scaleMult;
 
   return (
     <group ref={groupRef} position={[x, y, z]}>
@@ -163,19 +172,28 @@ export const TargetSphere: React.FC<TargetSphereProps> = React.memo(({
         onPointerOver={() => setHovered(true)}
         onPointerOut={() => setHovered(false)}
       >
-        {targetShape === 'torus' ? (
-          <torusGeometry args={[radius * 0.8, radius * 0.3, 16, 32]} />
-        ) : targetShape === 'cube' ? (
-          <boxGeometry args={[radius * 1.5, radius * 1.5, radius * 1.5]} />
+        {shape === 'torus' ? (
+          <torusGeometry args={[effRadius * 0.8, effRadius * 0.3, 16, 32]} />
+        ) : shape === 'cube' ? (
+          <boxGeometry args={[effRadius * 1.5, effRadius * 1.5, effRadius * 1.5]} />
+        ) : shape === 'octahedron' ? (
+          <octahedronGeometry args={[effRadius * 1.2, 0]} />
+        ) : shape === 'cylinder' ? (
+          <cylinderGeometry args={[effRadius * 0.8, effRadius * 0.8, effRadius * 1.6, 32]} />
+        ) : shape === 'cone' ? (
+          <coneGeometry args={[effRadius, effRadius * 1.8, 32]} />
+        ) : shape === 'capsule' ? (
+          <capsuleGeometry args={[effRadius * 0.7, effRadius * 1.0, 16, 32]} />
         ) : (
-          <sphereGeometry args={[radius, 32, 32]} />
+          <sphereGeometry args={[effRadius, 32, 32]} />
         )}
         <meshStandardMaterial
           color={hovered ? '#ffffff' : activeColor}
+          wireframe={isWireframe}
           roughness={0.15}
           metalness={0.1}
           emissive={activeColor === '#ffffff' ? '#f5b8c9' : activeColor}
-          emissiveIntensity={hovered ? 0.95 : 0.65}
+          emissiveIntensity={glowIntensity}
         />
       </mesh>
     </group>
