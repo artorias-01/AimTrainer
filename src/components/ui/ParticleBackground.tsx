@@ -15,6 +15,7 @@ interface Particle {
 export const ParticleBackground: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const performanceMode = useSettingsStore((s) => s.performanceMode);
+  const themeAccentColor = useSettingsStore((s) => s.themeAccentColor) || '#f5b8c9';
 
   useEffect(() => {
     if (performanceMode) return;
@@ -39,7 +40,7 @@ export const ParticleBackground: React.FC = () => {
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const particleCount = Math.min(50, Math.floor((width * height) / 22000));
     const particles: Particle[] = [];
-    const colors = ['#f5b8c9', '#ffffff', '#e89ba9'];
+    const colors = [themeAccentColor, '#ffffff', themeAccentColor];
 
     for (let i = 0; i < particleCount; i++) {
       particles.push({
@@ -76,7 +77,7 @@ export const ParticleBackground: React.FC = () => {
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
         ctx.fillStyle = p.color;
         ctx.globalAlpha = p.alpha;
-        ctx.shadowColor = '#f5b8c9';
+        ctx.shadowColor = themeAccentColor;
         ctx.shadowBlur = 4;
         ctx.fill();
         ctx.shadowBlur = 0;
@@ -91,7 +92,7 @@ export const ParticleBackground: React.FC = () => {
             ctx.beginPath();
             ctx.moveTo(p.x, p.y);
             ctx.lineTo(p2.x, p2.y);
-            ctx.strokeStyle = '#f5b8c9';
+            ctx.strokeStyle = themeAccentColor;
             ctx.globalAlpha = (1 - dist / 90) * 0.08;
             ctx.lineWidth = 0.5;
             ctx.stroke();

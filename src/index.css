@@ -1,11 +1,13 @@
 @import "tailwindcss";
 
 :root {
+  --accent-color: #f5b8c9;
+  --accent-color-rgb: 245, 184, 201;
   --color-paper: #ffffff;
   --color-ink: #0d0d0d;
-  --color-pink: #f5b8c9;
+  --color-pink: var(--accent-color);
   --color-pink-hover: #e89ba9;
-  --color-pink-muted: rgba(245, 184, 201, 0.2);
+  --color-pink-muted: rgba(var(--accent-color-rgb), 0.2);
   --color-ink-muted: #1c1c1c;
   --color-ink-border: #2a2a2a;
   --color-paper-border: #e2e2e2;
@@ -48,6 +50,64 @@ h1, h2, h3, .font-serif-display {
   text-shadow: none !important;
 }
 
+/* Dynamic Accent Class Overrides for UI Chrome */
+.text-pink, .text-\[\#f5b8c9\] {
+  color: var(--accent-color) !important;
+}
+
+.bg-pink, .bg-\[\#f5b8c9\] {
+  background-color: var(--accent-color) !important;
+}
+
+.border-pink, .border-\[\#f5b8c9\] {
+  border-color: var(--accent-color) !important;
+}
+
+.ring-\[\#f5b8c9\] {
+  --tw-ring-color: var(--accent-color) !important;
+}
+
+.fill-\[\#f5b8c9\] {
+  fill: var(--accent-color) !important;
+}
+
+.stroke-\[\#f5b8c9\] {
+  stroke: var(--accent-color) !important;
+}
+
+.accent-\[\#f5b8c9\] {
+  accent-color: var(--accent-color) !important;
+}
+
+/* Opacity variants */
+.border-\[\#f5b8c9\]\/20 {
+  border-color: rgba(var(--accent-color-rgb), 0.2) !important;
+}
+
+.border-\[\#f5b8c9\]\/30 {
+  border-color: rgba(var(--accent-color-rgb), 0.3) !important;
+}
+
+.border-\[\#f5b8c9\]\/40 {
+  border-color: rgba(var(--accent-color-rgb), 0.4) !important;
+}
+
+.border-\[\#f5b8c9\]\/60 {
+  border-color: rgba(var(--accent-color-rgb), 0.6) !important;
+}
+
+.bg-\[\#f5b8c9\]\/10 {
+  background-color: rgba(var(--accent-color-rgb), 0.1) !important;
+}
+
+.bg-\[\#f5b8c9\]\/20 {
+  background-color: rgba(var(--accent-color-rgb), 0.2) !important;
+}
+
+.bg-\[\#f5b8c9\]\/90 {
+  background-color: rgba(var(--accent-color-rgb), 0.9) !important;
+}
+
 /* Inverted / Broadsheet Banding */
 .band-black {
   background-color: #0d0d0d;
@@ -63,18 +123,6 @@ h1, h2, h3, .font-serif-display {
 
 .border-ink {
   border-color: #0d0d0d;
-}
-
-.border-pink {
-  border-color: #f5b8c9;
-}
-
-.bg-pink {
-  background-color: #f5b8c9;
-}
-
-.text-pink {
-  color: #f5b8c9;
 }
 
 .bg-ink {
@@ -108,9 +156,9 @@ h1, h2, h3, .font-serif-display {
 }
 
 .btn-editorial-primary:hover {
-  background-color: #f5b8c9;
+  background-color: var(--accent-color);
   color: #0d0d0d;
-  border-color: #f5b8c9;
+  border-color: var(--accent-color);
 }
 
 .btn-editorial-primary:active {
@@ -119,7 +167,7 @@ h1, h2, h3, .font-serif-display {
 
 .btn-editorial-primary:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 2px #f5b8c9 !important;
+  box-shadow: 0 0 0 2px var(--accent-color) !important;
 }
 
 .btn-editorial-secondary {
@@ -146,7 +194,7 @@ h1, h2, h3, .font-serif-display {
 .btn-editorial-secondary:hover {
   background-color: #1f1f1f;
   color: #ffffff;
-  border-color: #f5b8c9;
+  border-color: var(--accent-color);
 }
 
 .btn-editorial-secondary:active {
@@ -155,13 +203,13 @@ h1, h2, h3, .font-serif-display {
 
 .btn-editorial-secondary:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 2px #f5b8c9 !important;
+  box-shadow: 0 0 0 2px var(--accent-color) !important;
 }
 
 .btn-editorial-pink {
-  background-color: #f5b8c9;
+  background-color: var(--accent-color);
   color: #0d0d0d;
-  border: 1px solid #f5b8c9;
+  border: 1px solid var(--accent-color);
   padding: 0.75rem 1.5rem;
   border-radius: 12px;
   font-family: 'Space Grotesk', sans-serif;
@@ -177,6 +225,21 @@ h1, h2, h3, .font-serif-display {
   justify-content: center;
   gap: 0.5rem;
   outline: none;
+}
+
+.btn-editorial-pink:hover {
+  background-color: #ffffff;
+  color: #0d0d0d;
+  border-color: #ffffff;
+}
+
+.btn-editorial-pink:active {
+  transform: scale(0.97);
+}
+
+.btn-editorial-pink:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px #ffffff !important;
 }
 
 .btn-editorial-pink:hover {

@@ -5,6 +5,7 @@ import { useSettingsStore } from '../store/useSettingsStore';
 import { useStatsStore } from '../store/useStatsStore';
 import { calculateSensFromCm360 } from '../utils/sensitivity';
 import type { GameEngine } from '../utils/sensitivity';
+import { isValidHexColor, normalizeHexColor } from '../utils/crosshairImporter';
 import { soundManager } from '../utils/audio';
 import {
   Sliders,
@@ -76,6 +77,8 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
     setArenaBackdrop,
     arenaColor,
     setArenaColor,
+    themeAccentColor,
+    setThemeAccentColor,
   } = useSettingsStore();
 
   const { clearHistory } = useStatsStore();
@@ -536,6 +539,111 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
                 <p className="font-sans-ui text-xs text-neutral-400 leading-relaxed">
                   Disables ambient background particle fields, caps 3D Canvas resolution to 1.0 DPR, and disables non-essential animations to maximize frame rate and eliminate input latency on low-spec hardware.
                 </p>
+
+                {/* UI Theme Accent Color Customizer */}
+                <div className="space-y-4 bg-[#0d0d0d] p-5 rounded-[12px] border border-[#262626]">
+                  <div className="flex justify-between items-center border-b border-[#262626] pb-3">
+                    <label className="text-[10px] font-mono text-[#f5b8c9] uppercase tracking-widest block font-bold">
+                      UI THEME ACCENT COLOR
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <div
+                        className="w-4 h-4 rounded-full border border-white/20 shadow-sm"
+                        style={{ backgroundColor: themeAccentColor }}
+                      />
+                      <span className="text-xs font-mono text-white font-bold">{themeAccentColor.toUpperCase()}</span>
+                    </div>
+                  </div>
+
+                  <p className="font-sans-ui text-xs text-neutral-400">
+                    Customizes the primary accent color across all UI chrome, active buttons, focus indicators, and dividers.
+                  </p>
+
+                  {/* Contrast Safeguard Warning */}
+                  {isLowContrastTarget(themeAccentColor) && (
+                    <div className="bg-amber-950/40 border border-amber-500/50 p-3 rounded-[10px] flex items-center gap-2.5 text-xs font-mono text-amber-200">
+                      <AlertCircle className="w-4 h-4 text-amber-400 shrink-0" />
+                      <span>LOW CONTRAST WARNING: Selected accent color may be difficult to read against dark UI backgrounds!</span>
+                    </div>
+                  )}
+
+                  {/* Quick-Select Presets */}
+                  <div className="space-y-2">
+                    <span className="text-xs font-mono text-neutral-400 font-bold block uppercase">
+                      PRESET ACCENT PALETTES
+                    </span>
+                    <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                      {[
+                        { name: 'EDITORIAL PINK', hex: '#F5B8C9' },
+                        { name: 'VALORANT RED', hex: '#FF3344' },
+                        { name: 'NEON CYAN', hex: '#00FFFF' },
+                        { name: 'ELECTRIC BLUE', hex: '#3B82F6' },
+                        { name: 'LIME GREEN', hex: '#39FF14' },
+                      ].map((swatch) => (
+                        <button
+                          key={swatch.hex}
+                          type="button"
+                          onClick={() => {
+                            setThemeAccentColor(swatch.hex);
+                            showSaveConfirmation(`THEME ACCENT SET TO ${swatch.name}`);
+                          }}
+                          className={`py-2 px-3 rounded-[10px] text-xs font-mono font-bold transition-all border flex items-center justify-between ${
+                            themeAccentColor.toUpperCase() === swatch.hex.toUpperCase()
+                              ? 'border-white text-white shadow-md'
+                              : 'border-[#262626] text-neutral-400 hover:text-white'
+                          }`}
+                          style={{
+                            backgroundColor: themeAccentColor.toUpperCase() === swatch.hex.toUpperCase() ? swatch.hex : '#141414',
+                            color: themeAccentColor.toUpperCase() === swatch.hex.toUpperCase()
+                              ? (['#F5B8C9', '#00FFFF', '#39FF14'].includes(swatch.hex) ? '#0d0d0d' : '#ffffff')
+                              : undefined,
+                          }}
+                        >
+                          <span>{swatch.name}</span>
+                          <div className="w-3 h-3 rounded-full border border-white/20" style={{ backgroundColor: swatch.hex }} />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Custom Hex Picker */}
+                  <div className="flex items-center justify-between pt-2 border-t border-[#262626]/60 font-mono text-xs">
+                    <span className="text-neutral-400">CUSTOM ACCENT HEX COLOR</span>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="color"
+                        value={themeAccentColor}
+                        onChange={(e) => {
+                          setThemeAccentColor(e.target.value);
+                          showSaveConfirmation(`THEME ACCENT SET TO ${e.target.value.toUpperCase()}`);
+                        }}
+                        className="w-7 h-7 rounded cursor-pointer border border-[#262626] bg-transparent"
+                      />
+                      <input
+                        type="text"
+                        value={themeAccentColor}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          if (isValidHexColor(val)) {
+                            setThemeAccentColor(normalizeHexColor(val));
+                            showSaveConfirmation(`THEME ACCENT SET TO ${normalizeHexColor(val)}`);
+                          }
+                        }}
+                        className="w-28 bg-[#141414] border border-[#262626] rounded-[8px] px-3 py-1 text-xs font-mono uppercase text-white font-bold"
+                      />
+                      <button
+                        onClick={() => {
+                          setThemeAccentColor('#f5b8c9');
+                          showSaveConfirmation('RESET TO DEFAULT PINK ACCENT');
+                        }}
+                        className="px-3 py-1 rounded-[8px] bg-[#141414] hover:bg-[#262626] text-neutral-400 hover:text-white border border-[#262626] text-xs font-mono font-bold"
+                      >
+                        RESET
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
                 {/* Target Shape & Parameter Studio */}
                 <div className="space-y-4 bg-[#0d0d0d] p-5 rounded-[12px] border border-[#262626]">
                   <div className="flex justify-between items-center border-b border-[#262626] pb-3">

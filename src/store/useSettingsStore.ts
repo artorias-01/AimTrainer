@@ -46,6 +46,22 @@ function getStoredTargetShapeConfig(): TargetShapeConfig {
   }
 }
 
+export function applyThemeAccent(hex: string) {
+  if (typeof document !== 'undefined') {
+    document.documentElement.style.setProperty('--accent-color', hex);
+    let clean = hex.replace('#', '').trim();
+    if (clean.length === 3) {
+      clean = clean.split('').map((c) => c + c).join('');
+    }
+    if (clean.length === 6) {
+      const r = parseInt(clean.substring(0, 2), 16) || 245;
+      const g = parseInt(clean.substring(2, 4), 16) || 184;
+      const b = parseInt(clean.substring(4, 6), 16) || 201;
+      document.documentElement.style.setProperty('--accent-color-rgb', `${r}, ${g}, ${b}`);
+    }
+  }
+}
+
 interface SettingsState {
   settings: SensitivityProfile;
   crosshair: CrosshairConfig;
@@ -62,6 +78,7 @@ interface SettingsState {
   targetColor: string;
   arenaBackdrop: ArenaBackdrop;
   arenaColor: string;
+  themeAccentColor: string;
   scenarioCrosshairMap: Record<string, string>;
 
   updateSettings: (partial: Partial<SensitivityProfile>) => void;
@@ -77,6 +94,7 @@ interface SettingsState {
   setTargetColor: (color: string) => void;
   setArenaBackdrop: (backdrop: ArenaBackdrop) => void;
   setArenaColor: (color: string) => void;
+  setThemeAccentColor: (color: string) => void;
   setScenarioCrosshair: (targetKey: string, presetId: string) => void;
   getCrosshairForScenario: (scenarioId: string, category: string) => CrosshairConfig;
 }
@@ -93,7 +111,10 @@ const initialShapeConfig = getStoredTargetShapeConfig();
 const initialTargetColor = localStorage.getItem('aimtt_target_color_v1') || '#f5b8c9';
 const initialBackdrop = (localStorage.getItem('aimtt_arena_backdrop_v1') as ArenaBackdrop) || 'grid-room';
 const initialArenaColor = localStorage.getItem('aimtt_arena_color_v1') || '#121212';
+const initialThemeAccent = localStorage.getItem('aimtt_theme_accent_v1') || '#f5b8c9';
 const initialCrosshairMap = getScenarioCrosshairMap();
+
+applyThemeAccent(initialThemeAccent);
 
 soundManager.setMasterVolume(initialAudio.masterVolume);
 soundManager.setHitVolume(initialAudio.hitVolume);
@@ -119,6 +140,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
   targetColor: initialTargetColor,
   arenaBackdrop: initialBackdrop,
   arenaColor: initialArenaColor,
+  themeAccentColor: initialThemeAccent,
   scenarioCrosshairMap: initialCrosshairMap,
 
   updateSettings: (partial) => {
@@ -206,6 +228,12 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
   setArenaColor: (color) => {
     localStorage.setItem('aimtt_arena_color_v1', color);
     set({ arenaColor: color });
+  },
+
+  setThemeAccentColor: (color) => {
+    localStorage.setItem('aimtt_theme_accent_v1', color);
+    applyThemeAccent(color);
+    set({ themeAccentColor: color });
   },
 
   setScenarioCrosshair: (targetKey, presetId) => {
