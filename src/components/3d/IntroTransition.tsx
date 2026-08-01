@@ -97,6 +97,7 @@ function ParticleTargetLockScene({ onFlashSound }: { onFlashSound: () => void })
 
   const targetShapeConfig = useSettingsStore((s) => s.targetShapeConfig);
   const performanceMode = useSettingsStore((s) => s.performanceMode);
+  const themeAccentColor = useSettingsStore((s) => s.themeAccentColor) || '#f5b8c9';
 
   const shapeType = targetShapeConfig?.shape || 'sphere';
   const particleCount = performanceMode ? 100 : 250;
@@ -109,11 +110,11 @@ function ParticleTargetLockScene({ onFlashSound }: { onFlashSound: () => void })
 
     const targetPos = sampleShapePoints(shapeType, particleCount);
 
-    const pinkRGB = new THREE.Color('#f5b8c9');
+    const accentRGB = new THREE.Color(themeAccentColor);
     const whiteRGB = new THREE.Color('#ffffff');
 
     for (let i = 0; i < particleCount; i++) {
-      // Scatter in spherical boundary radius 4.5 to 7.0
+      // Scatter in spherical boundary radius 3.5 to 7.0
       const radius = 3.5 + Math.random() * 3.5;
       const theta = Math.random() * Math.PI * 2;
       const phi = Math.acos(2 * Math.random() - 1);
@@ -130,7 +131,7 @@ function ParticleTargetLockScene({ onFlashSound }: { onFlashSound: () => void })
       currPos[i * 3 + 1] = sy;
       currPos[i * 3 + 2] = sz;
 
-      const c = Math.random() < 0.65 ? pinkRGB : whiteRGB;
+      const c = Math.random() < 0.65 ? accentRGB : whiteRGB;
       col[i * 3] = c.r;
       col[i * 3 + 1] = c.g;
       col[i * 3 + 2] = c.b;
@@ -142,7 +143,7 @@ function ParticleTargetLockScene({ onFlashSound }: { onFlashSound: () => void })
       colors: col,
       currentPositions: currPos,
     };
-  }, [shapeType, particleCount]);
+  }, [shapeType, particleCount, themeAccentColor]);
 
   useFrame(({ clock }) => {
     const t = clock.getElapsedTime();
@@ -152,7 +153,6 @@ function ParticleTargetLockScene({ onFlashSound }: { onFlashSound: () => void })
     let convFactor = 0;
     if (t > 0.6) {
       const rawProgress = Math.min((t - 0.6) / 1.0, 1.0);
-      // Ease-in acceleration curve (t^2.5) for high speed lock-on momentum
       convFactor = Math.pow(rawProgress, 2.5);
     }
 
@@ -170,7 +170,6 @@ function ParticleTargetLockScene({ onFlashSound }: { onFlashSound: () => void })
         const ty = targetPositions[idx + 1];
         const tz = targetPositions[idx + 2];
 
-        // Slight ambient drift during scatter
         const driftX = Math.sin(t * 1.5 + i) * 0.08 * (1 - convFactor);
         const driftY = Math.cos(t * 1.2 + i) * 0.08 * (1 - convFactor);
 
@@ -190,7 +189,6 @@ function ParticleTargetLockScene({ onFlashSound }: { onFlashSound: () => void })
     }
 
     if (coreMeshRef.current) {
-      // Core shape fades in as convergence finishes
       const coreOpacity = t >= 1.5 ? Math.min((t - 1.5) / 0.3, 1.0) : 0;
       coreMeshRef.current.scale.setScalar(coreOpacity);
       coreMeshRef.current.rotation.y = t * 0.5;
@@ -198,7 +196,6 @@ function ParticleTargetLockScene({ onFlashSound }: { onFlashSound: () => void })
       const mat = coreMeshRef.current.material as THREE.MeshStandardMaterial;
       if (mat) {
         if (t >= 1.6 && t <= 1.9) {
-          // Emissive flash pulse
           const flashProgress = (t - 1.6) / 0.3;
           mat.emissiveIntensity = 0.8 + Math.sin(flashProgress * Math.PI) * 2.2;
         } else {
@@ -221,7 +218,7 @@ function ParticleTargetLockScene({ onFlashSound }: { onFlashSound: () => void })
   return (
     <group position={[0, 0, 0]}>
       <ambientLight intensity={0.8} />
-      <pointLight position={[5, 5, 5]} intensity={2.5} color="#f5b8c9" />
+      <pointLight position={[5, 5, 5]} intensity={2.5} color={themeAccentColor} />
 
       {/* Converging Point Particles */}
       <points ref={pointsRef}>
@@ -262,9 +259,9 @@ function ParticleTargetLockScene({ onFlashSound }: { onFlashSound: () => void })
           <sphereGeometry args={[1.4, 32, 32]} />
         )}
         <meshStandardMaterial
-          color="#f5b8c9"
+          color={themeAccentColor}
           wireframe
-          emissive="#f5b8c9"
+          emissive={themeAccentColor}
           emissiveIntensity={0.8}
         />
       </mesh>
@@ -273,14 +270,14 @@ function ParticleTargetLockScene({ onFlashSound }: { onFlashSound: () => void })
       <mesh ref={shockwaveRef} scale={0} rotation={[Math.PI / 2, 0, 0]}>
         <ringGeometry args={[0.9, 1.05, 64]} />
         <meshBasicMaterial
-          color="#f5b8c9"
+          color={themeAccentColor}
           transparent
           opacity={0}
           side={THREE.DoubleSide}
         />
       </mesh>
 
-      <gridHelper args={[24, 24, '#f5b8c9', '#262626']} position={[0, -2.5, 0]} />
+      <gridHelper args={[24, 24, themeAccentColor, '#262626']} position={[0, -2.5, 0]} />
     </group>
   );
 }
@@ -304,12 +301,10 @@ export const IntroTransition: React.FC<IntroTransitionProps> = ({ onComplete }) 
   };
 
   useEffect(() => {
-    // Show logo right at lock-on flash beat (1.6s)
     const logoTimer = setTimeout(() => {
       setShowLogo(true);
     }, 1600);
 
-    // Sequence ends at 2.6s
     const timer = setTimeout(() => {
       handleFinish();
     }, 2600);
@@ -353,7 +348,7 @@ export const IntroTransition: React.FC<IntroTransitionProps> = ({ onComplete }) 
           {/* Vignette Gradient Overlay */}
           <div className="absolute inset-0 z-10 bg-gradient-to-t from-[#0d0d0d] via-transparent to-[#0d0d0d]/80 pointer-events-none" />
 
-          {/* Overlay Text & Logo Formation (Arrives on lock-on flash beat at 1.6s) */}
+          {/* Overlay Text & Logo Formation */}
           <AnimatePresence>
             {showLogo && (
               <motion.div
@@ -363,10 +358,10 @@ export const IntroTransition: React.FC<IntroTransitionProps> = ({ onComplete }) 
                 className="relative z-20 text-center space-y-3 max-w-sm pointer-events-none"
               >
                 <h1 className="font-display font-black text-4xl md:text-5xl tracking-widest text-white drop-shadow-xl">
-                  AIM <span className="text-[#f5b8c9]">//</span> TT
+                  AIM <span className="text-pink">//</span> TT
                 </h1>
-                <div className="h-0.5 w-16 bg-[#f5b8c9] mx-auto rounded-full animate-pulse" />
-                <p className="font-mono text-[10px] text-[#f5b8c9] font-bold tracking-[0.3em] uppercase">
+                <div className="h-0.5 w-16 bg-pink mx-auto rounded-full animate-pulse" />
+                <p className="font-mono text-[10px] text-pink font-bold tracking-[0.3em] uppercase">
                   TARGET ACQUIRED
                 </p>
               </motion.div>
@@ -375,7 +370,7 @@ export const IntroTransition: React.FC<IntroTransitionProps> = ({ onComplete }) 
 
           {/* Skip Notice Pill */}
           <div className="absolute bottom-8 z-20">
-            <span className="px-3.5 py-1.5 rounded-full bg-[#141414]/90 border border-[#f5b8c9]/30 text-[10px] font-mono font-bold text-[#f5b8c9] tracking-wider uppercase backdrop-blur-sm shadow-md">
+            <span className="px-3.5 py-1.5 rounded-full bg-[#141414]/90 border border-pink/30 text-[10px] font-mono font-bold text-pink tracking-wider uppercase backdrop-blur-sm shadow-md">
               [ ESC / CLICK ANYWHERE TO SKIP ]
             </span>
           </div>

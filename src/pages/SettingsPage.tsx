@@ -5,7 +5,6 @@ import { useSettingsStore } from '../store/useSettingsStore';
 import { useStatsStore } from '../store/useStatsStore';
 import { calculateSensFromCm360 } from '../utils/sensitivity';
 import type { GameEngine } from '../utils/sensitivity';
-import { isValidHexColor, normalizeHexColor } from '../utils/crosshairImporter';
 import { soundManager } from '../utils/audio';
 import {
   Sliders,
@@ -24,6 +23,7 @@ import {
 
 import { TargetPreview3D } from '../components/ui/TargetPreview3D';
 import { CrosshairStudio } from '../components/ui/CrosshairStudio';
+import { HexColorInput } from '../components/ui/HexColorInput';
 
 function getHexLuminance(hex: string): number {
   let c = hex.replace('#', '').trim();
@@ -619,17 +619,12 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
                         }}
                         className="w-7 h-7 rounded cursor-pointer border border-[#262626] bg-transparent"
                       />
-                      <input
-                        type="text"
+                      <HexColorInput
                         value={themeAccentColor}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          if (isValidHexColor(val)) {
-                            setThemeAccentColor(normalizeHexColor(val));
-                            showSaveConfirmation(`THEME ACCENT SET TO ${normalizeHexColor(val)}`);
-                          }
+                        onChange={(val) => {
+                          setThemeAccentColor(val);
+                          showSaveConfirmation(`THEME ACCENT SET TO ${val}`);
                         }}
-                        className="w-28 bg-[#141414] border border-[#262626] rounded-[8px] px-3 py-1 text-xs font-mono uppercase text-white font-bold"
                       />
                       <button
                         onClick={() => {

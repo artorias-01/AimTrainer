@@ -23,7 +23,7 @@ const ArenaController: React.FC<ArenaControllerProps> = ({ onPointerLockChange, 
     updateTargetPositions,
     tickSecond,
   } = useGameStore();
-  const { settings, arenaBackdrop, arenaColor } = useSettingsStore();
+  const { settings, arenaBackdrop, arenaColor, themeAccentColor } = useSettingsStore();
 
   const wallColor = arenaColor || (arenaBackdrop === 'gradient-room' ? '#181216' : '#121212');
 
@@ -308,7 +308,7 @@ const ArenaController: React.FC<ArenaControllerProps> = ({ onPointerLockChange, 
 
           {/* Floor with Editorial Grid Lines at Y = 0 */}
           {arenaBackdrop === 'grid-room' && (
-            <gridHelper args={[30, 30, '#f5b8c9', '#262626']} position={[0, 0, -1.5]} />
+            <gridHelper args={[30, 30, themeAccentColor, '#262626']} position={[0, 0, -1.5]} />
           )}
 
           {/* Ceiling Plane at Y = 7.5 */}
@@ -336,6 +336,7 @@ export const ArenaScene: React.FC<ArenaSceneProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const activeScenario = useGameStore((s) => s.activeScenario);
   const performanceMode = useSettingsStore((s) => s.performanceMode);
+  const themeAccentColor = useSettingsStore((s) => s.themeAccentColor) || '#f5b8c9';
   const initialSpawn = activeScenario.playerPosition || { x: 0, y: 2.2, z: 3.5 };
 
   const handleClickCanvas = () => {
@@ -357,7 +358,7 @@ export const ArenaScene: React.FC<ArenaSceneProps> = ({
       >
         <ambientLight intensity={1.5} />
         <directionalLight position={[0, 8, 4]} intensity={2.0} color="#ffffff" />
-        <pointLight position={[0, 3, -5]} intensity={2.0} color="#f5b8c9" />
+        <pointLight position={[0, 3, -5]} intensity={2.0} color={themeAccentColor} />
         <ArenaController onPointerLockChange={onPointerLockChange} isTouchDevice={isTouchDevice} />
       </Canvas>
     </div>

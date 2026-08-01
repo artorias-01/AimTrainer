@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useSettingsStore } from '../../store/useSettingsStore';
 import { CrosshairPreview } from './CrosshairPreview';
+import { HexColorInput } from './HexColorInput';
 import {
   migrateCrosshairConfig,
   getSavedCrosshairPresets,
@@ -359,11 +360,9 @@ export const CrosshairStudio: React.FC = () => {
                   onChange={(e) => updateInner({ color: e.target.value })}
                   className="w-6 h-6 rounded cursor-pointer border border-[#262626] bg-transparent"
                 />
-                <input
-                  type="text"
+                <HexColorInput
                   value={c.innerLines.color}
-                  onChange={(e) => updateInner({ color: e.target.value })}
-                  className="w-24 bg-[#141414] border border-[#262626] rounded-[8px] px-2 py-1 text-xs font-mono uppercase text-white font-bold"
+                  onChange={(val) => updateInner({ color: val })}
                 />
               </div>
             </div>
@@ -462,11 +461,9 @@ export const CrosshairStudio: React.FC = () => {
                   onChange={(e) => updateOuter({ color: e.target.value })}
                   className="w-6 h-6 rounded cursor-pointer border border-[#262626] bg-transparent"
                 />
-                <input
-                  type="text"
+                <HexColorInput
                   value={c.outerLines.color}
-                  onChange={(e) => updateOuter({ color: e.target.value })}
-                  className="w-24 bg-[#141414] border border-[#262626] rounded-[8px] px-2 py-1 text-xs font-mono uppercase text-white font-bold"
+                  onChange={(val) => updateOuter({ color: val })}
                 />
               </div>
             </div>
@@ -535,11 +532,9 @@ export const CrosshairStudio: React.FC = () => {
                   onChange={(e) => updateDotConfig({ color: e.target.value })}
                   className="w-6 h-6 rounded cursor-pointer border border-[#262626] bg-transparent"
                 />
-                <input
-                  type="text"
+                <HexColorInput
                   value={c.dot.color}
-                  onChange={(e) => updateDotConfig({ color: e.target.value })}
-                  className="w-24 bg-[#141414] border border-[#262626] rounded-[8px] px-2 py-1 text-xs font-mono uppercase text-white font-bold"
+                  onChange={(val) => updateDotConfig({ color: val })}
                 />
               </div>
             </div>
@@ -609,11 +604,9 @@ export const CrosshairStudio: React.FC = () => {
                   onChange={(e) => updateOutlineConfig({ color: e.target.value })}
                   className="w-6 h-6 rounded cursor-pointer border border-[#262626] bg-transparent"
                 />
-                <input
-                  type="text"
+                <HexColorInput
                   value={c.outline.color}
-                  onChange={(e) => updateOutlineConfig({ color: e.target.value })}
-                  className="w-24 bg-[#141414] border border-[#262626] rounded-[8px] px-2 py-1 text-xs font-mono uppercase text-white font-bold"
+                  onChange={(val) => updateOutlineConfig({ color: val })}
                 />
               </div>
             </div>

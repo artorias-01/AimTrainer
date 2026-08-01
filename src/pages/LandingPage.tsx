@@ -36,17 +36,17 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
       {/* Radial Dark Vignette */}
       <div className="absolute inset-0 z-0 bg-gradient-to-t from-[#0d0d0d] via-transparent to-[#0d0d0d]/80 pointer-events-none" />
 
-      {/* Centered Editorial Game Title & Menu Container */}
-      <div className="relative z-10 max-w-lg w-full text-center space-y-6">
+      {/* Centered Editorial Game Title & Menu Container with Backdrop Treatment */}
+      <div className="relative z-10 max-w-lg w-full text-center space-y-6 bg-[#0d0d0d]/40 backdrop-blur-sm p-6 sm:p-8 rounded-[16px] border border-[#262626]/50 shadow-2xl">
         {/* Compact Title Section with Ornamental Divider */}
         <div className="space-y-3">
           <h1 className="font-display font-extrabold text-4xl md:text-6xl tracking-tight leading-none text-white drop-shadow-md">
-            AIM <span className="text-[#f5b8c9]">//</span> TT
+            AIM <span className="text-pink">//</span> TT
           </h1>
           <div className="flex items-center justify-center gap-3 w-40 mx-auto opacity-75">
-            <div className="h-px bg-gradient-to-r from-transparent to-[#f5b8c9] flex-1" />
-            <span className="text-[#f5b8c9] text-xs font-mono">◆</span>
-            <div className="h-px bg-gradient-to-l from-transparent to-[#f5b8c9] flex-1" />
+            <div className="h-px bg-gradient-to-r from-transparent to-pink flex-1" />
+            <span className="text-pink text-xs font-mono">◆</span>
+            <div className="h-px bg-gradient-to-l from-transparent to-pink flex-1" />
           </div>
           <p className="font-mono text-[10px] md:text-xs text-neutral-400 tracking-widest uppercase">
             3D ONLINE AIM ENGINE
@@ -55,7 +55,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
 
         {/* Daily Streak Indicator Badge */}
         <div className="flex justify-center">
-          <div className="px-4 py-1.5 rounded-[12px] bg-[#141414]/90 border border-[#f5b8c9]/30 text-xs font-mono font-bold flex items-center justify-center gap-2 text-[#f5b8c9] backdrop-blur-sm shadow-md tracking-wider">
+          <div className="px-4 py-1.5 rounded-[12px] bg-[#141414]/90 border border-pink/30 text-xs font-mono font-bold flex items-center justify-center gap-2 text-pink backdrop-blur-sm shadow-md tracking-wider">
             <span>
               {dailyStreak.streakCount > 0
                 ? `${dailyStreak.streakCount} DAY STREAK ACTIVE`
@@ -76,21 +76,21 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
               transition={{ duration: 0.2 }}
               className="flex flex-col items-center gap-5 max-w-xs mx-auto py-2"
             >
-              {/* Option 1: START DRILL (Primary Action - Visually emphasized text with pink side ticks) */}
+              {/* Option 1: START DRILL */}
               <button
                 onClick={() => {
                   soundManager.playClick();
                   setShowDrillMenu(true);
                 }}
                 onMouseEnter={() => soundManager.playHover()}
-                className="group relative font-display font-extrabold text-2xl md:text-3xl tracking-widest text-white hover:text-[#f5b8c9] transition-colors duration-200 py-1 flex items-center justify-center gap-2 focus:outline-none"
+                className="group relative font-display font-extrabold text-2xl md:text-3xl tracking-widest text-white hover:text-pink transition-colors duration-200 py-1 flex items-center justify-center gap-2 focus:outline-none"
               >
-                <span className="text-[#f5b8c9] font-mono text-base transition-transform group-hover:-translate-x-1">‹</span>
+                <span className="text-pink font-mono text-base transition-transform group-hover:-translate-x-1">‹</span>
                 <span className="relative">
                   START DRILL
-                  <span className="absolute bottom-0 left-0 w-0 h-[2.5px] bg-[#f5b8c9] group-hover:w-full transition-all duration-250 ease-out" />
+                  <span className="absolute bottom-0 left-0 w-0 h-[2.5px] bg-pink group-hover:w-full transition-all duration-250 ease-out" />
                 </span>
-                <span className="text-[#f5b8c9] font-mono text-base transition-transform group-hover:translate-x-1">›</span>
+                <span className="text-pink font-mono text-base transition-transform group-hover:translate-x-1">›</span>
               </button>
 
               {/* Option 2: DRILL LIBRARY */}
@@ -100,14 +100,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
                   onNavigate('library');
                 }}
                 onMouseEnter={() => soundManager.playHover()}
-                className="group relative font-display font-bold text-lg md:text-2xl tracking-widest text-neutral-300 hover:text-[#f5b8c9] transition-colors duration-200 py-1 flex items-center justify-center gap-2 focus:outline-none"
+                className="group relative font-display font-bold text-lg md:text-2xl tracking-widest text-neutral-300 hover:text-pink transition-colors duration-200 py-1 flex items-center justify-center gap-2 focus:outline-none"
               >
-                <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-[#f5b8c9] font-mono text-sm">‹</span>
+                <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-pink font-mono text-sm">‹</span>
                 <span className="relative">
                   DRILL LIBRARY
-                  <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-[#f5b8c9] group-hover:w-full transition-all duration-250 ease-out" />
+                  <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-pink group-hover:w-full transition-all duration-250 ease-out" />
                 </span>
-                <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-[#f5b8c9] font-mono text-sm">›</span>
+                <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-pink font-mono text-sm">›</span>
               </button>
 
               {/* Option 3: ANALYTICS */}
@@ -117,14 +117,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
                   onNavigate('dashboard');
                 }}
                 onMouseEnter={() => soundManager.playHover()}
-                className="group relative font-display font-bold text-lg md:text-2xl tracking-widest text-neutral-300 hover:text-[#f5b8c9] transition-colors duration-200 py-1 flex items-center justify-center gap-2 focus:outline-none"
+                className="group relative font-display font-bold text-lg md:text-2xl tracking-widest text-neutral-300 hover:text-pink transition-colors duration-200 py-1 flex items-center justify-center gap-2 focus:outline-none"
               >
-                <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-[#f5b8c9] font-mono text-sm">‹</span>
+                <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-pink font-mono text-sm">‹</span>
                 <span className="relative">
                   ANALYTICS
-                  <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-[#f5b8c9] group-hover:w-full transition-all duration-250 ease-out" />
+                  <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-pink group-hover:w-full transition-all duration-250 ease-out" />
                 </span>
-                <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-[#f5b8c9] font-mono text-sm">›</span>
+                <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-pink font-mono text-sm">›</span>
               </button>
 
               {/* Option 4: OPTIONS */}
@@ -134,14 +134,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
                   onNavigate('settings');
                 }}
                 onMouseEnter={() => soundManager.playHover()}
-                className="group relative font-display font-bold text-lg md:text-2xl tracking-widest text-neutral-300 hover:text-[#f5b8c9] transition-colors duration-200 py-1 flex items-center justify-center gap-2 focus:outline-none"
+                className="group relative font-display font-bold text-lg md:text-2xl tracking-widest text-neutral-300 hover:text-pink transition-colors duration-200 py-1 flex items-center justify-center gap-2 focus:outline-none"
               >
-                <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-[#f5b8c9] font-mono text-sm">‹</span>
+                <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-pink font-mono text-sm">‹</span>
                 <span className="relative">
                   OPTIONS
-                  <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-[#f5b8c9] group-hover:w-full transition-all duration-250 ease-out" />
+                  <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-pink group-hover:w-full transition-all duration-250 ease-out" />
                 </span>
-                <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-[#f5b8c9] font-mono text-sm">›</span>
+                <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-pink font-mono text-sm">›</span>
               </button>
             </motion.div>
           ) : (
@@ -155,7 +155,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
               className="bg-[#0d0d0d]/95 border border-[#262626] rounded-[12px] p-5 space-y-4 max-w-sm mx-auto backdrop-blur-md shadow-xl text-left"
             >
               <div className="flex items-center justify-between border-b border-[#262626] pb-3">
-                <span className="font-mono text-xs text-[#f5b8c9] font-bold tracking-widest uppercase">
+                <span className="font-mono text-xs text-pink font-bold tracking-widest uppercase">
                   SELECT TRAINING DRILL
                 </span>
                 <span className="font-mono text-[10px] text-neutral-400">{SCENARIOS.length} DRILLS</span>
@@ -168,22 +168,22 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
                     key={sc.id}
                     onClick={() => handleSelectDrill(sc.id)}
                     onMouseEnter={() => soundManager.playHover()}
-                    className="w-full text-left py-3 px-3 transition-all duration-150 group flex items-center justify-between hover:bg-[#f5b8c9]/10 border-l-2 border-l-transparent hover:border-l-[#f5b8c9] focus:outline-none"
+                    className="w-full text-left py-3 px-3 transition-all duration-150 group flex items-center justify-between hover:bg-pink/10 border-l-2 border-l-transparent hover:border-l-pink focus:outline-none"
                   >
                     <div>
-                      <span className="font-display font-bold text-sm block text-neutral-200 group-hover:text-[#f5b8c9] transition-colors">
+                      <span className="font-display font-bold text-sm block text-neutral-200 group-hover:text-pink transition-colors">
                         {sc.name}
                       </span>
                       <span className="font-mono text-[10px] text-neutral-500 group-hover:text-neutral-300 block transition-colors">
                         {sc.category.toUpperCase()} // {sc.durationSeconds}S
                       </span>
                     </div>
-                    <Target className="w-3.5 h-3.5 text-neutral-500 group-hover:text-[#f5b8c9] transition-colors" />
+                    <Target className="w-3.5 h-3.5 text-neutral-500 group-hover:text-pink transition-colors" />
                   </button>
                 ))}
               </div>
 
-              {/* Back to Menu Text-First Button */}
+              {/* Back to Menu Button */}
               <button
                 onClick={() => {
                   soundManager.playClick();
@@ -192,12 +192,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
                 onMouseEnter={() => soundManager.playHover()}
                 className="group relative font-display font-bold text-sm tracking-widest text-neutral-400 hover:text-white transition-colors duration-200 py-1.5 w-full flex items-center justify-center gap-2 focus:outline-none"
               >
-                <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-[#f5b8c9] font-mono text-xs">‹</span>
+                <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-pink font-mono text-xs">‹</span>
                 <span className="relative">
                   BACK TO MENU
-                  <span className="absolute bottom-0 left-0 w-0 h-[1.5px] bg-[#f5b8c9] group-hover:w-full transition-all duration-250 ease-out" />
+                  <span className="absolute bottom-0 left-0 w-0 h-[1.5px] bg-pink group-hover:w-full transition-all duration-250 ease-out" />
                 </span>
-                <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-[#f5b8c9] font-mono text-xs">›</span>
+                <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-pink font-mono text-xs">›</span>
               </button>
             </motion.div>
           )}
