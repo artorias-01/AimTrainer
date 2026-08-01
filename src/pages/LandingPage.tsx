@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { HeroScene } from '../components/3d/HeroScene';
 import { getAllScenarios } from '../utils/scenarios';
 import { getDailyStreak } from '../utils/storage';
 import { useGameStore } from '../store/useGameStore';
 import { soundManager } from '../utils/audio';
-import { Target } from 'lucide-react';
+import { Target, ArrowRight, ChevronLeft } from 'lucide-react';
 
 interface LandingPageProps {
   onNavigate: (page: string, scenarioId?: string) => void;
@@ -37,38 +37,142 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
       {/* Radial Dark Vignette */}
       <div className="absolute inset-0 z-0 bg-gradient-to-t from-[#0d0d0d] via-transparent to-[#0d0d0d]/80 pointer-events-none" />
 
-      {/* Centered Editorial Game Title & Menu Container with Backdrop Treatment */}
-      <div className="relative z-10 max-w-lg w-full text-center space-y-6 bg-[#0d0d0d]/40 backdrop-blur-sm p-6 sm:p-8 rounded-[16px] border border-[#262626]/50 shadow-2xl">
-        {/* Compact Title Section with Ornamental Divider */}
-        <div className="space-y-3">
-          <h1 className="font-display font-extrabold text-4xl md:text-6xl tracking-tight leading-none text-white drop-shadow-md">
-            AIM <span className="text-pink">//</span> TT
-          </h1>
-          <div className="flex items-center justify-center gap-3 w-40 mx-auto opacity-75">
-            <div className="h-px bg-gradient-to-r from-transparent to-pink flex-1" />
-            <span className="text-pink text-xs font-mono">◆</span>
-            <div className="h-px bg-gradient-to-l from-transparent to-pink flex-1" />
-          </div>
-          <p className="font-mono text-[10px] md:text-xs text-neutral-400 tracking-widest uppercase">
-            3D ONLINE AIM ENGINE
-          </p>
-        </div>
+      {/* Dynamic Main Container */}
+      <div
+        className={`relative z-10 w-full transition-all duration-300 ${
+          showDrillMenu
+            ? 'max-w-7xl flex flex-col md:flex-row items-center md:items-stretch justify-between gap-8'
+            : 'max-w-lg text-center space-y-6 bg-[#0d0d0d]/40 backdrop-blur-sm p-6 sm:p-8 rounded-[16px] border border-[#262626]/50 shadow-2xl'
+        }`}
+      >
+        {showDrillMenu ? (
+          /* DRILL SELECTOR HORIZONTAL LAYOUT */
+          <>
+            {/* Left Column: Title & Back Button */}
+            <div className="bg-[#0d0d0d]/80 backdrop-blur-md p-6 rounded-[16px] border border-[#262626] shadow-2xl space-y-5 w-full md:w-72 shrink-0 flex flex-col justify-between text-left">
+              <div className="space-y-3">
+                <h1 className="font-display font-extrabold text-3xl md:text-4xl tracking-tight leading-none text-white">
+                  AIM <span className="text-pink">//</span> TT
+                </h1>
+                <div className="flex items-center gap-2 w-28 opacity-75">
+                  <div className="h-px bg-gradient-to-r from-pink to-transparent flex-1" />
+                  <span className="text-pink text-[10px] font-mono">◆</span>
+                </div>
+                <span className="font-mono text-[10px] text-neutral-400 tracking-widest uppercase block">
+                  DRILL SELECTOR
+                </span>
+                <p className="font-sans-ui text-xs text-neutral-400 leading-relaxed">
+                  Choose from {allScenarios.length} competitive aim scenarios across clicking, precision, tracking, and switching categories.
+                </p>
+              </div>
 
-        {/* Daily Streak Indicator Badge */}
-        <div className="flex justify-center">
-          <div className="px-4 py-1.5 rounded-[12px] bg-[#141414]/90 border border-pink/30 text-xs font-mono font-bold flex items-center justify-center gap-2 text-pink backdrop-blur-sm shadow-md tracking-wider">
-            <span>
-              {dailyStreak.streakCount > 0
-                ? `${dailyStreak.streakCount} DAY STREAK ACTIVE`
-                : 'NO ACTIVE STREAK • COMPLETE A DRILL TODAY'}
-            </span>
-          </div>
-        </div>
+              <button
+                onClick={() => {
+                  soundManager.playClick();
+                  setShowDrillMenu(false);
+                }}
+                onMouseEnter={() => soundManager.playHover()}
+                className="btn-editorial-secondary py-3 text-xs font-bold uppercase flex items-center justify-center gap-2 text-white border-[#262626] hover:border-pink transition-all"
+              >
+                <ChevronLeft className="w-4 h-4 text-pink" /> BACK TO MAIN MENU
+              </button>
+            </div>
 
-        {/* Dynamic Menu (Switches between Main Menu & Drill Selector) */}
-        <AnimatePresence mode="wait">
-          {!showDrillMenu ? (
-            /* MAIN MENU (Text-First, Restrained, Borderless) */
+            {/* Right Column: Horizontal Cards Scrollable Track */}
+            <motion.div
+              key="drill-horizontal-track"
+              initial={{ opacity: 0, x: 25 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 25 }}
+              transition={{ duration: 0.25 }}
+              className="flex-1 w-full max-w-full overflow-hidden bg-[#0d0d0d]/90 backdrop-blur-md border border-[#262626] rounded-[16px] p-6 space-y-4 shadow-2xl text-left"
+            >
+              <div className="flex items-center justify-between border-b border-[#262626] pb-3">
+                <span className="font-mono text-xs text-pink font-bold tracking-widest uppercase">
+                  SELECT TRAINING DRILL
+                </span>
+                <span className="font-mono text-xs text-neutral-400 bg-[#141414] px-3 py-1 rounded-[8px] border border-[#262626]">
+                  {allScenarios.length} DRILLS AVAILABLE
+                </span>
+              </div>
+
+              {/* Horizontally Scrollable Cards Container */}
+              <div className="flex flex-row gap-4 overflow-x-auto py-2 pr-2 scroll-smooth thin-pink-scrollbar">
+                {allScenarios.map((sc) => (
+                  <button
+                    key={sc.id}
+                    onClick={() => handleSelectDrill(sc.id)}
+                    onMouseEnter={() => soundManager.playHover()}
+                    className="w-64 h-52 shrink-0 bg-[#0d0d0d] hover:bg-pink/10 border border-[#262626] hover:border-pink rounded-[12px] p-4 flex flex-col justify-between text-left transition-all duration-200 group focus:outline-none focus:border-pink active:scale-95 shadow-md"
+                  >
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-mono font-bold text-pink uppercase tracking-wider bg-pink/10 px-2 py-0.5 rounded-[6px] border border-pink/20">
+                          {sc.category}
+                        </span>
+                        {sc.isCustom ? (
+                          <span className="text-[9px] font-mono font-bold text-white bg-pink px-1.5 py-0.5 rounded-[4px]">
+                            CUSTOM
+                          </span>
+                        ) : (
+                          <span className="text-[10px] font-mono text-neutral-400 font-bold">
+                            {sc.durationSeconds}S
+                          </span>
+                        )}
+                      </div>
+
+                      <h3 className="font-display font-extrabold text-base text-white group-hover:text-pink transition-colors leading-tight">
+                        {sc.name}
+                      </h3>
+
+                      <p className="font-sans-ui text-[11px] text-neutral-400 line-clamp-2 leading-snug">
+                        {sc.description}
+                      </p>
+                    </div>
+
+                    <div className="flex items-center justify-between border-t border-[#262626] pt-2.5 mt-2">
+                      <span className="text-[10px] font-mono text-neutral-400 group-hover:text-neutral-200 flex items-center gap-1 font-bold">
+                        <Target className="w-3.5 h-3.5 text-pink" /> {sc.difficulty}
+                      </span>
+                      <span className="text-[10px] font-mono text-pink font-bold group-hover:translate-x-1 transition-transform flex items-center gap-1">
+                        START DRILL <ArrowRight className="w-3.5 h-3.5" />
+                      </span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </motion.div>
+          </>
+        ) : (
+          /* MAIN MENU MODE */
+          <>
+            {/* Title Section */}
+            <div className="space-y-3">
+              <h1 className="font-display font-extrabold text-4xl md:text-6xl tracking-tight leading-none text-white drop-shadow-md">
+                AIM <span className="text-pink">//</span> TT
+              </h1>
+              <div className="flex items-center justify-center gap-3 w-40 mx-auto opacity-75">
+                <div className="h-px bg-gradient-to-r from-transparent to-pink flex-1" />
+                <span className="text-pink text-xs font-mono">◆</span>
+                <div className="h-px bg-gradient-to-l from-transparent to-pink flex-1" />
+              </div>
+              <p className="font-mono text-[10px] md:text-xs text-neutral-400 tracking-widest uppercase">
+                3D ONLINE AIM ENGINE
+              </p>
+            </div>
+
+            {/* Daily Streak Indicator Badge */}
+            <div className="flex justify-center">
+              <div className="px-4 py-1.5 rounded-[12px] bg-[#141414]/90 border border-pink/30 text-xs font-mono font-bold flex items-center justify-center gap-2 text-pink backdrop-blur-sm shadow-md tracking-wider">
+                <span>
+                  {dailyStreak.streakCount > 0
+                    ? `${dailyStreak.streakCount} DAY STREAK ACTIVE`
+                    : 'NO ACTIVE STREAK • COMPLETE A DRILL TODAY'}
+                </span>
+              </div>
+            </div>
+
+            {/* Main Menu Buttons */}
             <motion.div
               key="main-menu"
               initial={{ opacity: 0, y: 15 }}
@@ -145,71 +249,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
                 <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-pink font-mono text-sm">›</span>
               </button>
             </motion.div>
-          ) : (
-            /* DRILL SELECTOR MENU */
-            <motion.div
-              key="drill-menu"
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -15 }}
-              transition={{ duration: 0.2 }}
-              className="bg-[#0d0d0d]/95 border border-[#262626] rounded-[12px] p-5 space-y-4 max-w-sm mx-auto backdrop-blur-md shadow-xl text-left"
-            >
-              <div className="flex items-center justify-between border-b border-[#262626] pb-3">
-                <span className="font-mono text-xs text-pink font-bold tracking-widest uppercase">
-                  SELECT TRAINING DRILL
-                </span>
-                <span className="font-mono text-[10px] text-neutral-400">{allScenarios.length} DRILLS</span>
-              </div>
-
-              {/* Scrollable Scenario Hairline Pick List */}
-              <div className="divide-y divide-[#262626] border-b border-[#262626] max-h-[280px] overflow-y-auto pr-1.5 thin-pink-scrollbar">
-                {allScenarios.map((sc) => (
-                  <button
-                    key={sc.id}
-                    onClick={() => handleSelectDrill(sc.id)}
-                    onMouseEnter={() => soundManager.playHover()}
-                    className="w-full text-left py-3 px-3 transition-all duration-150 group flex items-center justify-between hover:bg-pink/10 border-l-2 border-l-transparent hover:border-l-pink focus:outline-none"
-                  >
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="font-display font-bold text-sm block text-neutral-200 group-hover:text-pink transition-colors">
-                          {sc.name}
-                        </span>
-                        {sc.isCustom && (
-                          <span className="text-[9px] font-mono font-bold text-white bg-pink-600 px-1.5 py-0.5 rounded-[4px]">
-                            CUSTOM
-                          </span>
-                        )}
-                      </div>
-                      <span className="font-mono text-[10px] text-neutral-500 group-hover:text-neutral-300 block transition-colors">
-                        {sc.category.toUpperCase()} // {sc.durationSeconds}S
-                      </span>
-                    </div>
-                    <Target className="w-3.5 h-3.5 text-neutral-500 group-hover:text-pink transition-colors" />
-                  </button>
-                ))}
-              </div>
-
-              {/* Back to Menu Button */}
-              <button
-                onClick={() => {
-                  soundManager.playClick();
-                  setShowDrillMenu(false);
-                }}
-                onMouseEnter={() => soundManager.playHover()}
-                className="group relative font-display font-bold text-sm tracking-widest text-neutral-400 hover:text-white transition-colors duration-200 py-1.5 w-full flex items-center justify-center gap-2 focus:outline-none"
-              >
-                <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-pink font-mono text-xs">‹</span>
-                <span className="relative">
-                  BACK TO MENU
-                  <span className="absolute bottom-0 left-0 w-0 h-[1.5px] bg-pink group-hover:w-full transition-all duration-250 ease-out" />
-                </span>
-                <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-pink font-mono text-xs">›</span>
-              </button>
-            </motion.div>
-          )}
-        </AnimatePresence>
+          </>
+        )}
       </div>
     </div>
   );

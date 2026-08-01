@@ -45,13 +45,22 @@ export const LiveHUD: React.FC = () => {
     hits,
     misses,
     streak,
+    timeOnTargetMs,
+    totalSessionTimeMs,
+    currentTrackingStreakMs,
     pauseSession,
   } = useGameStore();
 
   const { crosshair, pauseKey, performanceMode } = useSettingsStore();
 
+  const isTrackingMode = activeScenario.category === 'tracking';
+
   const totalShots = hits + misses;
   const accuracy = totalShots > 0 ? Math.round((hits / totalShots) * 100) : 100;
+
+  const liveTrackingAcc = totalSessionTimeMs > 0 ? Math.round((timeOnTargetMs / totalSessionTimeMs) * 100) : 0;
+  const timeTrackedSec = Math.round((timeOnTargetMs / 1000) * 10) / 10;
+  const currentStreakSec = Math.round((currentTrackingStreakMs / 1000) * 10) / 10;
 
   const formatTime = (secs: number) => {
     const m = Math.floor(secs / 60);
@@ -78,37 +87,68 @@ export const LiveHUD: React.FC = () => {
             </span>
           </div>
 
-          {/* Compact Floating Stats Card */}
+          {/* Compact Floating Stats Card - Category Driven */}
           <motion.div
             initial={performanceMode ? false : { opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.35, ease: 'easeOut' }}
             className="bg-[#0d0d0d]/95 backdrop-blur-md border border-[#262626] border-l-2 border-l-pink rounded-[12px] p-3.5 flex items-center justify-between gap-3 text-xs font-mono shadow-lg"
           >
-            <div className="flex flex-col">
-              <span className="text-[9px] text-neutral-400 font-bold uppercase">HITS</span>
-              <span className="font-extrabold text-white text-sm">
-                <AnimatedNumber value={hits} />
-              </span>
-            </div>
+            {isTrackingMode ? (
+              <>
+                <div className="flex flex-col">
+                  <span className="text-[9px] text-neutral-400 font-bold uppercase">TIME ON TARGET</span>
+                  <span className="font-extrabold text-white text-sm">
+                    {timeTrackedSec.toFixed(1)}s
+                  </span>
+                </div>
 
-            <div className="h-6 w-px bg-[#262626]" />
+                <div className="h-6 w-px bg-[#262626]" />
 
-            <div className="flex flex-col">
-              <span className="text-[9px] text-neutral-400 font-bold uppercase">MISSES</span>
-              <span className="font-extrabold text-neutral-400 text-sm">
-                <AnimatedNumber value={misses} />
-              </span>
-            </div>
+                <div className="flex flex-col">
+                  <span className="text-[9px] text-neutral-400 font-bold uppercase">LOCK STREAK</span>
+                  <span className="font-extrabold text-neutral-300 text-sm">
+                    {currentStreakSec.toFixed(1)}s
+                  </span>
+                </div>
 
-            <div className="h-6 w-px bg-[#262626]" />
+                <div className="h-6 w-px bg-[#262626]" />
 
-            <div className="flex flex-col">
-              <span className="text-[9px] text-pink font-bold uppercase">ACCURACY</span>
-              <span className="font-extrabold text-pink text-sm">
-                <AnimatedNumber value={accuracy} />%
-              </span>
-            </div>
+                <div className="flex flex-col">
+                  <span className="text-[9px] text-pink font-bold uppercase">TARGET LOCK</span>
+                  <span className="font-extrabold text-pink text-sm">
+                    <AnimatedNumber value={liveTrackingAcc} />%
+                  </span>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="flex flex-col">
+                  <span className="text-[9px] text-neutral-400 font-bold uppercase">HITS</span>
+                  <span className="font-extrabold text-white text-sm">
+                    <AnimatedNumber value={hits} />
+                  </span>
+                </div>
+
+                <div className="h-6 w-px bg-[#262626]" />
+
+                <div className="flex flex-col">
+                  <span className="text-[9px] text-neutral-400 font-bold uppercase">MISSES</span>
+                  <span className="font-extrabold text-neutral-400 text-sm">
+                    <AnimatedNumber value={misses} />
+                  </span>
+                </div>
+
+                <div className="h-6 w-px bg-[#262626]" />
+
+                <div className="flex flex-col">
+                  <span className="text-[9px] text-pink font-bold uppercase">ACCURACY</span>
+                  <span className="font-extrabold text-pink text-sm">
+                    <AnimatedNumber value={accuracy} />%
+                  </span>
+                </div>
+              </>
+            )}
           </motion.div>
         </div>
 
