@@ -1,44 +1,251 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { motion, AnimatePresence } from 'framer-motion';
 import * as THREE from 'three';
 import { soundManager } from '../../utils/audio';
 import { useSettingsStore } from '../../store/useSettingsStore';
 
-function AnimatedIntroScene() {
-  const meshRef = React.useRef<THREE.Mesh>(null);
-  const ringRef = React.useRef<THREE.Mesh>(null);
-  const targetShapeConfig = useSettingsStore((s) => s.targetShapeConfig);
+function sampleShapePoints(shape: string, count: number): Float32Array {
+  const targetPositions = new Float32Array(count * 3);
 
-  useFrame(({ clock, camera }) => {
-    const t = clock.getElapsedTime();
+  for (let i = 0; i < count; i++) {
+    let x = 0, y = 0, z = 0;
 
-    // 1. Slow, elegant camera dolly-in over duration (Z: 7.5 -> 4.8)
-    const dollyProgress = Math.min(t / 2.2, 1.0);
-    camera.position.z = 7.5 - dollyProgress * 2.7;
-
-    // 2. Core geometry: smooth scale reveal + single deliberate Y-axis rotation
-    if (meshRef.current) {
-      const scaleProgress = Math.min(t / 0.6, 1.0);
-      meshRef.current.scale.setScalar(scaleProgress);
-      meshRef.current.rotation.y = t * 0.45;
+    if (shape === 'cube') {
+      const face = Math.floor(Math.random() * 6);
+      const u = (Math.random() - 0.5) * 2.2;
+      const v = (Math.random() - 0.5) * 2.2;
+      if (face === 0) { x = 1.1; y = u; z = v; }
+      else if (face === 1) { x = -1.1; y = u; z = v; }
+      else if (face === 2) { x = u; y = 1.1; z = v; }
+      else if (face === 3) { x = u; y = -1.1; z = v; }
+      else if (face === 4) { x = u; y = v; z = 1.1; }
+      else { x = u; y = v; z = -1.1; }
+    } else if (shape === 'torus') {
+      const R = 1.2;
+      const r = 0.4;
+      const u = Math.random() * Math.PI * 2;
+      const v = Math.random() * Math.PI * 2;
+      x = (R + r * Math.cos(v)) * Math.cos(u);
+      y = (R + r * Math.cos(v)) * Math.sin(u);
+      z = r * Math.sin(v);
+    } else if (shape === 'octahedron') {
+      const r = 1.5;
+      const u = Math.random() * Math.PI * 2;
+      const v = (Math.random() - 0.5) * Math.PI;
+      const absX = Math.cos(v) * Math.cos(u);
+      const absY = Math.cos(v) * Math.sin(u);
+      const absZ = Math.sin(v);
+      const norm = Math.abs(absX) + Math.abs(absY) + Math.abs(absZ);
+      x = (absX / norm) * r;
+      y = (absY / norm) * r;
+      z = (absZ / norm) * r;
+    } else if (shape === 'cylinder') {
+      const radius = 1.0;
+      const halfH = 0.9;
+      const angle = Math.random() * Math.PI * 2;
+      if (Math.random() < 0.7) {
+        x = Math.cos(angle) * radius;
+        z = Math.sin(angle) * radius;
+        y = (Math.random() - 0.5) * halfH * 2;
+      } else {
+        const rCap = Math.sqrt(Math.random()) * radius;
+        x = Math.cos(angle) * rCap;
+        z = Math.sin(angle) * rCap;
+        y = Math.random() < 0.5 ? halfH : -halfH;
+      }
+    } else if (shape === 'cone') {
+      const radius = 1.2;
+      const height = 2.0;
+      const h = Math.random();
+      const angle = Math.random() * Math.PI * 2;
+      const rAtH = (1 - h) * radius;
+      x = Math.cos(angle) * rAtH;
+      z = Math.sin(angle) * rAtH;
+      y = h * height - height / 2;
+    } else if (shape === 'capsule') {
+      const r = 0.8;
+      const halfH = 0.6;
+      const angle = Math.random() * Math.PI * 2;
+      const h = (Math.random() - 0.5) * halfH * 2;
+      x = Math.cos(angle) * r;
+      z = Math.sin(angle) * r;
+      y = h;
+    } else {
+      // Sphere (default)
+      const r = 1.4;
+      const u = Math.random() * Math.PI * 2;
+      const v = Math.acos(2 * Math.random() - 1);
+      x = r * Math.sin(v) * Math.cos(u);
+      y = r * Math.sin(v) * Math.sin(u);
+      z = r * Math.cos(v);
     }
 
-    // 3. Outer orbital ring: slow reverse rotation
-    if (ringRef.current) {
-      ringRef.current.rotation.y = -t * 0.25;
+    targetPositions[i * 3] = x;
+    targetPositions[i * 3 + 1] = y;
+    targetPositions[i * 3 + 2] = z;
+  }
+
+  return targetPositions;
+}
+
+function ParticleTargetLockScene({ onFlashSound }: { onFlashSound: () => void }) {
+  const pointsRef = useRef<THREE.Points>(null);
+  const coreMeshRef = useRef<THREE.Mesh>(null);
+  const shockwaveRef = useRef<THREE.Mesh>(null);
+  const soundFiredRef = useRef(false);
+
+  const targetShapeConfig = useSettingsStore((s) => s.targetShapeConfig);
+  const performanceMode = useSettingsStore((s) => s.performanceMode);
+
+  const shapeType = targetShapeConfig?.shape || 'sphere';
+  const particleCount = performanceMode ? 100 : 250;
+
+  // Initial scattered positions & color arrays
+  const { startPositions, targetPositions, colors, currentPositions } = useMemo(() => {
+    const startPos = new Float32Array(particleCount * 3);
+    const currPos = new Float32Array(particleCount * 3);
+    const col = new Float32Array(particleCount * 3);
+
+    const targetPos = sampleShapePoints(shapeType, particleCount);
+
+    const pinkRGB = new THREE.Color('#f5b8c9');
+    const whiteRGB = new THREE.Color('#ffffff');
+
+    for (let i = 0; i < particleCount; i++) {
+      // Scatter in spherical boundary radius 4.5 to 7.0
+      const radius = 3.5 + Math.random() * 3.5;
+      const theta = Math.random() * Math.PI * 2;
+      const phi = Math.acos(2 * Math.random() - 1);
+
+      const sx = radius * Math.sin(phi) * Math.cos(theta);
+      const sy = radius * Math.sin(phi) * Math.sin(theta);
+      const sz = radius * Math.cos(phi);
+
+      startPos[i * 3] = sx;
+      startPos[i * 3 + 1] = sy;
+      startPos[i * 3 + 2] = sz;
+
+      currPos[i * 3] = sx;
+      currPos[i * 3 + 1] = sy;
+      currPos[i * 3 + 2] = sz;
+
+      const c = Math.random() < 0.65 ? pinkRGB : whiteRGB;
+      col[i * 3] = c.r;
+      col[i * 3 + 1] = c.g;
+      col[i * 3 + 2] = c.b;
+    }
+
+    return {
+      startPositions: startPos,
+      targetPositions: targetPos,
+      colors: col,
+      currentPositions: currPos,
+    };
+  }, [shapeType, particleCount]);
+
+  useFrame(({ clock }) => {
+    const t = clock.getElapsedTime();
+
+    // 1. Scatter Drift Phase (0.0s - 0.6s)
+    // 2. Acceleration / Convergence Phase (0.6s - 1.6s)
+    let convFactor = 0;
+    if (t > 0.6) {
+      const rawProgress = Math.min((t - 0.6) / 1.0, 1.0);
+      // Ease-in acceleration curve (t^2.5) for high speed lock-on momentum
+      convFactor = Math.pow(rawProgress, 2.5);
+    }
+
+    if (pointsRef.current) {
+      const posAttr = pointsRef.current.geometry.attributes.position;
+      const arr = posAttr.array as Float32Array;
+
+      for (let i = 0; i < particleCount; i++) {
+        const idx = i * 3;
+        const sx = startPositions[idx];
+        const sy = startPositions[idx + 1];
+        const sz = startPositions[idx + 2];
+
+        const tx = targetPositions[idx];
+        const ty = targetPositions[idx + 1];
+        const tz = targetPositions[idx + 2];
+
+        // Slight ambient drift during scatter
+        const driftX = Math.sin(t * 1.5 + i) * 0.08 * (1 - convFactor);
+        const driftY = Math.cos(t * 1.2 + i) * 0.08 * (1 - convFactor);
+
+        arr[idx] = sx + (tx - sx) * convFactor + driftX;
+        arr[idx + 1] = sy + (ty - sy) * convFactor + driftY;
+        arr[idx + 2] = sz + (tz - sz) * convFactor;
+      }
+
+      posAttr.needsUpdate = true;
+      pointsRef.current.rotation.y = t * 0.3;
+    }
+
+    // 3. Lock-On Flash & Shockwave Pulse (1.6s - 1.9s)
+    if (t >= 1.6 && !soundFiredRef.current) {
+      soundFiredRef.current = true;
+      onFlashSound();
+    }
+
+    if (coreMeshRef.current) {
+      // Core shape fades in as convergence finishes
+      const coreOpacity = t >= 1.5 ? Math.min((t - 1.5) / 0.3, 1.0) : 0;
+      coreMeshRef.current.scale.setScalar(coreOpacity);
+      coreMeshRef.current.rotation.y = t * 0.5;
+
+      const mat = coreMeshRef.current.material as THREE.MeshStandardMaterial;
+      if (mat) {
+        if (t >= 1.6 && t <= 1.9) {
+          // Emissive flash pulse
+          const flashProgress = (t - 1.6) / 0.3;
+          mat.emissiveIntensity = 0.8 + Math.sin(flashProgress * Math.PI) * 2.2;
+        } else {
+          mat.emissiveIntensity = 0.8;
+        }
+      }
+    }
+
+    // Shockwave Ring Animation
+    if (shockwaveRef.current && t >= 1.6) {
+      const swProgress = Math.min((t - 1.6) / 0.5, 1.0);
+      shockwaveRef.current.scale.setScalar(0.5 + swProgress * 3.5);
+      const swMat = shockwaveRef.current.material as THREE.MeshBasicMaterial;
+      if (swMat) {
+        swMat.opacity = (1 - swProgress) * 0.8;
+      }
     }
   });
 
-  const shapeType = targetShapeConfig?.shape || 'sphere';
-
   return (
     <group position={[0, 0, 0]}>
-      <ambientLight intensity={0.6} />
-      <pointLight position={[5, 5, 5]} intensity={2.0} color="#f5b8c9" />
+      <ambientLight intensity={0.8} />
+      <pointLight position={[5, 5, 5]} intensity={2.5} color="#f5b8c9" />
 
-      {/* Core Geometry (Scaled from 0, slow single-axis spin, pink emissive) */}
-      <mesh ref={meshRef}>
+      {/* Converging Point Particles */}
+      <points ref={pointsRef}>
+        <bufferGeometry>
+          <bufferAttribute
+            attach="attributes-position"
+            args={[currentPositions, 3]}
+          />
+          <bufferAttribute
+            attach="attributes-color"
+            args={[colors, 3]}
+          />
+        </bufferGeometry>
+        <pointsMaterial
+          size={0.07}
+          vertexColors
+          transparent
+          opacity={0.9}
+          blending={THREE.AdditiveBlending}
+        />
+      </points>
+
+      {/* Solid Core Shape Revealed on Convergence */}
+      <mesh ref={coreMeshRef} scale={0}>
         {shapeType === 'torus' ? (
           <torusGeometry args={[1.2, 0.4, 16, 32]} />
         ) : shapeType === 'cube' ? (
@@ -52,7 +259,7 @@ function AnimatedIntroScene() {
         ) : shapeType === 'capsule' ? (
           <capsuleGeometry args={[0.8, 1.2, 16, 32]} />
         ) : (
-          <icosahedronGeometry args={[1.4, 1]} />
+          <sphereGeometry args={[1.4, 32, 32]} />
         )}
         <meshStandardMaterial
           color="#f5b8c9"
@@ -62,20 +269,18 @@ function AnimatedIntroScene() {
         />
       </mesh>
 
-      {/* Outer Orbital Ring (Translucent silver, visually distinct) */}
-      <mesh ref={ringRef}>
-        <torusGeometry args={[2.5, 0.03, 16, 100]} />
-        <meshStandardMaterial
-          color="#ffffff"
+      {/* Expanding Lock-On Shockwave Ring */}
+      <mesh ref={shockwaveRef} scale={0} rotation={[Math.PI / 2, 0, 0]}>
+        <ringGeometry args={[0.9, 1.05, 64]} />
+        <meshBasicMaterial
+          color="#f5b8c9"
           transparent
-          opacity={0.35}
-          emissive="#ffffff"
-          emissiveIntensity={0.2}
+          opacity={0}
+          side={THREE.DoubleSide}
         />
       </mesh>
 
-      {/* Floor Grid */}
-      <gridHelper args={[20, 20, '#f5b8c9', '#262626']} position={[0, -2, 0]} />
+      <gridHelper args={[24, 24, '#f5b8c9', '#262626']} position={[0, -2.5, 0]} />
     </group>
   );
 }
@@ -86,6 +291,7 @@ interface IntroTransitionProps {
 
 export const IntroTransition: React.FC<IntroTransitionProps> = ({ onComplete }) => {
   const [visible, setVisible] = useState(true);
+  const [showLogo, setShowLogo] = useState(false);
 
   const handleFinish = () => {
     try {
@@ -98,9 +304,15 @@ export const IntroTransition: React.FC<IntroTransitionProps> = ({ onComplete }) 
   };
 
   useEffect(() => {
+    // Show logo right at lock-on flash beat (1.6s)
+    const logoTimer = setTimeout(() => {
+      setShowLogo(true);
+    }, 1600);
+
+    // Sequence ends at 2.6s
     const timer = setTimeout(() => {
       handleFinish();
-    }, 2200);
+    }, 2600);
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' || e.key === ' ' || e.key === 'Enter') {
@@ -111,6 +323,7 @@ export const IntroTransition: React.FC<IntroTransitionProps> = ({ onComplete }) 
 
     window.addEventListener('keydown', handleKeyDown);
     return () => {
+      clearTimeout(logoTimer);
       clearTimeout(timer);
       window.removeEventListener('keydown', handleKeyDown);
     };
@@ -132,29 +345,33 @@ export const IntroTransition: React.FC<IntroTransitionProps> = ({ onComplete }) 
         >
           {/* 3D Canvas Background */}
           <div className="absolute inset-0 z-0">
-            <Canvas camera={{ position: [0, 0, 7.5], fov: 60 }}>
-              <AnimatedIntroScene />
+            <Canvas camera={{ position: [0, 0, 7.0], fov: 60 }}>
+              <ParticleTargetLockScene onFlashSound={() => soundManager.playClick()} />
             </Canvas>
           </div>
 
           {/* Vignette Gradient Overlay */}
           <div className="absolute inset-0 z-10 bg-gradient-to-t from-[#0d0d0d] via-transparent to-[#0d0d0d]/80 pointer-events-none" />
 
-          {/* Overlay Text & Logo Formation */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.4 }}
-            className="relative z-20 text-center space-y-4 max-w-sm pointer-events-none"
-          >
-            <h1 className="font-display font-black text-4xl md:text-5xl tracking-widest text-white drop-shadow-lg">
-              AIM <span className="text-[#f5b8c9]">//</span> TT
-            </h1>
-            <div className="h-0.5 w-16 bg-[#f5b8c9] mx-auto rounded-full animate-pulse" />
-            <p className="font-mono text-[10px] text-neutral-400 tracking-[0.3em] uppercase">
-              INITIALIZING 3D ENGINE
-            </p>
-          </motion.div>
+          {/* Overlay Text & Logo Formation (Arrives on lock-on flash beat at 1.6s) */}
+          <AnimatePresence>
+            {showLogo && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.85, y: 10 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                transition={{ duration: 0.35, ease: 'easeOut' }}
+                className="relative z-20 text-center space-y-3 max-w-sm pointer-events-none"
+              >
+                <h1 className="font-display font-black text-4xl md:text-5xl tracking-widest text-white drop-shadow-xl">
+                  AIM <span className="text-[#f5b8c9]">//</span> TT
+                </h1>
+                <div className="h-0.5 w-16 bg-[#f5b8c9] mx-auto rounded-full animate-pulse" />
+                <p className="font-mono text-[10px] text-[#f5b8c9] font-bold tracking-[0.3em] uppercase">
+                  TARGET ACQUIRED
+                </p>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* Skip Notice Pill */}
           <div className="absolute bottom-8 z-20">

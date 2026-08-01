@@ -352,12 +352,15 @@ export const useGameStore = create<GameState>((set, get) => ({
     const hitPoints = Math.round(500 * comboMultiplier);
     const newScore = score + hitPoints;
 
-    const updatedTargets = targets.map((t) => {
+    const updatedTargets: TargetInstance[] = [];
+    for (const t of targets) {
       if (t.id === targetId) {
-        return createRandomTarget(activeScenario, t.id);
+        const otherActive = targets.filter((x) => x.id !== targetId);
+        updatedTargets.push(createRandomTarget(activeScenario, t.id, otherActive));
+      } else {
+        updatedTargets.push(t);
       }
-      return t;
-    });
+    }
 
     set({
       score: newScore,
@@ -419,9 +422,10 @@ export const useGameStore = create<GameState>((set, get) => ({
       const hasExpired = targets.some((t) => now - t.spawnTime > effectiveLifetimeMs);
 
       if (hasExpired) {
+        const otherActive = targets.filter((x) => now - x.spawnTime <= effectiveLifetimeMs);
         const updated = targets.map((t) => {
           if (now - t.spawnTime > effectiveLifetimeMs) {
-            return createRandomTarget(activeScenario, t.id);
+            return createRandomTarget(activeScenario, t.id, otherActive);
           }
           return t;
         });
@@ -437,15 +441,36 @@ export const useGameStore = create<GameState>((set, get) => ({
   },
 }));
 
+function isTooCloseToExisting(
+  candidate: { x: number; y: number; z: number; radius: number },
+  existingTargets: TargetInstance[],
+  idToExclude?: string
+): boolean {
+  const minPadding = candidate.radius < 0.25 ? 0.25 : 0.45;
+  const minDist = candidate.radius * 2 + minPadding;
+
+  for (const existing of existingTargets) {
+    if (idToExclude && existing.id === idToExclude) continue;
+    const dx = candidate.x - existing.x;
+    const dy = candidate.y - existing.y;
+    const dz = candidate.z - existing.z;
+    const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+    if (dist < minDist) {
+      return true;
+    }
+  }
+  return false;
+}
+
 function generateTargetsForScenario(scenario: ScenarioDef): TargetInstance[] {
   const list: TargetInstance[] = [];
   for (let i = 0; i < scenario.targetCount; i++) {
-    list.push(createRandomTarget(scenario, `target-${i}`));
+    list.push(createRandomTarget(scenario, `target-${i}`, list));
   }
   return list;
 }
 
-function createRandomTarget(scenario: ScenarioDef, id: string): TargetInstance {
+function generateCandidateTarget(scenario: ScenarioDef, id: string): TargetInstance {
   const radius = scenario.targetRadius;
   const clearance = radius + 0.12;
 
@@ -502,4 +527,22 @@ function createRandomTarget(scenario: ScenarioDef, id: string): TargetInstance {
     lastDirectionChange: Date.now(),
     phaseOffset: Math.random() * Math.PI * 2,
   };
+}
+
+function createRandomTarget(
+  scenario: ScenarioDef,
+  id: string,
+  existingTargets: TargetInstance[] = []
+): TargetInstance {
+  let candidate = generateCandidateTarget(scenario, id);
+  const maxAttempts = 20;
+
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    if (!isTooCloseToExisting(candidate, existingTargets, id)) {
+      return candidate;
+    }
+    candidate = generateCandidateTarget(scenario, id);
+  }
+
+  return candidate;
 }
