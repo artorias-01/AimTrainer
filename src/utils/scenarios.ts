@@ -325,14 +325,4 @@ export function getScenarioById(id: string): ScenarioDef {
   return all.find((s) => s.id === id) || SCENARIOS[0];
 }
 
-/* Deterministic Daily Challenge Picker */
-export function getDailyChallengeScenario(dateStr?: string): ScenarioDef {
-  const targetDate = dateStr || new Date().toISOString().split('T')[0];
-  let hash = 0;
-  for (let i = 0; i < targetDate.length; i++) {
-    hash = (hash << 5) - hash + targetDate.charCodeAt(i);
-    hash |= 0;
-  }
-  const index = Math.abs(hash) % SCENARIOS.length;
-  return SCENARIOS[index];
-}
+

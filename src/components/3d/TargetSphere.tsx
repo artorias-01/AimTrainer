@@ -153,6 +153,8 @@ export const TargetSphere: React.FC<TargetSphereProps> = React.memo(({
   });
 
   const targetShape = useSettingsStore((s) => s.targetShape) || 'sphere';
+  const customTargetColor = useSettingsStore((s) => s.targetColor);
+  const activeColor = customTargetColor || baseColor;
 
   return (
     <group ref={groupRef} position={[x, y, z]}>
@@ -169,10 +171,10 @@ export const TargetSphere: React.FC<TargetSphereProps> = React.memo(({
           <sphereGeometry args={[radius, 32, 32]} />
         )}
         <meshStandardMaterial
-          color={hovered ? '#ffffff' : baseColor}
+          color={hovered ? '#ffffff' : activeColor}
           roughness={0.15}
           metalness={0.1}
-          emissive={baseColor === '#ffffff' ? '#f5b8c9' : baseColor}
+          emissive={activeColor === '#ffffff' ? '#f5b8c9' : activeColor}
           emissiveIntensity={hovered ? 0.95 : 0.65}
         />
       </mesh>

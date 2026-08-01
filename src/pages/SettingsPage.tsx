@@ -34,6 +34,26 @@ import {
   Gamepad2,
 } from 'lucide-react';
 
+function getHexLuminance(hex: string): number {
+  let c = hex.replace('#', '').trim();
+  if (c.length === 3) {
+    c = c.split('').map((x) => x + x).join('');
+  }
+  if (c.length !== 6) return 1.0;
+  const r = parseInt(c.substring(0, 2), 16) / 255;
+  const g = parseInt(c.substring(2, 4), 16) / 255;
+  const b = parseInt(c.substring(4, 6), 16) / 255;
+  const a = [r, g, b].map((v) => (v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4)));
+  return a[0] * 0.2126 + a[1] * 0.7152 + a[2] * 0.0722;
+}
+
+function isLowContrastTarget(hex: string): boolean {
+  const bgLuminance = 0.005; // #0d0d0d
+  const targetLuminance = getHexLuminance(hex);
+  const ratio = (targetLuminance + 0.05) / (bgLuminance + 0.05);
+  return ratio < 2.5;
+}
+
 interface SettingsPageProps {
   onNavigate?: (page: string) => void;
 }
@@ -62,8 +82,12 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
     setKeybinds,
     targetShape,
     setTargetShape,
+    targetColor,
+    setTargetColor,
     arenaBackdrop,
     setArenaBackdrop,
+    arenaColor,
+    setArenaColor,
     setScenarioCrosshair,
   } = useSettingsStore();
 
@@ -1021,10 +1045,10 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
                 <p className="font-sans-ui text-xs text-neutral-400 leading-relaxed">
                   Disables ambient background particle fields, caps 3D Canvas resolution to 1.0 DPR, and disables non-essential animations to maximize frame rate and eliminate input latency on low-spec hardware.
                 </p>
-                {/* Cosmetic Target Shapes */}
-                <div className="space-y-3 bg-[#0d0d0d] p-5 rounded-[12px] border border-[#262626]">
+                {/* Cosmetic Target Shapes & Color */}
+                <div className="space-y-4 bg-[#0d0d0d] p-5 rounded-[12px] border border-[#262626]">
                   <label className="text-[10px] font-mono text-[#f5b8c9] uppercase tracking-widest block font-bold">
-                    COSMETIC TARGET SHAPE
+                    TARGET GEOMETRY & COLOR
                   </label>
                   <div className="grid grid-cols-3 gap-2">
                     {[
@@ -1048,12 +1072,60 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
                       </button>
                     ))}
                   </div>
+
+                  {/* Target Color Picker with Contrast Safety Alert */}
+                  <div className="space-y-2 pt-2 border-t border-[#262626]/60">
+                    <div className="flex justify-between items-center text-xs font-mono text-neutral-400">
+                      <span>CUSTOM TARGET HEX COLOR</span>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="color"
+                          value={targetColor || '#f5b8c9'}
+                          onChange={(e) => {
+                            setTargetColor(e.target.value);
+                            showSaveConfirmation(`TARGET COLOR UPDATED TO ${e.target.value.toUpperCase()}`);
+                          }}
+                          className="w-6 h-6 rounded cursor-pointer border border-[#262626] bg-transparent"
+                        />
+                        <span className="text-white font-bold">{targetColor || '#f5b8c9'}</span>
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={targetColor || '#f5b8c9'}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setTargetColor(val);
+                        }}
+                        placeholder="#f5b8c9"
+                        className="flex-1 bg-[#141414] border border-[#262626] rounded-[12px] p-2.5 text-xs text-white font-mono uppercase focus:outline-none focus:border-[#f5b8c9]"
+                      />
+                      <button
+                        onClick={() => {
+                          setTargetColor('#f5b8c9');
+                          showSaveConfirmation('TARGET COLOR RESET TO DEFAULT PINK');
+                        }}
+                        className="px-3 py-2 bg-[#141414] hover:bg-[#262626] text-neutral-400 hover:text-white border border-[#262626] rounded-[12px] text-[10px] font-mono font-bold transition-all"
+                      >
+                        RESET
+                      </button>
+                    </div>
+
+                    {/* Low Contrast Warning Alert */}
+                    {isLowContrastTarget(targetColor || '#f5b8c9') && (
+                      <div className="flex items-center gap-2 bg-amber-500/10 border border-amber-500/40 p-2.5 rounded-[10px] text-amber-400 text-[11px] font-mono">
+                        <AlertCircle className="w-4 h-4 shrink-0" />
+                        <span>LOW CONTRAST WARNING: Target color may blend into dark arena environment!</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
 
-                {/* Cosmetic Arena Backdrops */}
-                <div className="space-y-3 bg-[#0d0d0d] p-5 rounded-[12px] border border-[#262626]">
+                {/* Cosmetic Arena Backdrops & Wall Color */}
+                <div className="space-y-4 bg-[#0d0d0d] p-5 rounded-[12px] border border-[#262626]">
                   <label className="text-[10px] font-mono text-[#f5b8c9] uppercase tracking-widest block font-bold">
-                    COSMETIC ARENA BACKDROP
+                    COSMETIC ARENA BACKDROP & WALL COLOR
                   </label>
                   <div className="grid grid-cols-3 gap-2">
                     {[
@@ -1076,6 +1148,43 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
                         {backdrop.label}
                       </button>
                     ))}
+                  </div>
+
+                  {/* Arena Wall Color Hex Picker */}
+                  <div className="space-y-2 pt-2 border-t border-[#262626]/60">
+                    <div className="flex justify-between items-center text-xs font-mono text-neutral-400">
+                      <span>ARENA WALL HEX COLOR</span>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="color"
+                          value={arenaColor || '#121212'}
+                          onChange={(e) => {
+                            setArenaColor(e.target.value);
+                            showSaveConfirmation(`ARENA COLOR UPDATED TO ${e.target.value.toUpperCase()}`);
+                          }}
+                          className="w-6 h-6 rounded cursor-pointer border border-[#262626] bg-transparent"
+                        />
+                        <span className="text-white font-bold">{arenaColor || '#121212'}</span>
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={arenaColor || '#121212'}
+                        onChange={(e) => setArenaColor(e.target.value)}
+                        placeholder="#121212"
+                        className="flex-1 bg-[#141414] border border-[#262626] rounded-[12px] p-2.5 text-xs text-white font-mono uppercase focus:outline-none focus:border-[#f5b8c9]"
+                      />
+                      <button
+                        onClick={() => {
+                          setArenaColor('#121212');
+                          showSaveConfirmation('ARENA COLOR RESET TO DEFAULT');
+                        }}
+                        className="px-3 py-2 bg-[#141414] hover:bg-[#262626] text-neutral-400 hover:text-white border border-[#262626] rounded-[12px] text-[10px] font-mono font-bold transition-all"
+                      >
+                        RESET
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>

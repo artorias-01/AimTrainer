@@ -30,6 +30,8 @@ export const CustomScenarioModal: React.FC<CustomScenarioModalProps> = ({
   const [pathType, setPathType] = useState<'linear' | 'sinusoidal' | 'erratic'>(initialScenario?.pathType || 'linear');
   const [directionChangeIntervalMs, setDirectionChangeIntervalMs] = useState(initialScenario?.directionChangeIntervalMs || 1000);
   const [enableJukes, setEnableJukes] = useState(initialScenario?.enableJukes || false);
+  const [playerDistance, setPlayerDistance] = useState(initialScenario?.playerPosition?.z ?? 3.0);
+  const [speedVariance, setSpeedVariance] = useState(initialScenario?.speedVariance ?? 0.2);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,11 +49,12 @@ export const CustomScenarioModal: React.FC<CustomScenarioModalProps> = ({
       targetRadius,
       targetSpeed,
       arenaType,
-      playerPosition: initialScenario?.playerPosition || { x: 0, y: 2.2, z: 3.0 },
+      playerPosition: { x: 0, y: 2.2, z: playerDistance },
       hasLifetimeLimit,
       lifetimeMs: hasLifetimeLimit ? lifetimeMs : undefined,
       pathType: targetSpeed > 0 ? pathType : undefined,
       directionChangeIntervalMs: targetSpeed > 0 ? directionChangeIntervalMs : undefined,
+      speedVariance: targetSpeed > 0 ? speedVariance : undefined,
       enableJukes: targetSpeed > 0 ? enableJukes : undefined,
       tags: ['CUSTOM', category.toUpperCase(), arenaType.toUpperCase()],
       recommendedCm360: '25-45 cm',
@@ -253,6 +256,23 @@ export const CustomScenarioModal: React.FC<CustomScenarioModalProps> = ({
                   className="w-full accent-[#f5b8c9] bg-[#262626] rounded-lg h-2"
                 />
               </div>
+              {targetSpeed > 0 && (
+                <div className="space-y-1 pt-1">
+                  <div className="flex justify-between text-[10px] text-neutral-400">
+                    <span>SPEED DRIFT VARIANCE</span>
+                    <span className="text-white font-bold">{(speedVariance * 100).toFixed(0)}%</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="0"
+                    max="1.0"
+                    step="0.05"
+                    value={speedVariance}
+                    onChange={(e) => setSpeedVariance(parseFloat(e.target.value))}
+                    className="w-full accent-[#f5b8c9] bg-[#262626] rounded-lg h-2"
+                  />
+                </div>
+              )}
             </div>
 
             <div className="space-y-2 bg-[#0d0d0d] p-3.5 rounded-[12px] border border-[#262626]">
@@ -283,6 +303,21 @@ export const CustomScenarioModal: React.FC<CustomScenarioModalProps> = ({
                   <option value="Advanced">Advanced</option>
                   <option value="Pro">Pro</option>
                 </select>
+              </div>
+              <div className="space-y-1 pt-1">
+                <div className="flex justify-between text-[10px] text-neutral-400">
+                  <span>DISTANCE TO TARGET WALL</span>
+                  <span className="text-white font-bold">{playerDistance.toFixed(1)} M</span>
+                </div>
+                <input
+                  type="range"
+                  min="1.5"
+                  max="10.0"
+                  step="0.5"
+                  value={playerDistance}
+                  onChange={(e) => setPlayerDistance(parseFloat(e.target.value))}
+                  className="w-full accent-[#f5b8c9] bg-[#262626] rounded-lg h-2"
+                />
               </div>
             </div>
           </div>

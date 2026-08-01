@@ -23,7 +23,9 @@ const ArenaController: React.FC<ArenaControllerProps> = ({ onPointerLockChange, 
     updateTargetPositions,
     tickSecond,
   } = useGameStore();
-  const { settings, arenaBackdrop } = useSettingsStore();
+  const { settings, arenaBackdrop, arenaColor } = useSettingsStore();
+
+  const wallColor = arenaColor || (arenaBackdrop === 'gradient-room' ? '#181216' : '#121212');
 
   const yawRef = useRef<number>(0);
   const pitchRef = useRef<number>(0);
@@ -283,13 +285,13 @@ const ArenaController: React.FC<ArenaControllerProps> = ({ onPointerLockChange, 
           {/* Front Target Wall (Z = -6.5) */}
           <mesh position={[0, 3.2, -6.5]}>
             <planeGeometry args={[22, 10]} />
-            <meshStandardMaterial color={arenaBackdrop === 'gradient-room' ? '#181216' : '#121212'} roughness={0.8} />
+            <meshStandardMaterial color={wallColor} roughness={0.8} />
           </mesh>
 
           {/* Rear Target Wall (Z = +6.5 for 360 6-Wall Mode) */}
           <mesh position={[0, 3.2, 6.5]} rotation={[0, Math.PI, 0]}>
             <planeGeometry args={[22, 10]} />
-            <meshStandardMaterial color="#121212" roughness={0.8} />
+            <meshStandardMaterial color={wallColor} roughness={0.8} />
           </mesh>
 
           {/* Left Wall (X = -11) */}

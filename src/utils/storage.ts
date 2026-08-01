@@ -169,6 +169,9 @@ export function getStoredSessions(): SessionResult[] {
 }
 
 export function saveSessionResult(session: SessionResult): { isNewPB: boolean } {
+  const todayStr = new Date().toISOString().split('T')[0];
+  recordDailyCompletion(todayStr);
+
   const sessions = getStoredSessions();
   sessions.unshift(session);
   const cappedSessions = sessions.slice(0, 200);
@@ -313,6 +316,8 @@ export function getStoredBenchmarkRuns(): BenchmarkRunResult[] {
 }
 
 export function saveBenchmarkRun(result: BenchmarkRunResult): BenchmarkRunResult[] {
+  const todayStr = new Date().toISOString().split('T')[0];
+  recordDailyCompletion(todayStr);
   const current = getStoredBenchmarkRuns();
   const updated = [result, ...current].slice(0, 100);
   localStorage.setItem(BENCHMARK_KEY, JSON.stringify(updated));

@@ -31,7 +31,9 @@ interface SettingsState {
   pauseKey: string;
   restartKey: string;
   targetShape: TargetShape;
+  targetColor: string;
   arenaBackdrop: ArenaBackdrop;
+  arenaColor: string;
   scenarioCrosshairMap: Record<string, string>;
 
   updateSettings: (partial: Partial<SensitivityProfile>) => void;
@@ -44,7 +46,9 @@ interface SettingsState {
   setDisplayName: (name: string) => void;
   setKeybinds: (pause: string, restart: string) => void;
   setTargetShape: (shape: TargetShape) => void;
+  setTargetColor: (color: string) => void;
   setArenaBackdrop: (backdrop: ArenaBackdrop) => void;
+  setArenaColor: (color: string) => void;
   setScenarioCrosshair: (targetKey: string, presetId: string) => void;
   getCrosshairForScenario: (scenarioId: string, category: string) => CrosshairConfig;
 }
@@ -58,7 +62,9 @@ const initialRestartKey = localStorage.getItem('aimtt_restart_key') || 'KeyR';
 const initialSpeedMult = parseFloat(localStorage.getItem('aimtt_speed_mult_v1') || '1.0');
 const initialPerfMode = localStorage.getItem('aimtt_perf_mode_v1') === 'true';
 const initialShape = (localStorage.getItem('aimtt_target_shape_v1') as TargetShape) || 'sphere';
+const initialTargetColor = localStorage.getItem('aimtt_target_color_v1') || '#f5b8c9';
 const initialBackdrop = (localStorage.getItem('aimtt_arena_backdrop_v1') as ArenaBackdrop) || 'grid-room';
+const initialArenaColor = localStorage.getItem('aimtt_arena_color_v1') || '#121212';
 const initialCrosshairMap = getScenarioCrosshairMap();
 
 soundManager.setMasterVolume(initialAudio.masterVolume);
@@ -82,7 +88,9 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
   pauseKey: initialPauseKey,
   restartKey: initialRestartKey,
   targetShape: initialShape,
+  targetColor: initialTargetColor,
   arenaBackdrop: initialBackdrop,
+  arenaColor: initialArenaColor,
   scenarioCrosshairMap: initialCrosshairMap,
 
   updateSettings: (partial) => {
@@ -156,9 +164,19 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     set({ targetShape: shape });
   },
 
+  setTargetColor: (color) => {
+    localStorage.setItem('aimtt_target_color_v1', color);
+    set({ targetColor: color });
+  },
+
   setArenaBackdrop: (backdrop) => {
     localStorage.setItem('aimtt_arena_backdrop_v1', backdrop);
     set({ arenaBackdrop: backdrop });
+  },
+
+  setArenaColor: (color) => {
+    localStorage.setItem('aimtt_arena_color_v1', color);
+    set({ arenaColor: color });
   },
 
   setScenarioCrosshair: (targetKey, presetId) => {

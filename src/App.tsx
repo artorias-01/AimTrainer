@@ -10,6 +10,7 @@ import { DashboardPage } from './pages/DashboardPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { OnboardingOverlay } from './components/ui/OnboardingOverlay';
 import { CommandPalette } from './components/ui/CommandPalette';
+import { IntroTransition } from './components/3d/IntroTransition';
 import { useGameStore } from './store/useGameStore';
 import { getOnboardingCompleted } from './utils/storage';
 
@@ -23,6 +24,13 @@ export function App() {
   const [activePage, setActivePage] = useState<string>(getInitialPage);
   const [showOnboarding, setShowOnboarding] = useState<boolean>(!getOnboardingCompleted());
   const [showCommandPalette, setShowCommandPalette] = useState<boolean>(false);
+  const [showIntro, setShowIntro] = useState<boolean>(() => {
+    try {
+      return !sessionStorage.getItem('aimtt_intro_played_v1');
+    } catch {
+      return true;
+    }
+  });
   const { setScenario } = useGameStore();
 
   // Listen to browser Back / Forward buttons and hash changes
@@ -67,6 +75,9 @@ export function App() {
 
   return (
     <div className="relative min-h-screen bg-[#0d0d0d] text-white flex flex-col font-sans-ui selection:bg-[#f5b8c9] selection:text-[#0d0d0d]">
+      {/* 3D Intro Transition (played once per session) */}
+      {showIntro && <IntroTransition onComplete={() => setShowIntro(false)} />}
+
       {/* Onboarding Overlay for first-run users */}
       {showOnboarding && <OnboardingOverlay onDismiss={() => setShowOnboarding(false)} />}
 
