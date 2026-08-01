@@ -282,20 +282,6 @@ export const useGameStore = create<GameState>((set, get) => ({
       newHp = Math.max(0, trackingHp - (frameMs * 0.035));
     }
 
-    const infinitePracticeMode = useSettingsStore.getState().infinitePracticeMode;
-
-    if (newHp <= 0 && !infinitePracticeMode) {
-      set({
-        totalSessionTimeMs: newTotalTime,
-        timeOnTargetMs: newTimeOnTarget,
-        currentTrackingStreakMs: 0,
-        longestTrackingStreakMs: newLongestStreak,
-        trackingHp: 0,
-      });
-      get().stopSession();
-      return;
-    }
-
     set({
       totalSessionTimeMs: newTotalTime,
       timeOnTargetMs: newTimeOnTarget,

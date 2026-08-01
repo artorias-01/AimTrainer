@@ -52,7 +52,7 @@ export const LiveHUD: React.FC = () => {
     pauseSession,
   } = useGameStore();
 
-  const { crosshair, pauseKey, performanceMode, infinitePracticeMode } = useSettingsStore();
+  const { crosshair, pauseKey, performanceMode } = useSettingsStore();
 
   const isTrackingMode = activeScenario.category === 'tracking';
 
@@ -161,7 +161,7 @@ export const LiveHUD: React.FC = () => {
             >
               <div className="flex items-center justify-between text-[9px] text-neutral-400 font-bold uppercase">
                 <span className="flex items-center gap-1.5 text-accent">
-                  TRACKING HP {infinitePracticeMode ? '(NO FAIL)' : ''}
+                  TRACKING HP
                 </span>
                 <span className="text-white font-extrabold">{Math.round(trackingHp)}%</span>
               </div>

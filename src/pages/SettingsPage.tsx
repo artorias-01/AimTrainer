@@ -79,8 +79,6 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
     setArenaColor,
     themeAccentColor,
     setThemeAccentColor,
-    infinitePracticeMode,
-    setInfinitePracticeMode,
   } = useSettingsStore();
 
   const { clearHistory } = useStatsStore();
@@ -450,30 +448,6 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
                       </button>
                     ))}
                   </div>
-                </div>
-
-                {/* Practice Mode (No Fail) Toggle */}
-                <div className="bg-[#141414] border border-[#262626] rounded-[12px] p-6 flex items-center justify-between">
-                  <div className="space-y-1">
-                    <span className="font-display font-bold text-sm text-white block">PRACTICE MODE (NO FAIL)</span>
-                    <span className="text-xs font-mono text-neutral-400">
-                      Guarantees tracking and practice sessions always run full duration without early performance termination.
-                    </span>
-                  </div>
-                  <button
-                    onClick={() => {
-                      const nextVal = !infinitePracticeMode;
-                      setInfinitePracticeMode(nextVal);
-                      showSaveConfirmation(`PRACTICE MODE ${nextVal ? 'ENABLED' : 'DISABLED'}`);
-                    }}
-                    className={`px-4 py-2 rounded-[12px] text-xs font-mono font-bold border transition-all ${
-                      infinitePracticeMode
-                        ? 'bg-pink text-[#0d0d0d] border-pink'
-                        : 'bg-[#0d0d0d] text-neutral-500 border-[#262626]'
-                    }`}
-                  >
-                    {infinitePracticeMode ? 'ENABLED (ALWAYS RUN)' : 'DISABLED'}
-                  </button>
                 </div>
 
                 {/* Clear Stats History Section */}
