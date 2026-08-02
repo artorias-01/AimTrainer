@@ -16,7 +16,7 @@ import type { CrosshairConfig } from '../utils/storage';
 import { soundManager } from '../utils/audio';
 
 export type TargetShapeType = 'sphere' | 'torus' | 'cube' | 'octahedron' | 'cylinder' | 'cone' | 'capsule';
-export type ArenaBackdrop = 'grid-room' | 'minimal-void' | 'gradient-room';
+export type ArenaBackdrop = 'grid-room' | 'minimal-void' | 'gradient-room' | 'nebula' | 'starfield' | 'deep-space' | 'aurora' | 'custom-image';
 
 export interface TargetShapeConfig {
   shape: TargetShapeType;

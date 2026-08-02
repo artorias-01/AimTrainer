@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
+import { Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { useSettingsStore } from '../../store/useSettingsStore';
 
@@ -18,6 +19,8 @@ interface TargetSphereProps {
   enableJukes?: boolean;
   spawnTime?: number;
   isTracking?: boolean;
+  currentHp?: number;
+  maxHp?: number;
   onHit: (id: string, hitX: number, hitY: number) => void;
 }
 
@@ -36,6 +39,8 @@ export const TargetSphere: React.FC<TargetSphereProps> = React.memo(({
   enableJukes = false,
   spawnTime = Date.now(),
   isTracking = false,
+  currentHp,
+  maxHp,
 }) => {
   const groupRef = useRef<THREE.Group>(null);
   const meshRef = useRef<THREE.Mesh>(null);
@@ -192,6 +197,28 @@ export const TargetSphere: React.FC<TargetSphereProps> = React.memo(({
           emissiveIntensity={glowIntensity}
         />
       </mesh>
+
+      {/* 3D Billboard Health Bar for Multi-Hit Targets */}
+      {maxHp !== undefined && maxHp > 1 && (
+        <Html center position={[0, effRadius + 0.32, 0]} distanceFactor={8} zIndexRange={[100, 0]}>
+          <div className="pointer-events-none select-none flex flex-col items-center">
+            <div className="w-14 h-2 bg-[#0d0d0d]/90 border border-[#262626] rounded-full p-0.5 shadow-md flex items-center overflow-hidden backdrop-blur-sm">
+              <div
+                className="h-full rounded-full transition-all duration-150"
+                style={{
+                  width: `${Math.max(0, Math.min(100, (((currentHp ?? maxHp) / maxHp) * 100)))}%`,
+                  backgroundColor:
+                    ((currentHp ?? maxHp) / maxHp) > 0.5
+                      ? '#22c55e'
+                      : ((currentHp ?? maxHp) / maxHp) > 0.25
+                      ? '#eab308'
+                      : '#ef4444',
+                }}
+              />
+            </div>
+          </div>
+        </Html>
+      )}
     </group>
   );
 });

@@ -32,6 +32,7 @@ export const CustomScenarioModal: React.FC<CustomScenarioModalProps> = ({
   const [enableJukes, setEnableJukes] = useState(initialScenario?.enableJukes || false);
   const [playerDistance, setPlayerDistance] = useState(initialScenario?.playerPosition?.z ?? 3.0);
   const [speedVariance, setSpeedVariance] = useState(initialScenario?.speedVariance ?? 0.2);
+  const [maxHp, setMaxHp] = useState(initialScenario?.maxHp ?? 1);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,6 +49,8 @@ export const CustomScenarioModal: React.FC<CustomScenarioModalProps> = ({
       targetCount,
       targetRadius,
       targetSpeed,
+      maxHp,
+      damagePerHit: 1,
       arenaType,
       playerPosition: { x: 0, y: 2.2, z: playerDistance },
       hasLifetimeLimit,
@@ -176,6 +179,18 @@ export const CustomScenarioModal: React.FC<CustomScenarioModalProps> = ({
                 value={targetSpeed}
                 onChange={(e) => setTargetSpeed(parseFloat(e.target.value))}
                 className="w-full accent-pink bg-[#262626] rounded-lg h-2.5 mt-2"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-neutral-400 font-bold">TARGET HP ({maxHp})</label>
+              <input
+                type="number"
+                min="1"
+                max="10"
+                value={maxHp}
+                onChange={(e) => setMaxHp(Math.max(1, parseInt(e.target.value) || 1))}
+                className="w-full bg-[#0d0d0d] border border-[#262626] rounded-[12px] p-2.5 text-sm text-white focus:outline-none focus:border-pink"
               />
             </div>
           </div>

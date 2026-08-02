@@ -6,6 +6,7 @@ import { useStatsStore } from '../store/useStatsStore';
 import { calculateSensFromCm360 } from '../utils/sensitivity';
 import type { GameEngine } from '../utils/sensitivity';
 import { soundManager } from '../utils/audio';
+import { saveCustomBackgroundImage, clearCustomBackgroundImage } from '../utils/db';
 import {
   Sliders,
   Volume2,
@@ -108,7 +109,37 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
 
   const showSaveConfirmation = (msg: string) => {
     setSaveToast(msg);
-    setTimeout(() => setSaveToast(null), 2000);
+    setTimeout(() => setSaveToast(null), 2500);
+  };
+
+  const handleCustomImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      showSaveConfirmation('ERROR: IMAGE EXCEEDS 5MB SIZE LIMIT!');
+      return;
+    }
+
+    if (!['image/png', 'image/jpeg', 'image/jpg', 'image/webp'].includes(file.type)) {
+      showSaveConfirmation('ERROR: INVALID FORMAT! USE PNG, JPEG, OR WEBP.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const dataUrl = reader.result as string;
+      await saveCustomBackgroundImage(dataUrl);
+      setArenaBackdrop('custom-image');
+      showSaveConfirmation('CUSTOM BACKGROUND IMAGE APPLIED!');
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleClearCustomImage = async () => {
+    await clearCustomBackgroundImage();
+    setArenaBackdrop('grid-room');
+    showSaveConfirmation('CUSTOM BACKGROUND CLEARED (RESET TO GRID)');
   };
 
   const engines: { id: GameEngine; label: string }[] = [
@@ -821,11 +852,16 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
                   <label className="text-[10px] font-mono text-pink uppercase tracking-widest block font-bold">
                     COSMETIC ARENA BACKDROP & WALL COLOR
                   </label>
-                  <div className="grid grid-cols-3 gap-2">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                     {[
                       { id: 'grid-room', label: 'GRID ROOM' },
                       { id: 'minimal-void', label: 'MINIMAL VOID' },
                       { id: 'gradient-room', label: 'GRADIENT ROOM' },
+                      { id: 'nebula', label: 'NEBULA' },
+                      { id: 'starfield', label: 'STARFIELD' },
+                      { id: 'deep-space', label: 'DEEP SPACE' },
+                      { id: 'aurora', label: 'AURORA' },
+                      { id: 'custom-image', label: 'CUSTOM IMAGE' },
                     ].map((backdrop) => (
                       <button
                         key={backdrop.id}
@@ -833,7 +869,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
                           setArenaBackdrop(backdrop.id as any);
                           showSaveConfirmation(`BACKDROP SET TO ${backdrop.label}`);
                         }}
-                        className={`py-2 rounded-[12px] text-xs font-mono font-bold transition-all border ${
+                        className={`py-2 px-1 rounded-[12px] text-xs font-mono font-bold transition-all border ${
                           arenaBackdrop === backdrop.id
                             ? 'bg-pink text-[#0d0d0d] border-pink'
                             : 'bg-[#141414] text-neutral-400 border-[#262626] hover:text-white'
@@ -842,6 +878,30 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
                         {backdrop.label}
                       </button>
                     ))}
+                  </div>
+
+                  {/* Custom Background Image File Upload & Clear Section */}
+                  <div className="space-y-2 pt-2 border-t border-[#262626]/60">
+                    <div className="flex justify-between items-center text-xs font-mono text-neutral-400">
+                      <span>CUSTOM BACKDROP IMAGE (PNG, JPG, WEBP — MAX 5MB)</span>
+                    </div>
+                    <div className="flex gap-2">
+                      <label className="flex-1 bg-[#141414] hover:bg-[#1a1a1a] border border-[#262626] hover:border-pink/50 rounded-[12px] p-2.5 text-xs text-neutral-300 font-mono flex items-center justify-center gap-2 cursor-pointer transition-all">
+                        <span>{arenaBackdrop === 'custom-image' ? 'UPLOAD DIFFERENT IMAGE' : 'CHOOSE CUSTOM IMAGE FILE'}</span>
+                        <input
+                          type="file"
+                          accept="image/png, image/jpeg, image/jpg, image/webp"
+                          onChange={handleCustomImageUpload}
+                          className="hidden"
+                        />
+                      </label>
+                      <button
+                        onClick={handleClearCustomImage}
+                        className="px-3 py-2 bg-[#141414] hover:bg-[#262626] text-neutral-400 hover:text-white border border-[#262626] rounded-[12px] text-[10px] font-mono font-bold transition-all"
+                      >
+                        RESET / CLEAR
+                      </button>
+                    </div>
                   </div>
 
                   {/* Arena Wall Color Hex Picker */}

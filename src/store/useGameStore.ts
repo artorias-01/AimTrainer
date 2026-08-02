@@ -19,6 +19,8 @@ export interface TargetInstance {
   baseSpeed?: number;
   lastDirectionChange?: number;
   phaseOffset?: number;
+  currentHp?: number;
+  maxHp?: number;
 }
 
 export type GameStatus = 'idle' | 'countdown' | 'playing' | 'paused' | 'finished';
@@ -65,7 +67,6 @@ interface GameState {
   totalSessionTimeMs: number;
   currentTrackingStreakMs: number;
   longestTrackingStreakMs: number;
-  trackingHp: number;
   trackingTimeline: { timeSec: number; onTargetPct: number }[];
 
   setScenario: (scenarioId: string) => void;
@@ -225,7 +226,6 @@ export const useGameStore = create<GameState>((set, get) => ({
       totalSessionTimeMs: 0,
       currentTrackingStreakMs: 0,
       longestTrackingStreakMs: 0,
-      trackingHp: 100,
       trackingTimeline: [],
     });
 
@@ -260,7 +260,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   },
 
   recordTrackingTick: (frameMs, isOnTarget) => {
-    const { status, timeOnTargetMs, totalSessionTimeMs, currentTrackingStreakMs, longestTrackingStreakMs, score, trackingHp } = get();
+    const { status, timeOnTargetMs, totalSessionTimeMs, currentTrackingStreakMs, longestTrackingStreakMs, score } = get();
     if (status !== 'playing' || frameMs <= 0) return;
 
     const newTotalTime = totalSessionTimeMs + frameMs;
@@ -268,7 +268,6 @@ export const useGameStore = create<GameState>((set, get) => ({
     let newCurrentStreak = currentTrackingStreakMs;
     let newLongestStreak = longestTrackingStreakMs;
     let scoreDelta = 0;
-    let newHp = trackingHp;
 
     if (isOnTarget) {
       newTimeOnTarget += frameMs;
@@ -276,10 +275,8 @@ export const useGameStore = create<GameState>((set, get) => ({
       newLongestStreak = Math.max(longestTrackingStreakMs, newCurrentStreak);
       const streakMult = Math.min(2.0, 1.0 + newCurrentStreak / 5000);
       scoreDelta = frameMs * 1.25 * streakMult;
-      newHp = Math.min(100, trackingHp + (frameMs * 0.02));
     } else {
       newCurrentStreak = 0;
-      newHp = Math.max(0, trackingHp - (frameMs * 0.035));
     }
 
     set({
@@ -287,7 +284,6 @@ export const useGameStore = create<GameState>((set, get) => ({
       timeOnTargetMs: newTimeOnTarget,
       currentTrackingStreakMs: newCurrentStreak,
       longestTrackingStreakMs: newLongestStreak,
-      trackingHp: newHp,
       score: Math.round(score + scoreDelta),
     });
   },
@@ -446,8 +442,30 @@ export const useGameStore = create<GameState>((set, get) => ({
     soundManager.playHit();
 
     const target = targets.find((t) => t.id === targetId);
-    const ttk = target ? Date.now() - target.spawnTime : 300;
+    if (!target) return;
 
+    const ttk = Date.now() - target.spawnTime;
+    const damage = activeScenario.damagePerHit || 1;
+    const maxHp = target.maxHp ?? activeScenario.maxHp ?? 1;
+    const currentHp = target.currentHp ?? maxHp;
+    const newHp = currentHp - damage;
+
+    if (newHp > 0) {
+      // Target damaged but not destroyed yet!
+      const updatedTargets = targets.map((t) =>
+        t.id === targetId ? { ...t, currentHp: newHp } : t
+      );
+      set({
+        hits: hits + 1,
+        targets: updatedTargets,
+        hitTimingsMs: [...hitTimingsMs, ttk],
+        hitLocations: [...hitLocations, { x: hitX, y: hitY }],
+        lastHitResult: { x: hitX, y: hitY, isHit: true, timestamp: Date.now() },
+      });
+      return;
+    }
+
+    // Target HP reached 0 -> Destroyed!
     const newStreak = streak + 1;
     const newMaxCombo = Math.max(maxCombo, newStreak);
     const comboMultiplier = Math.min(2.5, 1 + newStreak * 0.05);
@@ -616,6 +634,8 @@ function generateCandidateTarget(scenario: ScenarioDef, id: string): TargetInsta
   const vx = baseSpeed ? Math.cos(angle) * baseSpeed : 0;
   const vy = baseSpeed ? Math.sin(angle) * baseSpeed : 0;
 
+  const targetHp = scenario.maxHp || 1;
+
   return {
     id,
     x,
@@ -628,6 +648,8 @@ function generateCandidateTarget(scenario: ScenarioDef, id: string): TargetInsta
     baseSpeed,
     lastDirectionChange: Date.now(),
     phaseOffset: Math.random() * Math.PI * 2,
+    currentHp: targetHp,
+    maxHp: targetHp,
   };
 }
 

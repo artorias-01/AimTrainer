@@ -26,6 +26,8 @@ export interface ScenarioDef {
   directionChangeIntervalMs?: number;
   speedVariance?: number;
   enableJukes?: boolean;
+  maxHp?: number;
+  damagePerHit?: number;
   tags: string[];
   recommendedCm360: string;
   iconName: string;
@@ -404,6 +406,25 @@ export const SCENARIOS: ScenarioDef[] = [
     tags: ['HEADSHOT', 'HORIZONTAL', 'CROSSHAIR PLACEMENT'],
     recommendedCm360: '30-45 cm',
     iconName: 'Target',
+  },
+  {
+    id: 'smoothswitch-heavy',
+    name: 'SMOOTHSWITCH // HEAVY TARGETS',
+    category: 'switching',
+    description: '3-HP heavy targets requiring multiple hits to destroy. Practice sustained target switching and recoil control.',
+    difficulty: 'Advanced',
+    durationSeconds: 60,
+    targetCount: 4,
+    targetRadius: 0.38,
+    targetSpeed: 2.2,
+    maxHp: 3,
+    damagePerHit: 1,
+    arenaType: '1-wall',
+    playerPosition: { x: 0, y: 2.2, z: 3.5 },
+    pathType: 'linear',
+    tags: ['SMOOTHSWITCH', 'MULTI-HIT', 'HEAVY'],
+    recommendedCm360: '25-40 cm',
+    iconName: 'Layers',
   },
 ];
 

@@ -48,7 +48,6 @@ export const LiveHUD: React.FC = () => {
     timeOnTargetMs,
     totalSessionTimeMs,
     currentTrackingStreakMs,
-    trackingHp,
     pauseSession,
   } = useGameStore();
 
@@ -152,27 +151,6 @@ export const LiveHUD: React.FC = () => {
             )}
           </motion.div>
 
-          {/* Aim Labs-Style Tracking Health / HP Bar */}
-          {isTrackingMode && (
-            <motion.div
-              initial={performanceMode ? false : { opacity: 0, y: -5 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="bg-[#0d0d0d]/95 backdrop-blur-md border border-[#262626] rounded-[12px] p-3 space-y-1.5 shadow-lg font-mono text-xs"
-            >
-              <div className="flex items-center justify-between text-[9px] text-neutral-400 font-bold uppercase">
-                <span className="flex items-center gap-1.5 text-accent">
-                  TRACKING HP
-                </span>
-                <span className="text-white font-extrabold">{Math.round(trackingHp)}%</span>
-              </div>
-              <div className="w-full bg-[#141414] border border-[#262626] rounded-full h-2 overflow-hidden">
-                <div
-                  className="bg-accent h-full rounded-full transition-all duration-100"
-                  style={{ width: `${Math.max(0, Math.min(100, trackingHp))}%` }}
-                />
-              </div>
-            </motion.div>
-          )}
         </div>
 
         {/* Top-Right Prominent Metrics Grid */}

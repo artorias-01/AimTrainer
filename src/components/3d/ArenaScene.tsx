@@ -5,6 +5,7 @@ import { useGameStore } from '../../store/useGameStore';
 import { useSettingsStore } from '../../store/useSettingsStore';
 import { convertDeltaToRadians } from '../../utils/sensitivity';
 import { TargetSphere } from './TargetSphere';
+import { ArenaBackdrop3D } from './ArenaBackdrop';
 
 interface ArenaControllerProps {
   onPointerLockChange: (isLocked: boolean) => void;
@@ -257,6 +258,8 @@ const ArenaController: React.FC<ArenaControllerProps> = ({ onPointerLockChange, 
             enableJukes={activeScenario.enableJukes}
             spawnTime={t.spawnTime}
             isTracking={activeScenario.category === 'tracking'}
+            currentHp={t.currentHp}
+            maxHp={t.maxHp}
             onHit={(targetId, hitX, hitY) => registerHit(targetId, hitX, hitY)}
           />
         </group>
@@ -301,6 +304,9 @@ const ArenaController: React.FC<ArenaControllerProps> = ({ onPointerLockChange, 
           </mesh>
         </>
       )}
+
+      {/* Procedural Cosmic Skyboxes & Custom Image Backdrop */}
+      <ArenaBackdrop3D />
     </group>
   );
 };
@@ -334,6 +340,9 @@ export const ArenaScene: React.FC<ArenaSceneProps> = ({
       onClick={handleClickCanvas}
       className="w-full h-full bg-[#050505] relative cursor-crosshair overflow-hidden"
     >
+      {/* Central Contrast Safeguard Vignette Overlay for Target & Crosshair Legibility */}
+      <div className="absolute inset-0 pointer-events-none z-10 bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(5,5,5,0.65)_100%)]" />
+
       <Canvas
         camera={{ position: [initialSpawn.x, initialSpawn.y, initialSpawn.z], fov: 103 }}
         dpr={performanceMode ? 1 : [1, 1.5]}
