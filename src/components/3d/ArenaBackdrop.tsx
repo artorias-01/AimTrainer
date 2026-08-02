@@ -37,15 +37,15 @@ export const ArenaBackdrop3D: React.FC = () => {
 
   return (
     <group>
-      {/* Front Distant Sky Plane (Positioned at Z = -18, Y = 16, behind Z = -6.5 target wall) */}
-      <mesh position={[0, 16, -18]}>
-        <planeGeometry args={[60, 32]} />
+      {/* Front Distant Sky Plane (Positioned at Z = -18, Y = 7.5, aligned with target wall top & forward FOV) */}
+      <mesh position={[0, 7.5, -18]}>
+        <planeGeometry args={[70, 20]} />
         <meshBasicMaterial map={customTexture} depthWrite={false} />
       </mesh>
 
-      {/* Rear Distant Sky Plane (Positioned at Z = +18, Y = 16, behind Z = +6.5 rear target wall) */}
-      <mesh position={[0, 16, 18]} rotation={[0, Math.PI, 0]}>
-        <planeGeometry args={[60, 32]} />
+      {/* Rear Distant Sky Plane (Positioned at Z = +18, Y = 7.5, aligned with rear wall top & forward FOV) */}
+      <mesh position={[0, 7.5, 18]} rotation={[0, Math.PI, 0]}>
+        <planeGeometry args={[70, 20]} />
         <meshBasicMaterial map={customTexture} depthWrite={false} />
       </mesh>
     </group>

@@ -1,0 +1,99 @@
+================================================================================
+AIM TRAINER 3D ARENA - GEOMETRY & MESH STRUCTURE SPECIFICATION
+================================================================================
+
+1. OVERVIEW & COORDINATE SYSTEM
+--------------------------------------------------------------------------------
+- Center / Origin: (0.0, 0.0, 0.0) located on the floor in the center of the room.
+- Player Camera Position: Spawns at (0.0, 2.2, 3.5) or (0.0, 2.2, 1.8) depending
+  on scenario configuration, looking down the negative Z-axis (-Z) toward the
+  front target wall.
+- Vertical Axis (+Y): Upwards orientation. Floor level is at Y = 0.0.
+- Horizontal Axis (+X): Rightward orientation relative to player view.
+
+
+2. PRIMARY ARENA ROOM GEOMETRY (src/components/3d/ArenaScene.tsx)
+--------------------------------------------------------------------------------
+Unless arenaBackdrop === 'minimal-void', the arena room consists of 5 main
+architectural meshes surrounding the player:
+
+[Front Target Wall]
+- Mesh Type: PlaneGeometry
+- Position (X, Y, Z): (0.0, 3.2, -6.5)
+- Rotation (X, Y, Z): [0.0, 0.0, 0.0]
+- Dimensions: 22.0 units wide x 10.0 units high
+- Vertical Span: Y = -1.8 to Y = +8.2
+- Material: meshStandardMaterial with wallColor ('#121212' default)
+
+[Rear Target Wall (360 6-Wall Mode)]
+- Mesh Type: PlaneGeometry
+- Position (X, Y, Z): (0.0, 3.2, +6.5)
+- Rotation (X, Y, Z): [0.0, Math.PI, 0.0]
+- Dimensions: 22.0 units wide x 10.0 units high
+- Material: meshStandardMaterial with wallColor ('#121212' default)
+
+[Left Wall]
+- Mesh Type: PlaneGeometry
+- Position (X, Y, Z): (-11.0, 3.2, -1.5)
+- Rotation (X, Y, Z): [0.0, Math.PI / 2, 0.0]
+- Dimensions: 12.0 units wide x 10.0 units high
+- Material: meshStandardMaterial ('#0d0d0d')
+
+[Right Wall]
+- Mesh Type: PlaneGeometry
+- Position (X, Y, Z): (+11.0, 3.2, -1.5)
+- Rotation (X, Y, Z): [0.0, -Math.PI / 2, 0.0]
+- Dimensions: 12.0 units wide x 10.0 units high
+- Material: meshStandardMaterial ('#080808')
+
+[Ceiling Plane]
+- Mesh Type: PlaneGeometry
+- Position (X, Y, Z): (0.0, 7.5, -1.5)
+- Rotation (X, Y, Z): [Math.PI / 2, 0.0, 0.0]
+- Dimensions: 22.0 units wide x 12.0 units deep
+- Material: meshStandardMaterial ('#080808')
+
+[Floor Grid]
+- Helper Type: gridHelper
+- Position (X, Y, Z): (0.0, 0.0, -1.5)
+- Dimensions: 30 x 30 grid units
+- Material: Colored grid lines (themeAccentColor / '#262626') over floor plane
+
+
+3. DEDICATED SKY BACKDROP PLANES (src/components/3d/ArenaBackdrop.tsx)
+--------------------------------------------------------------------------------
+When arenaBackdrop === 'custom-image', two large dedicated sky backdrop planes
+are placed significantly BEHIND the finite target walls:
+
+[Front Distant Sky Plane]
+- Mesh Type: PlaneGeometry
+- Position (X, Y, Z): (0.0, 7.5, -18.0)
+- Rotation (X, Y, Z): [0.0, 0.0, 0.0]
+- Dimensions: 70.0 units wide x 20.0 units high
+- Vertical Span: Y = -2.5 to Y = +17.5 (aligned with forward FOV and target wall top)
+- Material: meshBasicMaterial mapped with customTexture (depthWrite={false})
+
+[Rear Distant Sky Plane]
+- Mesh Type: PlaneGeometry
+- Position (X, Y, Z): (0.0, 7.5, +18.0)
+- Rotation (X, Y, Z): [0.0, Math.PI, 0.0]
+- Dimensions: 70.0 units wide x 20.0 units high
+- Vertical Span: Y = -2.5 to Y = +17.5
+- Material: meshBasicMaterial mapped with customTexture (depthWrite={false})
+
+[Key Architectural Benefits]
+- Zero Target Wall Conflict: Target wall (22x10 at Z = -6.5) remains a plain
+  dark surface where target spheres spawn cleanly.
+- Zero Floor Conflict: Sky plane bottom rests at Y = 0.0 and extends upwards to
+  Y = 32.0, displaying the backdrop image strictly in the open sky space above
+  (Y > 8.2) and to the sides (X < -11 / X > +11) of the target wall.
+
+
+4. TARGET OBJECTS (src/components/3d/TargetSphere.tsx)
+--------------------------------------------------------------------------------
+- Default Mesh: SphereGeometry (radius 0.22 to 0.55 units based on scenario)
+- Alternate Geometries: torus, cube, octahedron, cylinder, cone, capsule
+- Material: meshStandardMaterial with emissiveIntensity (0.65) and targetColor
+- 3D Billboard HP Bar: Rendered via @react-three/drei <Html> floating directly
+  above target center when maxHp > 1.
+================================================================================
