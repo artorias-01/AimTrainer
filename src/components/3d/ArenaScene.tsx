@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useGameStore } from '../../store/useGameStore';
@@ -6,6 +6,7 @@ import { useSettingsStore } from '../../store/useSettingsStore';
 import { convertDeltaToRadians } from '../../utils/sensitivity';
 import { TargetSphere } from './TargetSphere';
 import { ArenaBackdrop3D } from './ArenaBackdrop';
+import { getCustomBackgroundImage } from '../../utils/db';
 
 interface ArenaControllerProps {
   onPointerLockChange: (isLocked: boolean) => void;
@@ -326,7 +327,30 @@ export const ArenaScene: React.FC<ArenaSceneProps> = ({
   const activeScenario = useGameStore((s) => s.activeScenario);
   const performanceMode = useSettingsStore((s) => s.performanceMode);
   const themeAccentColor = useSettingsStore((s) => s.themeAccentColor) || '#f5b8c9';
+  const arenaBackdrop = useSettingsStore((s) => s.arenaBackdrop);
   const initialSpawn = activeScenario.playerPosition || { x: 0, y: 2.2, z: 3.5 };
+
+  const [customBgUrl, setCustomBgUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (arenaBackdrop !== 'custom-image') {
+      setCustomBgUrl(null);
+      return;
+    }
+
+    let isMounted = true;
+    getCustomBackgroundImage().then((url) => {
+      if (isMounted && url) {
+        setCustomBgUrl(url);
+      }
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [arenaBackdrop]);
+
+  const isCustomBg = arenaBackdrop === 'custom-image' && customBgUrl !== null;
 
   const handleClickCanvas = () => {
     if (containerRef.current && document.pointerLockElement === null && !isTouchDevice) {
@@ -340,13 +364,29 @@ export const ArenaScene: React.FC<ArenaSceneProps> = ({
       onClick={handleClickCanvas}
       className="w-full h-full bg-[#050505] relative cursor-crosshair overflow-hidden"
     >
+      {/* CSS Background Layer Behind 3D Canvas */}
+      {isCustomBg && (
+        <div
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat pointer-events-none z-0"
+          style={{ backgroundImage: `url(${customBgUrl})` }}
+        />
+      )}
+
       {/* Central Contrast Safeguard Vignette Overlay for Target & Crosshair Legibility */}
-      <div className="absolute inset-0 pointer-events-none z-10 bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(5,5,5,0.65)_100%)]" />
+      <div className="absolute inset-0 pointer-events-none z-20 bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(5,5,5,0.65)_100%)]" />
 
       <Canvas
         camera={{ position: [initialSpawn.x, initialSpawn.y, initialSpawn.z], fov: 103 }}
         dpr={performanceMode ? 1 : [1, 1.5]}
-        gl={{ antialias: !performanceMode, powerPreference: 'high-performance' }}
+        gl={{ antialias: !performanceMode, powerPreference: 'high-performance', alpha: true }}
+        onCreated={({ gl }) => {
+          if (isCustomBg) {
+            gl.setClearColor(0x000000, 0); // Transparent WebGL context
+          } else {
+            gl.setClearColor(0x050505, 1); // Opaque background context
+          }
+        }}
+        className="relative z-10 w-full h-full"
       >
         <ambientLight intensity={1.5} />
         <directionalLight position={[0, 8, 4]} intensity={2.0} color="#ffffff" />
