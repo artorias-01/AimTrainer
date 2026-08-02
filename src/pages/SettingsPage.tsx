@@ -80,6 +80,8 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
     setArenaColor,
     themeAccentColor,
     setThemeAccentColor,
+    globalMultiHitTargets,
+    setGlobalMultiHitTargets,
   } = useSettingsStore();
 
   const { clearHistory } = useStatsStore();
@@ -479,6 +481,30 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
                       </button>
                     ))}
                   </div>
+                </div>
+
+                {/* Multi-Hit Targets (Global Toggle) */}
+                <div className="bg-[#141414] border border-[#262626] rounded-[12px] p-6 flex items-center justify-between">
+                  <div className="space-y-1">
+                    <span className="font-display font-bold text-sm text-white block">MULTI-HIT TARGETS (GLOBAL TOGGLE)</span>
+                    <span className="text-xs font-mono text-neutral-400">
+                      When enabled, applies multi-hit HP (2 hits) to standard scenarios and displays 3D health bars above targets.
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => {
+                      const nextVal = !globalMultiHitTargets;
+                      setGlobalMultiHitTargets(nextVal);
+                      showSaveConfirmation(`MULTI-HIT TARGETS ${nextVal ? 'ENABLED' : 'DISABLED'}`);
+                    }}
+                    className={`px-4 py-2 rounded-[12px] text-xs font-mono font-bold border transition-all ${
+                      globalMultiHitTargets
+                        ? 'bg-pink text-[#0d0d0d] border-pink'
+                        : 'bg-[#0d0d0d] text-neutral-500 border-[#262626]'
+                    }`}
+                  >
+                    {globalMultiHitTargets ? 'ENABLED (2-HIT)' : 'DISABLED (DEFAULT)'}
+                  </button>
                 </div>
 
                 {/* Clear Stats History Section */}
