@@ -200,9 +200,9 @@ export const TargetSphere: React.FC<TargetSphereProps> = React.memo(({
 
       {/* 3D Billboard Health Bar for Multi-Hit Targets */}
       {maxHp !== undefined && maxHp > 1 && (
-        <Html center position={[0, effRadius + 0.32, 0]} distanceFactor={8} zIndexRange={[100, 0]}>
-          <div className="pointer-events-none select-none flex flex-col items-center">
-            <div className="w-14 h-2 bg-[#0d0d0d]/90 border border-[#262626] rounded-full p-0.5 shadow-md flex items-center overflow-hidden backdrop-blur-sm">
+        <Html center position={[0, effRadius + 0.38, 0]} distanceFactor={7} zIndexRange={[100, 0]}>
+          <div className="pointer-events-none select-none flex flex-col items-center gap-0.5">
+            <div className="w-20 h-2.5 bg-[#0d0d0d]/95 border border-[#333] rounded-full p-0.5 shadow-lg flex items-center overflow-hidden backdrop-blur-md">
               <div
                 className="h-full rounded-full transition-all duration-150"
                 style={{
@@ -216,6 +216,9 @@ export const TargetSphere: React.FC<TargetSphereProps> = React.memo(({
                 }}
               />
             </div>
+            <span className="text-[9px] font-mono font-bold text-white/90 drop-shadow">
+              {currentHp ?? maxHp}/{maxHp} HP
+            </span>
           </div>
         </Html>
       )}

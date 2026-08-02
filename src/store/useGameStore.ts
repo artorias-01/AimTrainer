@@ -634,8 +634,7 @@ function generateCandidateTarget(scenario: ScenarioDef, id: string): TargetInsta
   const vx = baseSpeed ? Math.cos(angle) * baseSpeed : 0;
   const vy = baseSpeed ? Math.sin(angle) * baseSpeed : 0;
 
-  const globalMultiHit = useSettingsStore.getState().globalMultiHitTargets;
-  const targetHp = scenario.maxHp ?? (globalMultiHit ? 2 : 1);
+  const targetHp = scenario.maxHp || 1;
 
   return {
     id,

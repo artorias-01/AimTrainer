@@ -79,7 +79,6 @@ interface SettingsState {
   arenaBackdrop: ArenaBackdrop;
   arenaColor: string;
   themeAccentColor: string;
-  globalMultiHitTargets: boolean;
   scenarioCrosshairMap: Record<string, string>;
 
   updateSettings: (partial: Partial<SensitivityProfile>) => void;
@@ -96,7 +95,6 @@ interface SettingsState {
   setArenaBackdrop: (backdrop: ArenaBackdrop) => void;
   setArenaColor: (color: string) => void;
   setThemeAccentColor: (color: string) => void;
-  setGlobalMultiHitTargets: (enabled: boolean) => void;
   setScenarioCrosshair: (targetKey: string, presetId: string) => void;
   getCrosshairForScenario: (scenarioId: string, category: string) => CrosshairConfig;
 }
@@ -114,7 +112,6 @@ const initialTargetColor = localStorage.getItem('aimtt_target_color_v1') || '#f5
 const initialBackdrop = (localStorage.getItem('aimtt_arena_backdrop_v1') as ArenaBackdrop) || 'grid-room';
 const initialArenaColor = localStorage.getItem('aimtt_arena_color_v1') || '#121212';
 const initialThemeAccent = localStorage.getItem('aimtt_theme_accent_v1') || '#f5b8c9';
-const initialMultiHit = localStorage.getItem('aimtt_global_multihit_v1') === 'true';
 const initialCrosshairMap = getScenarioCrosshairMap();
 
 applyThemeAccent(initialThemeAccent);
@@ -144,13 +141,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
   arenaBackdrop: initialBackdrop,
   arenaColor: initialArenaColor,
   themeAccentColor: initialThemeAccent,
-  globalMultiHitTargets: initialMultiHit,
   scenarioCrosshairMap: initialCrosshairMap,
-
-  setGlobalMultiHitTargets: (enabled) => {
-    localStorage.setItem('aimtt_global_multihit_v1', enabled ? 'true' : 'false');
-    set({ globalMultiHitTargets: enabled });
-  },
 
   updateSettings: (partial) => {
     const updated = { ...get().settings, ...partial };

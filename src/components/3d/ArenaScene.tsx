@@ -34,6 +34,39 @@ const ArenaController: React.FC<ArenaControllerProps> = ({ onPointerLockChange, 
   const isLockedRef = useRef<boolean>(false);
   const lastSecondTickRef = useRef<number>(0);
   const lastTouchRef = useRef<{ x: number; y: number } | null>(null);
+  const isMouseDownRef = useRef<boolean>(false);
+  const lastAutoFireRef = useRef<number>(0);
+
+  const fireShot = () => {
+    if (status !== 'playing' || activeScenario.category === 'tracking') return;
+
+    raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
+    const intersects = raycaster.intersectObjects(scene.children, true);
+
+    let hitTargetId: string | null = null;
+    let hitPointX = 0;
+    let hitPointY = 0;
+
+    for (const hit of intersects) {
+      let obj: THREE.Object3D | null = hit.object;
+      while (obj) {
+        if (obj.userData && obj.userData.targetId) {
+          hitTargetId = obj.userData.targetId;
+          hitPointX = hit.point.x;
+          hitPointY = hit.point.y;
+          break;
+        }
+        obj = obj.parent;
+      }
+      if (hitTargetId) break;
+    }
+
+    if (hitTargetId) {
+      registerHit(hitTargetId, hitPointX, hitPointY);
+    } else {
+      registerMiss(0, 0);
+    }
+  };
 
   // Set FOV and position camera based on activeScenario.playerPosition
   useEffect(() => {
@@ -161,49 +194,34 @@ const ArenaController: React.FC<ArenaControllerProps> = ({ onPointerLockChange, 
     };
   }, [camera, isTouchDevice, settings, status]);
 
-  // Click Raycasting for Shot Hit Detection (Disabled for tracking scenarios)
+  // Click & Auto-Fire Listener
   useEffect(() => {
     const handleMouseDown = (e: MouseEvent) => {
-      if (status !== 'playing') return;
-      if (!isLockedRef.current && !isTouchDevice) return;
-      if (e.button !== 0 && !isTouchDevice) return; // Left click only
-
-      if (activeScenario.category === 'tracking') return;
-
-      // Raycast from camera center (0, 0)
-      raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
-
-      // Intersect with mesh targets in scene
-      const intersects = raycaster.intersectObjects(scene.children, true);
-
-      let hitTargetId: string | null = null;
-      let hitPointX = 0;
-      let hitPointY = 0;
-
-      for (const hit of intersects) {
-        let obj: THREE.Object3D | null = hit.object;
-        while (obj) {
-          if (obj.userData && obj.userData.targetId) {
-            hitTargetId = obj.userData.targetId;
-            hitPointX = hit.point.x;
-            hitPointY = hit.point.y;
-            break;
-          }
-          obj = obj.parent;
-        }
-        if (hitTargetId) break;
-      }
-
-      if (hitTargetId) {
-        registerHit(hitTargetId, hitPointX, hitPointY);
-      } else {
-        registerMiss(0, 0);
+      if (e.button !== 0) return;
+      isMouseDownRef.current = true;
+      if (status === 'playing' && activeScenario.category !== 'tracking') {
+        fireShot();
+        lastAutoFireRef.current = Date.now();
       }
     };
 
+    const handleMouseUp = (e: MouseEvent) => {
+      if (e.button === 0) {
+        isMouseDownRef.current = false;
+      }
+    };
+
+    const handleBlur = () => {
+      isMouseDownRef.current = false;
+    };
+
     window.addEventListener('mousedown', handleMouseDown);
+    window.addEventListener('mouseup', handleMouseUp);
+    window.addEventListener('blur', handleBlur);
     return () => {
       window.removeEventListener('mousedown', handleMouseDown);
+      window.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener('blur', handleBlur);
     };
   }, [activeScenario.category, camera, isTouchDevice, raycaster, registerHit, registerMiss, scene, status]);
 
@@ -220,6 +238,17 @@ const ArenaController: React.FC<ArenaControllerProps> = ({ onPointerLockChange, 
 
     // Update target movement for tracking/strafe tasks
     updateTargetPositions(delta);
+
+    // Full-Auto Firing Stream (600 RPM / 100ms interval)
+    if (
+      activeScenario.fireMode === 'auto' &&
+      isMouseDownRef.current &&
+      activeScenario.category !== 'tracking' &&
+      now - lastAutoFireRef.current >= 100
+    ) {
+      lastAutoFireRef.current = now;
+      fireShot();
+    }
 
     // If tracking scenario, calculate precise continuous time-on-target
     if (activeScenario.category === 'tracking') {
