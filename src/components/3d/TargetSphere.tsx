@@ -19,6 +19,7 @@ interface TargetSphereProps {
   enableJukes?: boolean;
   spawnTime?: number;
   isTracking?: boolean;
+  showSpawnTelegraph?: boolean;
   currentHp?: number;
   maxHp?: number;
   onHit: (id: string, hitX: number, hitY: number) => void;
@@ -39,11 +40,13 @@ export const TargetSphere: React.FC<TargetSphereProps> = React.memo(({
   enableJukes = false,
   spawnTime = Date.now(),
   isTracking = false,
+  showSpawnTelegraph = false,
   currentHp,
   maxHp,
 }) => {
   const groupRef = useRef<THREE.Group>(null);
   const meshRef = useRef<THREE.Mesh>(null);
+  const telegraphRef = useRef<THREE.Mesh>(null);
   const [hovered, setHovered] = useState(false);
   const targetSpeedMultiplier = useSettingsStore((s) => s.targetSpeedMultiplier) || 1.0;
   const themeAccentColor = useSettingsStore((s) => s.themeAccentColor) || '#f5b8c9';
@@ -91,6 +94,17 @@ export const TargetSphere: React.FC<TargetSphereProps> = React.memo(({
       }
       if (isTracking && hovered) {
         meshRef.current.scale.setScalar(1.1 + Math.sin(t * 10) * 0.06);
+      }
+    }
+
+    // 2. Telegraph Ring Frame Animation (Gated to timed/reflex scenarios)
+    if (telegraphRef.current) {
+      const elapsed = now - spawnTime;
+      if (showSpawnTelegraph && elapsed < 150) {
+        telegraphRef.current.visible = true;
+        (telegraphRef.current.material as THREE.MeshBasicMaterial).opacity = (1 - elapsed / 150) * 0.85;
+      } else {
+        telegraphRef.current.visible = false;
       }
     }
 
@@ -205,13 +219,11 @@ export const TargetSphere: React.FC<TargetSphereProps> = React.memo(({
         />
       </mesh>
 
-      {/* 150ms Pre-Spawn Warm Pulse Telegraph Indicator */}
-      {Date.now() - spawnTime < 150 && (
-        <mesh position={[0, 0, 0]}>
-          <ringGeometry args={[effRadius * 1.1, effRadius * 1.35, 32]} />
-          <meshBasicMaterial color="#ffffff" side={THREE.DoubleSide} transparent opacity={0.7} />
-        </mesh>
-      )}
+      {/* 150ms Pre-Spawn Warm Pulse Telegraph Indicator (Scoped to timed/reflex scenarios & frame driven) */}
+      <mesh ref={telegraphRef} position={[0, 0, 0]} visible={false}>
+        <ringGeometry args={[effRadius * 1.1, effRadius * 1.35, 32]} />
+        <meshBasicMaterial color="#ffffff" side={THREE.DoubleSide} transparent opacity={0.85} />
+      </mesh>
 
       {/* 3D Billboard Health Bar for Multi-Hit Targets */}
       {maxHp !== undefined && maxHp > 1 && (

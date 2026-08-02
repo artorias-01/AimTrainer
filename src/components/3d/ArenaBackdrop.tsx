@@ -35,8 +35,9 @@ export const ArenaBackdrop3D: React.FC = () => {
   }
 
   return (
-    <mesh position={[0, 0, 0]}>
-      <sphereGeometry args={[500, 60, 40]} />
+    <mesh position={[0, 15, 0]}>
+      {/* 270-degree horizontal cylinder section eliminates polar sphere stretching */}
+      <cylinderGeometry args={[180, 180, 140, 32, 1, true, Math.PI * 0.25, Math.PI * 1.5]} />
       <meshBasicMaterial map={customTexture} side={THREE.BackSide} depthWrite={false} />
     </mesh>
   );
