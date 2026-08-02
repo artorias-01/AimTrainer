@@ -10,8 +10,6 @@ import { saveCustomBackgroundImage, clearCustomBackgroundImage } from '../utils/
 import {
   fetchNasaApodGallery,
   convertImageUrlToDataUrl,
-  getActiveNasaApiKey,
-  saveNasaApiKey,
 } from '../utils/nasa';
 import type { NasaApodItem } from '../utils/nasa';
 import {
@@ -124,13 +122,12 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
   const [nasaGallery, setNasaGallery] = useState<NasaApodItem[]>([]);
   const [nasaLoading, setNasaLoading] = useState(false);
   const [nasaError, setNasaError] = useState<string | null>(null);
-  const [userNasaKey, setUserNasaKey] = useState<string>(getActiveNasaApiKey());
   const [selectingNasaUrl, setSelectingNasaUrl] = useState<string | null>(null);
 
-  const handleFetchNasaGallery = async (keyOverride?: string) => {
+  const handleFetchNasaGallery = async () => {
     setNasaLoading(true);
     setNasaError(null);
-    const result = await fetchNasaApodGallery(8, keyOverride || userNasaKey);
+    const result = await fetchNasaApodGallery(8);
     setNasaLoading(false);
 
     if (result.success) {
@@ -998,32 +995,6 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
                     {/* Disclaimer Note */}
                     <div className="bg-[#141414] border border-[#262626] p-2.5 rounded-[10px] text-[10px] font-mono text-neutral-400">
                       <span className="text-pink font-bold">NOTE:</span> Astrophotography images will show a seam/distortion when wrapped around the arena dome — works best as an atmospheric backdrop rather than a seamless environment.
-                    </div>
-
-                    {/* NASA API Key Configuration Override */}
-                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-1">
-                      <div className="flex-1 flex items-center gap-2 bg-[#141414] border border-[#262626] rounded-[12px] px-3 py-1.5">
-                        <span className="text-[10px] font-mono text-neutral-400 shrink-0">API KEY:</span>
-                        <input
-                          type="text"
-                          value={userNasaKey}
-                          onChange={(e) => {
-                            const val = e.target.value;
-                            setUserNasaKey(val);
-                            saveNasaApiKey(val);
-                          }}
-                          placeholder="DEMO_KEY"
-                          className="flex-1 bg-transparent text-xs font-mono text-white focus:outline-none"
-                        />
-                      </div>
-                      <a
-                        href="https://api.nasa.gov/"
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-[10px] font-mono text-pink underline hover:text-pink/80 self-center"
-                      >
-                        Get Free Key at api.nasa.gov
-                      </a>
                     </div>
 
                     {/* NASA Error State */}

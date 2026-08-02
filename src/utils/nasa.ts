@@ -12,11 +12,15 @@ export interface NasaApodItem {
 export const DEFAULT_NASA_API_KEY = 'DEMO_KEY';
 
 export function getActiveNasaApiKey(): string {
+  const envKey = import.meta.env.VITE_NASA_API_KEY;
+  if (envKey && envKey.trim().length > 0) {
+    return envKey.trim();
+  }
   const userKey = localStorage.getItem('aimtt_nasa_api_key_v1');
   if (userKey && userKey.trim().length > 0) {
     return userKey.trim();
   }
-  return DEFAULT_NASA_API_KEY;
+  return 'DEMO_KEY';
 }
 
 export function saveNasaApiKey(apiKey: string): void {
