@@ -189,18 +189,18 @@ export const ArenaBackdrop3D: React.FC = () => {
         </mesh>
       )}
 
-      {/* 5. Custom Image & NASA Photo - Front & Rear Flat Wall Planes */}
+      {/* 5. Custom Image - Distant Sky Planes (Positioned Far Behind the Finite Arena Walls) */}
       {backdrop === 'custom-image' && customTexture && (
         <group>
-          {/* Front Wall Backdrop Plane */}
-          <mesh position={[0, 3.2, -6.48]}>
-            <planeGeometry args={[22.2, 10.2]} />
+          {/* Front Distant Sky Plane (Positioned at Z = -35, far behind Z = -6.5 front target wall) */}
+          <mesh position={[0, 15, -35]}>
+            <planeGeometry args={[140, 70]} />
             <meshBasicMaterial map={customTexture} depthWrite={false} />
           </mesh>
 
-          {/* Rear Wall Backdrop Plane */}
-          <mesh position={[0, 3.2, 6.48]} rotation={[0, Math.PI, 0]}>
-            <planeGeometry args={[22.2, 10.2]} />
+          {/* Rear Distant Sky Plane (Positioned at Z = +35, far behind Z = +6.5 rear target wall) */}
+          <mesh position={[0, 15, 35]} rotation={[0, Math.PI, 0]}>
+            <planeGeometry args={[140, 70]} />
             <meshBasicMaterial map={customTexture} depthWrite={false} />
           </mesh>
         </group>

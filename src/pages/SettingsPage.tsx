@@ -8,11 +8,6 @@ import type { GameEngine } from '../utils/sensitivity';
 import { soundManager } from '../utils/audio';
 import { saveCustomBackgroundImage, clearCustomBackgroundImage } from '../utils/db';
 import {
-  fetchNasaApodGallery,
-  convertImageUrlToDataUrl,
-} from '../utils/nasa';
-import type { NasaApodItem } from '../utils/nasa';
-import {
   Sliders,
   Volume2,
   VolumeX,
@@ -117,43 +112,6 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
   const showSaveConfirmation = (msg: string) => {
     setSaveToast(msg);
     setTimeout(() => setSaveToast(null), 2500);
-  };
-
-  const [nasaGallery, setNasaGallery] = useState<NasaApodItem[]>([]);
-  const [nasaLoading, setNasaLoading] = useState(false);
-  const [nasaError, setNasaError] = useState<string | null>(null);
-  const [selectingNasaUrl, setSelectingNasaUrl] = useState<string | null>(null);
-
-  const handleFetchNasaGallery = async () => {
-    setNasaLoading(true);
-    setNasaError(null);
-    const result = await fetchNasaApodGallery(8);
-    setNasaLoading(false);
-
-    if (result.success) {
-      setNasaGallery(result.data);
-      showSaveConfirmation(`LOADED ${result.data.length} NASA SPACE PHOTOS`);
-    } else {
-      setNasaError(result.error || 'Failed to fetch space photography');
-      showSaveConfirmation('NASA API FETCH FAILED');
-    }
-  };
-
-  const handleSelectNasaImage = async (item: NasaApodItem) => {
-    const targetUrl = item.hdurl || item.url;
-    setSelectingNasaUrl(targetUrl);
-    try {
-      const dataUrl = await convertImageUrlToDataUrl(targetUrl);
-      await saveCustomBackgroundImage(dataUrl);
-      setArenaBackdrop('custom-image');
-      showSaveConfirmation(`NASA APOD APPLIED: "${item.title.toUpperCase()}"`);
-    } catch (err) {
-      console.error('Failed to convert NASA image:', err);
-      setArenaBackdrop('custom-image');
-      showSaveConfirmation('APPLIED NASA IMAGE');
-    } finally {
-      setSelectingNasaUrl(null);
-    }
   };
 
   const handleCustomImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -970,71 +928,6 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
                         RESET / CLEAR
                       </button>
                     </div>
-                  </div>
-
-                  {/* NASA APOD Real Space Gallery Section */}
-                  <div className="space-y-3 pt-3 border-t border-[#262626]/60">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                      <div>
-                        <span className="font-mono text-xs font-bold text-pink uppercase block">
-                          NASA APOD REAL SPACE GALLERY
-                        </span>
-                        <span className="text-[10px] font-mono text-neutral-400">
-                          Fetch official Astronomy Picture of the Day photography directly from NASA.
-                        </span>
-                      </div>
-                      <button
-                        onClick={() => handleFetchNasaGallery()}
-                        disabled={nasaLoading}
-                        className="px-4 py-2 bg-pink hover:bg-pink/90 text-[#0d0d0d] rounded-[12px] text-xs font-mono font-bold transition-all disabled:opacity-50 border border-pink shrink-0"
-                      >
-                        {nasaLoading ? 'FETCHING NASA PHOTOS...' : nasaGallery.length > 0 ? 'REFRESH / GET NEW BATCH' : 'FETCH SPACE PHOTOS'}
-                      </button>
-                    </div>
-
-                    {/* Disclaimer Note */}
-                    <div className="bg-[#141414] border border-[#262626] p-2.5 rounded-[10px] text-[10px] font-mono text-neutral-400">
-                      <span className="text-pink font-bold">NOTE:</span> Astrophotography images will show a seam/distortion when wrapped around the arena dome — works best as an atmospheric backdrop rather than a seamless environment.
-                    </div>
-
-                    {/* NASA Error State */}
-                    {nasaError && (
-                      <div className="bg-amber-500/10 border border-amber-500/40 p-3 rounded-[10px] text-amber-400 text-xs font-mono space-y-1">
-                        <span className="font-bold block">FETCH ERROR</span>
-                        <span>{nasaError}</span>
-                      </div>
-                    )}
-
-                    {/* NASA APOD Gallery Thumbnail Grid */}
-                    {nasaGallery.length > 0 && (
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-2">
-                        {nasaGallery.map((item, idx) => (
-                          <button
-                            key={item.url + idx}
-                            onClick={() => handleSelectNasaImage(item)}
-                            disabled={selectingNasaUrl === (item.hdurl || item.url)}
-                            className={`group relative h-28 rounded-[12px] overflow-hidden border transition-all text-left ${
-                              selectingNasaUrl === (item.hdurl || item.url)
-                                ? 'border-pink ring-2 ring-pink opacity-60'
-                                : 'border-[#262626] hover:border-pink'
-                            }`}
-                          >
-                            <img
-                              src={item.url}
-                              alt={item.title}
-                              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                              loading="lazy"
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent p-2 flex flex-col justify-end">
-                              <span className="text-[10px] font-mono font-bold text-white line-clamp-1 group-hover:text-pink transition-colors">
-                                {item.title}
-                              </span>
-                              <span className="text-[8px] font-mono text-neutral-400">{item.date}</span>
-                            </div>
-                          </button>
-                        ))}
-                      </div>
-                    )}
                   </div>
 
                   {/* Arena Wall Color Hex Picker */}
