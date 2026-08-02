@@ -323,14 +323,13 @@ const ArenaController: React.FC<ArenaControllerProps> = ({ onPointerLockChange, 
             <meshStandardMaterial color="#0d0d0d" roughness={0.9} />
           </mesh>
 
-          {/* Ceiling — rendered for grid-room only; omitted for custom-image so the
-              background image shows through the open top of the arena */}
-          {arenaBackdrop !== 'custom-image' && (
-            <mesh position={[0, 7.5, -1.5]} rotation={[Math.PI / 2, 0, 0]}>
-              <planeGeometry args={[22, 12]} />
-              <meshStandardMaterial color="#080808" />
-            </mesh>
-          )}
+          {/* Ceiling — shown for both grid-room and custom-image modes.
+              Image is handled by an in-scene plane behind the front wall,
+              so the ceiling should be present to block sky leakage. */}
+          <mesh position={[0, 7.5, -1.5]} rotation={[Math.PI / 2, 0, 0]}>
+            <planeGeometry args={[22, 12]} />
+            <meshStandardMaterial color="#080808" />
+          </mesh>
 
           {/* Solid Opaque Floor Plane */}
           <mesh position={[0, -0.01, -1.5]} rotation={[-Math.PI / 2, 0, 0]}>

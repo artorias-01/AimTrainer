@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useSettingsStore } from '../../store/useSettingsStore';
@@ -21,6 +21,8 @@ export const ArenaBackdrop3D: React.FC = () => {
       loader.load(dataUrl, (tex) => {
         if (!isMounted) return;
         tex.colorSpace = THREE.SRGBColorSpace;
+        tex.wrapS = THREE.ClampToEdgeWrapping;
+        tex.wrapT = THREE.ClampToEdgeWrapping;
         tex.minFilter = THREE.LinearFilter;
         setCustomTexture(tex);
       });
@@ -31,22 +33,31 @@ export const ArenaBackdrop3D: React.FC = () => {
     };
   }, [backdrop]);
 
-  // Set scene.background — renders the texture screen-filling with zero distortion,
-  // no geometry needed, behind all 3D objects, visible from any look direction.
-  // This is the canonical Three.js way to display a background image.
+  // Always keep scene.background as solid dark — we use in-scene geometry
+  // for the custom image so it only fills the forward-facing black space.
   useEffect(() => {
-    if (backdrop === 'custom-image' && customTexture) {
-      scene.background = customTexture;
-    } else {
-      // Restore opaque dark background when not using custom image
-      scene.background = new THREE.Color(0x050505);
-    }
-
+    scene.background = new THREE.Color(0x050505);
     return () => {
       scene.background = new THREE.Color(0x050505);
     };
-  }, [backdrop, customTexture, scene]);
+  }, [scene]);
 
-  // Nothing to render — scene.background handles it all
-  return null;
+  if (backdrop !== 'custom-image' || !customTexture) {
+    return null;
+  }
+
+  // A flat plane placed just behind the front wall (Z = -7.5).
+  // Sized at 52 × 30 units — large enough to fill the visible margins
+  // (above, left, right of the front wall) at fov=103 from Z=2.5
+  // without extending to directions the player can't normally see.
+  // Centered at Y=3.5 (slightly above wall mid-point) so it covers
+  // the full upper region visible above the wall top.
+  // The front wall plane (22×10) occludes the center, so only the
+  // surrounding black-space margins show the image.
+  return (
+    <mesh position={[0, 3.5, -7.5]}>
+      <planeGeometry args={[52, 30]} />
+      <meshBasicMaterial map={customTexture} side={THREE.DoubleSide} depthWrite={false} />
+    </mesh>
+  );
 };
