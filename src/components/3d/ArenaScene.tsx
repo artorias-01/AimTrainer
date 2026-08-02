@@ -298,49 +298,48 @@ const ArenaController: React.FC<ArenaControllerProps> = ({ onPointerLockChange, 
       {/* Environment & Backdrop Options */}
       {arenaBackdrop !== 'minimal-void' && (
         <>
-          {/* Walls & Ceiling (Skipped when custom-image backdrop is active) */}
+          {/* Walls (rendered for grid-room and custom-image; skipped only for minimal-void) */}
+          {/* Front Target Wall (Z = -6.5) */}
+          <mesh position={[0, 3.2, -6.5]}>
+            <planeGeometry args={[22, 10]} />
+            <meshStandardMaterial color={wallColor} roughness={0.8} />
+          </mesh>
+
+          {/* Rear Target Wall (Z = +6.5 for 360 6-Wall Mode) */}
+          <mesh position={[0, 3.2, 6.5]} rotation={[0, Math.PI, 0]}>
+            <planeGeometry args={[22, 10]} />
+            <meshStandardMaterial color={wallColor} roughness={0.8} />
+          </mesh>
+
+          {/* Left Wall (X = -11) */}
+          <mesh position={[-11, 3.2, -1.5]} rotation={[0, Math.PI / 2, 0]}>
+            <planeGeometry args={[12, 10]} />
+            <meshStandardMaterial color="#0d0d0d" roughness={0.9} />
+          </mesh>
+
+          {/* Right Wall (X = +11) */}
+          <mesh position={[11, 3.2, -1.5]} rotation={[0, -Math.PI / 2, 0]}>
+            <planeGeometry args={[12, 10]} />
+            <meshStandardMaterial color="#0d0d0d" roughness={0.9} />
+          </mesh>
+
+          {/* Ceiling — rendered for grid-room only; omitted for custom-image so the
+              background image shows through the open top of the arena */}
           {arenaBackdrop !== 'custom-image' && (
-            <>
-              {/* Front Target Wall (Z = -6.5) */}
-              <mesh position={[0, 3.2, -6.5]}>
-                <planeGeometry args={[22, 10]} />
-                <meshStandardMaterial color={wallColor} roughness={0.8} />
-              </mesh>
-
-              {/* Rear Target Wall (Z = +6.5 for 360 6-Wall Mode) */}
-              <mesh position={[0, 3.2, 6.5]} rotation={[0, Math.PI, 0]}>
-                <planeGeometry args={[22, 10]} />
-                <meshStandardMaterial color={wallColor} roughness={0.8} />
-              </mesh>
-
-              {/* Left Wall (X = -11) */}
-              <mesh position={[-11, 3.2, -1.5]} rotation={[0, Math.PI / 2, 0]}>
-                <planeGeometry args={[12, 10]} />
-                <meshStandardMaterial color="#0d0d0d" roughness={0.9} />
-              </mesh>
-
-              {/* Right Wall (X = +11) */}
-              <mesh position={[11, 3.2, -1.5]} rotation={[0, -Math.PI / 2, 0]}>
-                <planeGeometry args={[12, 10]} />
-                <meshStandardMaterial color="#0d0d0d" roughness={0.9} />
-              </mesh>
-
-              {/* Ceiling Plane at Y = 7.5 */}
-              <mesh position={[0, 7.5, -1.5]} rotation={[Math.PI / 2, 0, 0]}>
-                <planeGeometry args={[22, 12]} />
-                <meshStandardMaterial color="#080808" />
-              </mesh>
-            </>
+            <mesh position={[0, 7.5, -1.5]} rotation={[Math.PI / 2, 0, 0]}>
+              <planeGeometry args={[22, 12]} />
+              <meshStandardMaterial color="#080808" />
+            </mesh>
           )}
 
-          {/* Solid Opaque Floor Plane (Provides footing/grounding for custom-image mode too) */}
+          {/* Solid Opaque Floor Plane */}
           <mesh position={[0, -0.01, -1.5]} rotation={[-Math.PI / 2, 0, 0]}>
             <planeGeometry args={[30, 30]} />
             <meshStandardMaterial color="#0b0b0b" roughness={0.9} />
           </mesh>
 
-          {/* Floor Grid Lines at Y = 0 */}
-          {arenaBackdrop === 'grid-room' && (
+          {/* Floor Grid Lines — shown for grid-room and custom-image modes */}
+          {(arenaBackdrop === 'grid-room' || arenaBackdrop === 'custom-image') && (
             <gridHelper args={[30, 30, themeAccentColor, '#262626']} position={[0, 0, -1.5]} />
           )}
         </>
