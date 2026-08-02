@@ -118,8 +118,8 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 5 * 1024 * 1024) {
-      showSaveConfirmation('ERROR: IMAGE EXCEEDS 5MB SIZE LIMIT!');
+    if (file.size > 50 * 1024 * 1024) {
+      showSaveConfirmation('ERROR: IMAGE EXCEEDS 50MB SIZE LIMIT!');
       return;
     }
 
@@ -131,9 +131,14 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
     const reader = new FileReader();
     reader.onload = async () => {
       const dataUrl = reader.result as string;
-      await saveCustomBackgroundImage(dataUrl);
-      setArenaBackdrop('custom-image');
-      showSaveConfirmation('CUSTOM BACKGROUND IMAGE APPLIED!');
+      try {
+        await saveCustomBackgroundImage(dataUrl);
+        setArenaBackdrop('custom-image');
+        showSaveConfirmation('CUSTOM BACKGROUND IMAGE APPLIED!');
+      } catch (err) {
+        console.error('Failed to save to IndexedDB:', err);
+        showSaveConfirmation('STORAGE QUOTA EXCEEDED! Image too large for browser storage.');
+      }
     };
     reader.readAsDataURL(file);
   };
@@ -883,10 +888,6 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
                       { id: 'grid-room', label: 'GRID ROOM' },
                       { id: 'minimal-void', label: 'MINIMAL VOID' },
                       { id: 'gradient-room', label: 'GRADIENT ROOM' },
-                      { id: 'nebula', label: 'NEBULA' },
-                      { id: 'starfield', label: 'STARFIELD' },
-                      { id: 'deep-space', label: 'DEEP SPACE' },
-                      { id: 'aurora', label: 'AURORA' },
                       { id: 'custom-image', label: 'CUSTOM IMAGE' },
                     ].map((backdrop) => (
                       <button
@@ -909,7 +910,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
                   {/* Custom Background Image File Upload & Clear Section */}
                   <div className="space-y-2 pt-2 border-t border-[#262626]/60">
                     <div className="flex justify-between items-center text-xs font-mono text-neutral-400">
-                      <span>CUSTOM BACKDROP IMAGE (PNG, JPG, WEBP — MAX 5MB)</span>
+                      <span>CUSTOM BACKDROP IMAGE (PNG, JPG, WEBP — MAX 50MB)</span>
                     </div>
                     <div className="flex gap-2">
                       <label className="flex-1 bg-[#141414] hover:bg-[#1a1a1a] border border-[#262626] hover:border-pink/50 rounded-[12px] p-2.5 text-xs text-neutral-300 font-mono flex items-center justify-center gap-2 cursor-pointer transition-all">
