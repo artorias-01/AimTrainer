@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useGameStore } from '../../store/useGameStore';
@@ -6,7 +6,6 @@ import { useSettingsStore } from '../../store/useSettingsStore';
 import { convertDeltaToRadians } from '../../utils/sensitivity';
 import { TargetSphere } from './TargetSphere';
 import { ArenaBackdrop3D } from './ArenaBackdrop';
-import { getCustomBackgroundImage } from '../../utils/db';
 
 interface ArenaControllerProps {
   onPointerLockChange: (isLocked: boolean) => void;
@@ -322,7 +321,13 @@ const ArenaController: React.FC<ArenaControllerProps> = ({ onPointerLockChange, 
             <meshStandardMaterial color="#0d0d0d" roughness={0.9} />
           </mesh>
 
-          {/* Floor with Editorial Grid Lines at Y = 0 */}
+          {/* Solid Opaque Floor Plane (Eliminates floor transparency leak) */}
+          <mesh position={[0, -0.01, -1.5]} rotation={[-Math.PI / 2, 0, 0]}>
+            <planeGeometry args={[30, 30]} />
+            <meshStandardMaterial color="#0b0b0b" roughness={0.9} />
+          </mesh>
+
+          {/* Floor Grid Lines at Y = 0 */}
           {arenaBackdrop === 'grid-room' && (
             <gridHelper args={[30, 30, themeAccentColor, '#262626']} position={[0, 0, -1.5]} />
           )}
@@ -335,7 +340,7 @@ const ArenaController: React.FC<ArenaControllerProps> = ({ onPointerLockChange, 
         </>
       )}
 
-      {/* Procedural Cosmic Skyboxes & Custom Image Backdrop */}
+      {/* In-Scene 3D Skybox & Backdrops */}
       <ArenaBackdrop3D />
     </group>
   );
@@ -356,30 +361,7 @@ export const ArenaScene: React.FC<ArenaSceneProps> = ({
   const activeScenario = useGameStore((s) => s.activeScenario);
   const performanceMode = useSettingsStore((s) => s.performanceMode);
   const themeAccentColor = useSettingsStore((s) => s.themeAccentColor) || '#f5b8c9';
-  const arenaBackdrop = useSettingsStore((s) => s.arenaBackdrop);
   const initialSpawn = activeScenario.playerPosition || { x: 0, y: 2.2, z: 3.5 };
-
-  const [customBgUrl, setCustomBgUrl] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (arenaBackdrop !== 'custom-image') {
-      setCustomBgUrl(null);
-      return;
-    }
-
-    let isMounted = true;
-    getCustomBackgroundImage().then((url) => {
-      if (isMounted && url) {
-        setCustomBgUrl(url);
-      }
-    });
-
-    return () => {
-      isMounted = false;
-    };
-  }, [arenaBackdrop]);
-
-  const isCustomBg = arenaBackdrop === 'custom-image' && customBgUrl !== null;
 
   const handleClickCanvas = () => {
     if (containerRef.current && document.pointerLockElement === null && !isTouchDevice) {
@@ -393,28 +375,13 @@ export const ArenaScene: React.FC<ArenaSceneProps> = ({
       onClick={handleClickCanvas}
       className="w-full h-full bg-[#050505] relative cursor-crosshair overflow-hidden"
     >
-      {/* CSS Background Layer Behind 3D Canvas */}
-      {isCustomBg && (
-        <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat pointer-events-none z-0"
-          style={{ backgroundImage: `url(${customBgUrl})` }}
-        />
-      )}
-
-      {/* Central Contrast Safeguard Vignette Overlay for Target & Crosshair Legibility */}
+      {/* Central Contrast Safeguard Vignette Overlay */}
       <div className="absolute inset-0 pointer-events-none z-20 bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(5,5,5,0.65)_100%)]" />
 
       <Canvas
         camera={{ position: [initialSpawn.x, initialSpawn.y, initialSpawn.z], fov: 103 }}
         dpr={performanceMode ? 1 : [1, 1.5]}
-        gl={{ antialias: !performanceMode, powerPreference: 'high-performance', alpha: true }}
-        onCreated={({ gl }) => {
-          if (isCustomBg) {
-            gl.setClearColor(0x000000, 0); // Transparent WebGL context
-          } else {
-            gl.setClearColor(0x050505, 1); // Opaque background context
-          }
-        }}
+        gl={{ antialias: !performanceMode, powerPreference: 'high-performance' }}
         className="relative z-10 w-full h-full"
       >
         <ambientLight intensity={1.5} />

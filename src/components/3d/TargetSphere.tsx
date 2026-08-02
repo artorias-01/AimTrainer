@@ -13,7 +13,7 @@ interface TargetSphereProps {
   vx?: number;
   vy?: number;
   targetSpeed?: number;
-  pathType?: 'linear' | 'sinusoidal' | 'erratic';
+  pathType?: 'linear' | 'sinusoidal' | 'erratic' | 'lissajous' | 'airstrafe';
   directionChangeIntervalMs?: number;
   speedVariance?: number;
   enableJukes?: boolean;
@@ -124,6 +124,13 @@ export const TargetSphere: React.FC<TargetSphereProps> = React.memo(({
 
       if (pathType === 'sinusoidal') {
         curY += Math.sin((now - spawnTime) * 0.004 * liveMult + phaseOffsetRef.current) * 0.6 * liveMult * delta;
+      } else if (pathType === 'lissajous') {
+        const time = (now - spawnTime) * 0.003 * liveMult + phaseOffsetRef.current;
+        curX += Math.cos(time * 1.2) * 2.2 * liveMult * delta;
+        curY += Math.sin(time * 2.4) * 2.2 * liveMult * delta;
+      } else if (pathType === 'airstrafe') {
+        const time = (now - spawnTime) * 0.0035 * liveMult + phaseOffsetRef.current;
+        curY += Math.sin(time * 2.8) * 3.2 * liveMult * delta;
       }
 
       const minX = -10.0 + radius + 0.1;
@@ -197,6 +204,14 @@ export const TargetSphere: React.FC<TargetSphereProps> = React.memo(({
           emissiveIntensity={glowIntensity}
         />
       </mesh>
+
+      {/* 150ms Pre-Spawn Warm Pulse Telegraph Indicator */}
+      {Date.now() - spawnTime < 150 && (
+        <mesh position={[0, 0, 0]}>
+          <ringGeometry args={[effRadius * 1.1, effRadius * 1.35, 32]} />
+          <meshBasicMaterial color="#ffffff" side={THREE.DoubleSide} transparent opacity={0.7} />
+        </mesh>
+      )}
 
       {/* 3D Billboard Health Bar for Multi-Hit Targets */}
       {maxHp !== undefined && maxHp > 1 && (
