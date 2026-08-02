@@ -27,13 +27,13 @@ export const CustomScenarioModal: React.FC<CustomScenarioModalProps> = ({
   const [arenaType, setArenaType] = useState<'1-wall' | '6-wall' | 'open-arena'>(initialScenario?.arenaType || '1-wall');
   const [hasLifetimeLimit, setHasLifetimeLimit] = useState(initialScenario?.hasLifetimeLimit || false);
   const [lifetimeMs, setLifetimeMs] = useState(initialScenario?.lifetimeMs || 600);
-  const [pathType, setPathType] = useState<'linear' | 'sinusoidal' | 'erratic' | 'lissajous' | 'airstrafe'>(initialScenario?.pathType || 'linear');
+  const [pathType, setPathType] = useState<'linear' | 'sinusoidal' | 'erratic'>(initialScenario?.pathType || 'linear');
   const [directionChangeIntervalMs, setDirectionChangeIntervalMs] = useState(initialScenario?.directionChangeIntervalMs || 1000);
   const [enableJukes, setEnableJukes] = useState(initialScenario?.enableJukes || false);
   const [playerDistance, setPlayerDistance] = useState(initialScenario?.playerPosition?.z ?? 3.0);
   const [speedVariance, setSpeedVariance] = useState(initialScenario?.speedVariance ?? 0.2);
   const [maxHp, setMaxHp] = useState(initialScenario?.maxHp ?? 1);
-  const [fireMode, setFireMode] = useState<'semi' | 'auto'>(initialScenario?.fireMode || 'semi');
+  const [fireMode, setFireMode] = useState<'semi' | 'auto'>(initialScenario?.fireMode ?? 'semi');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,6 +52,7 @@ export const CustomScenarioModal: React.FC<CustomScenarioModalProps> = ({
       targetSpeed,
       maxHp,
       damagePerHit: 1,
+      fireMode,
       arenaType,
       playerPosition: { x: 0, y: 2.2, z: playerDistance },
       hasLifetimeLimit,
@@ -60,7 +61,6 @@ export const CustomScenarioModal: React.FC<CustomScenarioModalProps> = ({
       directionChangeIntervalMs: targetSpeed > 0 ? directionChangeIntervalMs : undefined,
       speedVariance: targetSpeed > 0 ? speedVariance : undefined,
       enableJukes: targetSpeed > 0 ? enableJukes : undefined,
-      fireMode,
       tags: ['CUSTOM', category.toUpperCase(), arenaType.toUpperCase()],
       recommendedCm360: '25-45 cm',
       iconName: 'Target',
@@ -195,6 +195,27 @@ export const CustomScenarioModal: React.FC<CustomScenarioModalProps> = ({
                 className="w-full bg-[#0d0d0d] border border-[#262626] rounded-[12px] p-2.5 text-sm text-white focus:outline-none focus:border-pink"
               />
             </div>
+
+            <div className="space-y-1.5">
+              <label className="text-neutral-400 font-bold">FIRE MODE</label>
+              <div className="flex gap-2">
+                {(['semi', 'auto'] as const).map((mode) => (
+                  <button
+                    key={mode}
+                    type="button"
+                    onClick={() => setFireMode(mode)}
+                    className={`flex-1 py-2 rounded-[8px] text-[10px] font-bold uppercase border transition-all ${
+                      fireMode === mode ? 'bg-pink text-[#0d0d0d] border-pink' : 'bg-[#141414] text-neutral-400 border-[#262626]'
+                    }`}
+                  >
+                    {mode === 'semi' ? 'SEMI-AUTO' : 'FULL-AUTO'}
+                  </button>
+                ))}
+              </div>
+              <p className="text-[9px] text-neutral-500 leading-tight">
+                {fireMode === 'auto' ? 'Hold mouse to fire continuously (~600 RPM)' : 'One shot per click'}
+              </p>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-[#262626]">
@@ -293,7 +314,7 @@ export const CustomScenarioModal: React.FC<CustomScenarioModalProps> = ({
             </div>
 
             <div className="space-y-2 bg-[#0d0d0d] p-3.5 rounded-[12px] border border-[#262626]">
-              <label className="font-bold text-white block">ARENA & FIRING MECHANICS</label>
+              <label className="font-bold text-white block">ARENA & DIFFICULTY</label>
               <div className="grid grid-cols-2 gap-2">
                 {(['1-wall', '6-wall'] as const).map((type) => (
                   <button
@@ -307,23 +328,6 @@ export const CustomScenarioModal: React.FC<CustomScenarioModalProps> = ({
                     {type}
                   </button>
                 ))}
-              </div>
-              <div className="pt-2 border-t border-[#262626]">
-                <span className="text-[10px] text-neutral-400 font-bold block mb-1">FIRING MODE</span>
-                <div className="grid grid-cols-2 gap-2">
-                  {(['semi', 'auto'] as const).map((mode) => (
-                    <button
-                      key={mode}
-                      type="button"
-                      onClick={() => setFireMode(mode)}
-                      className={`py-1.5 rounded-[8px] text-[10px] font-bold uppercase border transition-all ${
-                        fireMode === mode ? 'bg-pink text-[#0d0d0d] border-pink' : 'bg-[#141414] text-neutral-400 border-[#262626]'
-                      }`}
-                    >
-                      {mode === 'semi' ? 'SEMI-AUTO (SINGLE)' : 'FULL-AUTO (600 RPM)'}
-                    </button>
-                  ))}
-                </div>
               </div>
               <div className="flex items-center justify-between pt-1">
                 <span className="text-[10px] text-neutral-400 font-bold">DIFFICULTY</span>

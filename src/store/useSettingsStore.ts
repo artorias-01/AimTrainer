@@ -79,6 +79,7 @@ interface SettingsState {
   arenaBackdrop: ArenaBackdrop;
   arenaColor: string;
   themeAccentColor: string;
+  globalMultiHitTargets?: never;
   scenarioCrosshairMap: Record<string, string>;
 
   updateSettings: (partial: Partial<SensitivityProfile>) => void;

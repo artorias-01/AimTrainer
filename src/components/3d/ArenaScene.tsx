@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useGameStore } from '../../store/useGameStore';
@@ -6,6 +6,7 @@ import { useSettingsStore } from '../../store/useSettingsStore';
 import { convertDeltaToRadians } from '../../utils/sensitivity';
 import { TargetSphere } from './TargetSphere';
 import { ArenaBackdrop3D } from './ArenaBackdrop';
+import { getCustomBackgroundImage } from '../../utils/db';
 
 interface ArenaControllerProps {
   onPointerLockChange: (isLocked: boolean) => void;
@@ -33,39 +34,6 @@ const ArenaController: React.FC<ArenaControllerProps> = ({ onPointerLockChange, 
   const isLockedRef = useRef<boolean>(false);
   const lastSecondTickRef = useRef<number>(0);
   const lastTouchRef = useRef<{ x: number; y: number } | null>(null);
-  const isMouseDownRef = useRef<boolean>(false);
-  const lastAutoFireRef = useRef<number>(0);
-
-  const fireShot = () => {
-    if (status !== 'playing' || activeScenario.category === 'tracking') return;
-
-    raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
-    const intersects = raycaster.intersectObjects(scene.children, true);
-
-    let hitTargetId: string | null = null;
-    let hitPointX = 0;
-    let hitPointY = 0;
-
-    for (const hit of intersects) {
-      let obj: THREE.Object3D | null = hit.object;
-      while (obj) {
-        if (obj.userData && obj.userData.targetId) {
-          hitTargetId = obj.userData.targetId;
-          hitPointX = hit.point.x;
-          hitPointY = hit.point.y;
-          break;
-        }
-        obj = obj.parent;
-      }
-      if (hitTargetId) break;
-    }
-
-    if (hitTargetId) {
-      registerHit(hitTargetId, hitPointX, hitPointY);
-    } else {
-      registerMiss(0, 0);
-    }
-  };
 
   // Set FOV and position camera based on activeScenario.playerPosition
   useEffect(() => {
@@ -193,36 +161,84 @@ const ArenaController: React.FC<ArenaControllerProps> = ({ onPointerLockChange, 
     };
   }, [camera, isTouchDevice, settings, status]);
 
-  // Click & Auto-Fire Listener
+  // Shared raycasting shot logic extracted for reuse by both semi and auto fire modes
+  const fireShot = React.useCallback(() => {
+    if (activeScenario.category === 'tracking') return;
+    raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
+    const intersects = raycaster.intersectObjects(scene.children, true);
+
+    let hitTargetId: string | null = null;
+    let hitPointX = 0;
+    let hitPointY = 0;
+
+    for (const hit of intersects) {
+      let obj: THREE.Object3D | null = hit.object;
+      while (obj) {
+        if (obj.userData && obj.userData.targetId) {
+          hitTargetId = obj.userData.targetId;
+          hitPointX = hit.point.x;
+          hitPointY = hit.point.y;
+          break;
+        }
+        obj = obj.parent;
+      }
+      if (hitTargetId) break;
+    }
+
+    if (hitTargetId) {
+      registerHit(hitTargetId, hitPointX, hitPointY);
+    } else {
+      registerMiss(0, 0);
+    }
+  }, [activeScenario.category, camera, raycaster, registerHit, registerMiss, scene]);
+
+  // Click Raycasting for Shot Hit Detection — supports semi-auto (one shot per click) and auto-fire (hold to fire at ~100ms interval)
+  const autoFireIntervalRef = useRef<number | null>(null);
+
+  const stopAutoFire = React.useCallback(() => {
+    if (autoFireIntervalRef.current !== null) {
+      clearInterval(autoFireIntervalRef.current);
+      autoFireIntervalRef.current = null;
+    }
+  }, []);
+
   useEffect(() => {
     const handleMouseDown = (e: MouseEvent) => {
-      if (e.button !== 0) return;
-      isMouseDownRef.current = true;
-      if (status === 'playing' && activeScenario.category !== 'tracking') {
+      if (status !== 'playing') return;
+      if (!isLockedRef.current && !isTouchDevice) return;
+      if (e.button !== 0 && !isTouchDevice) return; // Left click only
+
+      const isAuto = activeScenario.fireMode === 'auto';
+
+      if (isAuto) {
+        // Fire immediately on mousedown, then continue firing at 100ms interval
         fireShot();
-        lastAutoFireRef.current = Date.now();
+        stopAutoFire();
+        autoFireIntervalRef.current = window.setInterval(() => {
+          if (useGameStore.getState().status !== 'playing') {
+            stopAutoFire();
+            return;
+          }
+          fireShot();
+        }, 100);
+      } else {
+        // Semi-auto: one shot per click
+        fireShot();
       }
     };
 
     const handleMouseUp = (e: MouseEvent) => {
-      if (e.button === 0) {
-        isMouseDownRef.current = false;
-      }
-    };
-
-    const handleBlur = () => {
-      isMouseDownRef.current = false;
+      if (e.button === 0) stopAutoFire();
     };
 
     window.addEventListener('mousedown', handleMouseDown);
     window.addEventListener('mouseup', handleMouseUp);
-    window.addEventListener('blur', handleBlur);
     return () => {
       window.removeEventListener('mousedown', handleMouseDown);
       window.removeEventListener('mouseup', handleMouseUp);
-      window.removeEventListener('blur', handleBlur);
+      stopAutoFire();
     };
-  }, [activeScenario.category, camera, isTouchDevice, raycaster, registerHit, registerMiss, scene, status]);
+  }, [activeScenario.category, activeScenario.fireMode, camera, fireShot, isTouchDevice, raycaster, registerHit, registerMiss, scene, status, stopAutoFire]);
 
   // Main Render Frame Loop
   useFrame((_, delta) => {
@@ -237,17 +253,6 @@ const ArenaController: React.FC<ArenaControllerProps> = ({ onPointerLockChange, 
 
     // Update target movement for tracking/strafe tasks
     updateTargetPositions(delta);
-
-    // Full-Auto Firing Stream (600 RPM / 100ms interval)
-    if (
-      activeScenario.fireMode === 'auto' &&
-      isMouseDownRef.current &&
-      activeScenario.category !== 'tracking' &&
-      now - lastAutoFireRef.current >= 100
-    ) {
-      lastAutoFireRef.current = now;
-      fireShot();
-    }
 
     // If tracking scenario, calculate precise continuous time-on-target
     if (activeScenario.category === 'tracking') {
@@ -287,7 +292,6 @@ const ArenaController: React.FC<ArenaControllerProps> = ({ onPointerLockChange, 
             enableJukes={activeScenario.enableJukes}
             spawnTime={t.spawnTime}
             isTracking={activeScenario.category === 'tracking'}
-            showSpawnTelegraph={!!activeScenario.hasLifetimeLimit}
             currentHp={t.currentHp}
             maxHp={t.maxHp}
             onHit={(targetId, hitX, hitY) => registerHit(targetId, hitX, hitY)}
@@ -298,7 +302,6 @@ const ArenaController: React.FC<ArenaControllerProps> = ({ onPointerLockChange, 
       {/* Environment & Backdrop Options */}
       {arenaBackdrop !== 'minimal-void' && (
         <>
-          {/* Walls (rendered for grid-room and custom-image; skipped only for minimal-void) */}
           {/* Front Target Wall (Z = -6.5) */}
           <mesh position={[0, 3.2, -6.5]}>
             <planeGeometry args={[22, 10]} />
@@ -323,28 +326,16 @@ const ArenaController: React.FC<ArenaControllerProps> = ({ onPointerLockChange, 
             <meshStandardMaterial color="#0d0d0d" roughness={0.9} />
           </mesh>
 
-          {/* Ceiling — shown for both grid-room and custom-image modes.
-              Image is handled by an in-scene plane behind the front wall,
-              so the ceiling should be present to block sky leakage. */}
-          <mesh position={[0, 7.5, -1.5]} rotation={[Math.PI / 2, 0, 0]}>
-            <planeGeometry args={[22, 12]} />
-            <meshStandardMaterial color="#080808" />
-          </mesh>
-
-          {/* Solid Opaque Floor Plane */}
-          <mesh position={[0, -0.01, -1.5]} rotation={[-Math.PI / 2, 0, 0]}>
-            <planeGeometry args={[30, 30]} />
-            <meshStandardMaterial color="#0b0b0b" roughness={0.9} />
-          </mesh>
-
-          {/* Floor Grid Lines — shown for grid-room and custom-image modes */}
-          {(arenaBackdrop === 'grid-room' || arenaBackdrop === 'custom-image') && (
+          {/* Floor with Editorial Grid Lines at Y = 0 */}
+          {arenaBackdrop === 'grid-room' && (
             <gridHelper args={[30, 30, themeAccentColor, '#262626']} position={[0, 0, -1.5]} />
           )}
+
+          {/* Ceiling plane removed — open to sky so CSS background is visible above arena walls */}
         </>
       )}
 
-      {/* In-Scene 3D Skybox & Backdrops */}
+      {/* Procedural Cosmic Skyboxes & Custom Image Backdrop */}
       <ArenaBackdrop3D />
     </group>
   );
@@ -362,10 +353,44 @@ export const ArenaScene: React.FC<ArenaSceneProps> = ({
   isTouchDevice = false,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const glRef = useRef<THREE.WebGLRenderer | null>(null);
   const activeScenario = useGameStore((s) => s.activeScenario);
   const performanceMode = useSettingsStore((s) => s.performanceMode);
   const themeAccentColor = useSettingsStore((s) => s.themeAccentColor) || '#f5b8c9';
+  const arenaBackdrop = useSettingsStore((s) => s.arenaBackdrop);
   const initialSpawn = activeScenario.playerPosition || { x: 0, y: 2.2, z: 3.5 };
+
+  const [customBgUrl, setCustomBgUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (arenaBackdrop !== 'custom-image') {
+      setCustomBgUrl(null);
+      return;
+    }
+
+    let isMounted = true;
+    getCustomBackgroundImage().then((url) => {
+      if (isMounted && url) {
+        setCustomBgUrl(url);
+      }
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [arenaBackdrop]);
+
+  const isCustomBg = arenaBackdrop === 'custom-image' && customBgUrl !== null;
+
+  // Reactively update WebGL clear color whenever isCustomBg changes (including after async image load)
+  useEffect(() => {
+    if (!glRef.current) return;
+    if (isCustomBg) {
+      glRef.current.setClearColor(0x000000, 0); // Transparent — CSS background shows through
+    } else {
+      glRef.current.setClearColor(0x050505, 1); // Opaque default arena background
+    }
+  }, [isCustomBg]);
 
   const handleClickCanvas = () => {
     if (containerRef.current && document.pointerLockElement === null && !isTouchDevice) {
@@ -379,13 +404,26 @@ export const ArenaScene: React.FC<ArenaSceneProps> = ({
       onClick={handleClickCanvas}
       className="w-full h-full bg-[#050505] relative cursor-crosshair overflow-hidden"
     >
-      {/* Central Contrast Safeguard Vignette Overlay */}
+      {/* CSS Background Layer Behind 3D Canvas */}
+      {isCustomBg && (
+        <div
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat pointer-events-none z-0"
+          style={{ backgroundImage: `url(${customBgUrl})` }}
+        />
+      )}
+
+      {/* Central Contrast Safeguard Vignette Overlay for Target & Crosshair Legibility */}
       <div className="absolute inset-0 pointer-events-none z-20 bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(5,5,5,0.65)_100%)]" />
 
       <Canvas
         camera={{ position: [initialSpawn.x, initialSpawn.y, initialSpawn.z], fov: 103 }}
         dpr={performanceMode ? 1 : [1, 1.5]}
-        gl={{ antialias: !performanceMode, powerPreference: 'high-performance' }}
+        gl={{ antialias: !performanceMode, powerPreference: 'high-performance', alpha: true }}
+        onCreated={({ gl }) => {
+          // Store gl reference for reactive clear-color updates in the useEffect above
+          glRef.current = gl as unknown as THREE.WebGLRenderer;
+          gl.setClearColor(0x050505, 1); // Opaque default — useEffect will correct if custom-image is active
+        }}
         className="relative z-10 w-full h-full"
       >
         <ambientLight intensity={1.5} />

@@ -623,22 +623,10 @@ function generateCandidateTarget(scenario: ScenarioDef, id: string): TargetInsta
     }
   }
 
-  if (scenario.spawnConstraint === 'horizontal-line' || scenario.id === 'headshot-line') {
-    y = 2.2 + (Math.random() - 0.5) * 0.1; // Strict eye-level horizontal line constraint
-  }
-
   if (scenario.id === 'micro-flicks' || scenario.id === 'gridshot-small-grid') {
     x = (Math.random() - 0.5) * 6;
     y = 2.0 + (Math.random() - 0.5) * 3;
     z = -6.5 + clearance;
-  }
-
-  let effectiveRadius = scenario.targetRadius;
-  if (scenario.escalationMode === 'shrinking-radius' || scenario.id === 'escalating-precision') {
-    const totalTime = scenario.durationSeconds || 60;
-    const timeLeft = useGameStore.getState().timeLeft;
-    const elapsedRatio = Math.min(1, Math.max(0, (totalTime - timeLeft) / totalTime));
-    effectiveRadius = Math.max(0.16, 0.40 - elapsedRatio * 0.22); // Progressively shrinks from 0.40 to 0.18
   }
 
   const baseSpeed = scenario.targetSpeed;
@@ -646,14 +634,14 @@ function generateCandidateTarget(scenario: ScenarioDef, id: string): TargetInsta
   const vx = baseSpeed ? Math.cos(angle) * baseSpeed : 0;
   const vy = baseSpeed ? Math.sin(angle) * baseSpeed : 0;
 
-  const targetHp = scenario.maxHp || 1;
+  const targetHp = scenario.maxHp ?? 1;
 
   return {
     id,
     x,
     y,
     z,
-    radius: effectiveRadius,
+    radius: scenario.targetRadius,
     spawnTime: Date.now(),
     vx,
     vy,

@@ -13,13 +13,12 @@ interface TargetSphereProps {
   vx?: number;
   vy?: number;
   targetSpeed?: number;
-  pathType?: 'linear' | 'sinusoidal' | 'erratic' | 'lissajous' | 'airstrafe';
+  pathType?: 'linear' | 'sinusoidal' | 'erratic';
   directionChangeIntervalMs?: number;
   speedVariance?: number;
   enableJukes?: boolean;
   spawnTime?: number;
   isTracking?: boolean;
-  showSpawnTelegraph?: boolean;
   currentHp?: number;
   maxHp?: number;
   onHit: (id: string, hitX: number, hitY: number) => void;
@@ -40,13 +39,11 @@ export const TargetSphere: React.FC<TargetSphereProps> = React.memo(({
   enableJukes = false,
   spawnTime = Date.now(),
   isTracking = false,
-  showSpawnTelegraph = false,
   currentHp,
   maxHp,
 }) => {
   const groupRef = useRef<THREE.Group>(null);
   const meshRef = useRef<THREE.Mesh>(null);
-  const telegraphRef = useRef<THREE.Mesh>(null);
   const [hovered, setHovered] = useState(false);
   const targetSpeedMultiplier = useSettingsStore((s) => s.targetSpeedMultiplier) || 1.0;
   const themeAccentColor = useSettingsStore((s) => s.themeAccentColor) || '#f5b8c9';
@@ -97,17 +94,6 @@ export const TargetSphere: React.FC<TargetSphereProps> = React.memo(({
       }
     }
 
-    // 2. Telegraph Ring Frame Animation (Gated to timed/reflex scenarios)
-    if (telegraphRef.current) {
-      const elapsed = now - spawnTime;
-      if (showSpawnTelegraph && elapsed < 150) {
-        telegraphRef.current.visible = true;
-        (telegraphRef.current.material as THREE.MeshBasicMaterial).opacity = (1 - elapsed / 150) * 0.85;
-      } else {
-        telegraphRef.current.visible = false;
-      }
-    }
-
     // 2. Dynamic live speed evaluation (scales baseSpeed, heading velocity, & sinusoidal waves)
     const liveMult = useSettingsStore.getState().targetSpeedMultiplier || 1.0;
     const liveBaseSpeed = targetSpeed * liveMult;
@@ -138,13 +124,6 @@ export const TargetSphere: React.FC<TargetSphereProps> = React.memo(({
 
       if (pathType === 'sinusoidal') {
         curY += Math.sin((now - spawnTime) * 0.004 * liveMult + phaseOffsetRef.current) * 0.6 * liveMult * delta;
-      } else if (pathType === 'lissajous') {
-        const time = (now - spawnTime) * 0.003 * liveMult + phaseOffsetRef.current;
-        curX += Math.cos(time * 1.2) * 2.2 * liveMult * delta;
-        curY += Math.sin(time * 2.4) * 2.2 * liveMult * delta;
-      } else if (pathType === 'airstrafe') {
-        const time = (now - spawnTime) * 0.0035 * liveMult + phaseOffsetRef.current;
-        curY += Math.sin(time * 2.8) * 3.2 * liveMult * delta;
       }
 
       const minX = -10.0 + radius + 0.1;
@@ -219,17 +198,11 @@ export const TargetSphere: React.FC<TargetSphereProps> = React.memo(({
         />
       </mesh>
 
-      {/* 150ms Pre-Spawn Warm Pulse Telegraph Indicator (Scoped to timed/reflex scenarios & frame driven) */}
-      <mesh ref={telegraphRef} position={[0, 0, 0]} visible={false}>
-        <ringGeometry args={[effRadius * 1.1, effRadius * 1.35, 32]} />
-        <meshBasicMaterial color="#ffffff" side={THREE.DoubleSide} transparent opacity={0.85} />
-      </mesh>
-
       {/* 3D Billboard Health Bar for Multi-Hit Targets */}
       {maxHp !== undefined && maxHp > 1 && (
-        <Html center position={[0, effRadius + 0.38, 0]} distanceFactor={7} zIndexRange={[100, 0]}>
-          <div className="pointer-events-none select-none flex flex-col items-center gap-0.5">
-            <div className="w-20 h-2.5 bg-[#0d0d0d]/95 border border-[#333] rounded-full p-0.5 shadow-lg flex items-center overflow-hidden backdrop-blur-md">
+        <Html center position={[0, effRadius + 0.45, 0]} distanceFactor={8} zIndexRange={[100, 0]}>
+          <div className="pointer-events-none select-none flex flex-col items-center">
+            <div className="w-20 h-3 bg-[#0d0d0d]/90 border border-[#262626] rounded-full p-0.5 shadow-md flex items-center overflow-hidden backdrop-blur-sm">
               <div
                 className="h-full rounded-full transition-all duration-150"
                 style={{
@@ -243,9 +216,6 @@ export const TargetSphere: React.FC<TargetSphereProps> = React.memo(({
                 }}
               />
             </div>
-            <span className="text-[9px] font-mono font-bold text-white/90 drop-shadow">
-              {currentHp ?? maxHp}/{maxHp} HP
-            </span>
           </div>
         </Html>
       )}

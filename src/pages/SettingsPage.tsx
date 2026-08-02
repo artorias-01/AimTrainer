@@ -486,8 +486,6 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
                   </div>
                 </div>
 
-
-
                 {/* Clear Stats History Section */}
                 <div className="bg-[#141414] border border-[#262626] rounded-[12px] p-6 flex items-center justify-between">
                   <div>
