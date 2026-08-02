@@ -34,11 +34,16 @@ export const ArenaBackdrop3D: React.FC = () => {
     return null;
   }
 
+  // A flat plane has 1:1 UV mapping — no polar pinching or curved horizon
+  // bowing that plagued the sphere and cylinder approaches.
+  // Sized at 400 × 200 to overfill the frustum at fov=103 from any
+  // position inside the open arena (-11..11 X, 0..7.5 Y, -6.5..6.5 Z).
+  // Positioned well behind the target wall at Z = -100, centered vertically
+  // at Y = 7 so it sits across the player's natural eye-level view.
   return (
-    <mesh position={[0, 15, 0]}>
-      {/* 270-degree horizontal cylinder section eliminates polar sphere stretching */}
-      <cylinderGeometry args={[180, 180, 140, 32, 1, true, Math.PI * 0.25, Math.PI * 1.5]} />
-      <meshBasicMaterial map={customTexture} side={THREE.BackSide} depthWrite={false} />
+    <mesh position={[0, 7, -100]}>
+      <planeGeometry args={[400, 200]} />
+      <meshBasicMaterial map={customTexture} side={THREE.DoubleSide} depthWrite={false} />
     </mesh>
   );
 };
