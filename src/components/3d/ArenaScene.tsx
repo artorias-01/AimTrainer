@@ -336,13 +336,7 @@ const ArenaController: React.FC<ArenaControllerProps> = ({ onPointerLockChange, 
         </mesh>
       )}
 
-      {/* Solid Dark Ground Plane under Custom Image Floor to Prevent Background Bleed */}
-      {arenaBackdrop === 'custom-image' && (
-        <mesh position={[0, -0.01, -1.5]} rotation={[-Math.PI / 2, 0, 0]}>
-          <planeGeometry args={[30, 30]} />
-          <meshStandardMaterial color="#080808" roughness={0.9} />
-        </mesh>
-      )}
+
 
       {/* Floor with Editorial Grid Lines at Y = 0 */}
       {arenaBackdrop === 'grid-room' && (
