@@ -300,7 +300,7 @@ const ArenaController: React.FC<ArenaControllerProps> = ({ onPointerLockChange, 
       ))}
 
       {/* Environment & Backdrop Options */}
-      {arenaBackdrop !== 'minimal-void' && (
+      {arenaBackdrop !== 'minimal-void' && arenaBackdrop !== 'custom-image' && (
         <>
           {/* Front Target Wall (Z = -6.5) */}
           <mesh position={[0, 3.2, -6.5]}>
@@ -317,22 +317,20 @@ const ArenaController: React.FC<ArenaControllerProps> = ({ onPointerLockChange, 
           {/* Left Wall (X = -11) */}
           <mesh position={[-11, 3.2, -1.5]} rotation={[0, Math.PI / 2, 0]}>
             <planeGeometry args={[12, 10]} />
-            <meshStandardMaterial color="#0d0d0d" roughness={0.9} />
+            <meshStandardMaterial color="#080808" roughness={0.9} />
           </mesh>
 
           {/* Right Wall (X = +11) */}
           <mesh position={[11, 3.2, -1.5]} rotation={[0, -Math.PI / 2, 0]}>
             <planeGeometry args={[12, 10]} />
-            <meshStandardMaterial color="#0d0d0d" roughness={0.9} />
+            <meshStandardMaterial color="#080808" roughness={0.9} />
           </mesh>
-
-          {/* Floor with Editorial Grid Lines at Y = 0 */}
-          {arenaBackdrop === 'grid-room' && (
-            <gridHelper args={[30, 30, themeAccentColor, '#262626']} position={[0, 0, -1.5]} />
-          )}
-
-          {/* Ceiling plane removed — open to sky so CSS background is visible above arena walls */}
         </>
+      )}
+
+      {/* Floor with Editorial Grid Lines at Y = 0 */}
+      {(arenaBackdrop === 'grid-room' || arenaBackdrop === 'custom-image') && (
+        <gridHelper args={[30, 30, themeAccentColor, '#262626']} position={[0, 0, -1.5]} />
       )}
 
       {/* Procedural Cosmic Skyboxes & Custom Image Backdrop */}
