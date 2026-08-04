@@ -328,6 +328,22 @@ const ArenaController: React.FC<ArenaControllerProps> = ({ onPointerLockChange, 
         </>
       )}
 
+      {/* Semi-transparent Front Target Wall Panel for Custom Image Backdrop Contrast */}
+      {arenaBackdrop === 'custom-image' && (
+        <mesh position={[0, 3.2, -6.5]}>
+          <planeGeometry args={[22, 10]} />
+          <meshStandardMaterial color="#0a0a0a" transparent opacity={0.88} roughness={0.8} />
+        </mesh>
+      )}
+
+      {/* Solid Dark Ground Plane under Custom Image Floor to Prevent Background Bleed */}
+      {arenaBackdrop === 'custom-image' && (
+        <mesh position={[0, -0.01, -1.5]} rotation={[-Math.PI / 2, 0, 0]}>
+          <planeGeometry args={[30, 30]} />
+          <meshStandardMaterial color="#080808" roughness={0.9} />
+        </mesh>
+      )}
+
       {/* Floor with Editorial Grid Lines at Y = 0 */}
       {(arenaBackdrop === 'grid-room' || arenaBackdrop === 'custom-image') && (
         <gridHelper args={[30, 30, themeAccentColor, '#262626']} position={[0, 0, -1.5]} />
