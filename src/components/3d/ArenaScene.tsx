@@ -345,7 +345,7 @@ const ArenaController: React.FC<ArenaControllerProps> = ({ onPointerLockChange, 
       )}
 
       {/* Floor with Editorial Grid Lines at Y = 0 */}
-      {(arenaBackdrop === 'grid-room' || arenaBackdrop === 'custom-image') && (
+      {arenaBackdrop === 'grid-room' && (
         <gridHelper args={[30, 30, themeAccentColor, '#262626']} position={[0, 0, -1.5]} />
       )}
 
