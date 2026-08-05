@@ -34,84 +34,60 @@ h1, h2, h3, .font-serif-display {
   font-weight: 700;
 }
 
-/* Editorial & Modern Awwwards Typography */
-.font-syne {
-  font-family: 'Syne', sans-serif;
-  letter-spacing: -0.02em;
-}
-
-.font-outfit {
-  font-family: 'Outfit', sans-serif;
-}
-
+/* Editorial Utilities & Classes */
 .font-display {
-  font-family: 'Syne', 'Fraunces', sans-serif;
-  letter-spacing: -0.02em;
+  font-family: 'Fraunces', Georgia, serif;
 }
 
 .font-sans-ui {
-  font-family: 'Outfit', 'Space Grotesk', sans-serif;
+  font-family: 'Space Grotesk', sans-serif;
+  letter-spacing: -0.01em;
 }
 
-/* Glassmorphism & Awwwards Surface Classes */
-.glass-card {
-  background: rgba(13, 13, 16, 0.65);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+/* Persona 5 / P3R Aesthetic Design Tokens & Utilities */
+.shadow-persona {
+  box-shadow: 4px 4px 0px #000000 !important;
 }
 
-.glass-card-hover {
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.glass-card-hover:hover {
-  border-color: rgba(var(--accent-color-rgb), 0.35);
-  transform: translateY(-2px);
-  box-shadow: 0 25px 50px -12px rgba(var(--accent-color-rgb), 0.15);
+.shadow-persona-accent, .shadow-persona-pink {
+  box-shadow: 4px 4px 0px var(--accent-color) !important;
 }
 
-.glass-pill {
-  background: rgba(18, 18, 22, 0.75);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+.shadow-persona-lg {
+  box-shadow: 6px 6px 0px #000000 !important;
 }
 
-.text-gradient {
-  background: linear-gradient(135deg, #ffffff 30%, #a1a1aa 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+.shadow-persona-white {
+  box-shadow: 4px 4px 0px #ffffff !important;
 }
 
-.text-gradient-accent {
-  background: linear-gradient(135deg, #ffffff 15%, var(--accent-color) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+.bg-persona-dots {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1.5px, transparent 1.5px);
+  background-size: 16px 16px;
 }
 
-.glow-accent {
-  box-shadow: 0 0 35px -5px rgba(var(--accent-color-rgb), 0.4);
+.bg-persona-stripes {
+  background-image: repeating-linear-gradient(45deg, transparent, transparent 8px, rgba(0, 0, 0, 0.2) 8px, rgba(0, 0, 0, 0.2) 16px);
 }
 
-.glow-border {
-  position: relative;
-}
-.glow-border::after {
-  content: '';
-  position: absolute;
-  inset: -1px;
-  background: linear-gradient(135deg, rgba(var(--accent-color-rgb), 0.5), transparent 60%);
-  border-radius: inherit;
-  z-index: -1;
-  pointer-events: none;
+.persona-skew {
+  transform: skewX(-6deg);
 }
 
-/* Strict 12px border radius */
-.editorial-card, .editorial-btn, .editorial-tag, .editorial-input {
-  border-radius: 12px !important;
-  box-shadow: none !important;
-  text-shadow: none !important;
+.persona-unskew {
+  transform: skewX(6deg);
+}
+
+.persona-hover-lift {
+  transition: transform 0.15s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.15s cubic-bezier(0.2, 0, 0, 1) !important;
+}
+
+.persona-hover-lift:hover {
+  transform: translate(-3px, -3px) !important;
+}
+
+.persona-hover-lift:active {
+  transform: translate(0px, 0px) !important;
 }
 
 /* Base Semantic Accent Classes (Bound to var(--accent-color)) */

@@ -3,8 +3,11 @@ import { motion } from 'framer-motion';
 import { useStatsStore } from '../store/useStatsStore';
 import { useSettingsStore } from '../store/useSettingsStore';
 import { SCENARIOS } from '../utils/scenarios';
-import { getDailyStreak, getStoredBenchmarkRuns } from '../utils/storage';
-import { Trophy, Target, Activity, Calendar, AlertTriangle, Play, Award, Sparkles } from 'lucide-react';
+import {
+  getDailyStreak,
+  getStoredBenchmarkRuns,
+} from '../utils/storage';
+import { Trophy, Target, Activity, Calendar, AlertTriangle, Play } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
 
 interface DashboardPageProps {
@@ -95,45 +98,33 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
     grade: b.grade,
   }));
 
-  const latestGrade = benchmarkRuns.length > 0 ? benchmarkRuns[0].grade : 'UNRANKED';
-
   return (
     <motion.div
-      initial={{ opacity: 0, y: 15 }}
+      initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4 }}
-      className="w-full min-h-screen bg-[#030303] text-white pt-28 pb-16 px-6 md:px-16 space-y-10 select-none text-left"
+      exit={{ opacity: 0, y: -10 }}
+      className="p-6 md:p-10 space-y-8 max-w-7xl mx-auto select-none"
     >
-      {/* Top Header Glass Card */}
-      <div className="max-w-7xl mx-auto glass-card rounded-[24px] p-8 md:p-10 flex flex-col md:flex-row md:items-center justify-between gap-6 border border-white/10 shadow-2xl relative overflow-hidden">
-        <div className="space-y-2 relative z-10">
+      {/* Top Header Card */}
+      <div className="bg-[#141414] border border-[#262626] rounded-[12px] p-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <span className="text-[10px] font-mono font-extrabold text-pink uppercase tracking-widest bg-pink/15 px-3 py-1 rounded-full border border-pink/30">
+            <span className="font-mono text-xs text-pink uppercase font-bold tracking-widest">
               PERFORMANCE DASHBOARD
             </span>
-            <span className="text-xs font-mono text-neutral-400 font-bold">PILOT ID: #{displayName.toUpperCase()}</span>
           </div>
-          <h1 className="font-syne font-extrabold text-3xl md:text-5xl text-white tracking-tight">
-            PERFORMANCE ANALYTICS
-          </h1>
+          <h2 className="font-display text-3xl font-black text-white">
+            PILOT: {displayName.toUpperCase()}
+          </h2>
         </div>
 
-        <div className="flex items-center gap-4 flex-wrap relative z-10">
-          {/* Rank Badge */}
-          <div className="flex items-center gap-2.5 px-4 py-2 rounded-[14px] bg-white/[0.04] border border-white/10">
-            <Award className="w-5 h-5 text-pink" />
-            <div>
-              <span className="text-[9px] font-mono text-neutral-500 font-bold block">RANK RATING</span>
-              <span className="font-syne font-extrabold text-sm text-white block">{latestGrade}</span>
-            </div>
-          </div>
-
+        <div className="flex items-center gap-4 flex-wrap">
           <div className="flex items-center gap-2">
-            <span className="font-mono text-xs text-neutral-400 font-bold">FILTER:</span>
+            <span className="font-mono text-xs text-neutral-400">FILTER DRILL:</span>
             <select
               value={selectedScenarioFilter}
               onChange={(e) => setScenarioFilter(e.target.value)}
-              className="bg-black/60 text-white font-mono text-xs p-2.5 rounded-[14px] border border-white/15 focus:outline-none focus:border-pink font-bold"
+              className="bg-[#0d0d0d] text-white font-mono text-xs p-2 rounded-[8px] border border-[#262626] focus:outline-none focus:border-pink"
             >
               <option value="all">ALL SCENARIOS</option>
               {SCENARIOS.map((sc) => (
@@ -147,94 +138,94 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
       </div>
 
       {importStatusMsg && (
-        <div className="max-w-7xl mx-auto glass-card border border-pink text-pink p-4 rounded-[16px] font-mono text-xs font-bold text-center">
+        <div className="max-w-7xl mx-auto bg-[#141414] border border-pink text-pink p-3 rounded-[12px] font-mono text-xs font-bold text-center">
           {importStatusMsg}
         </div>
       )}
 
       {/* Weak-Point Detector Insights Box */}
       {hasEnoughData && (
-        <div className="max-w-7xl mx-auto glass-card border border-amber-500/40 rounded-[20px] p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-6 shadow-xl relative overflow-hidden">
-          <div className="flex items-center gap-4 relative z-10">
-            <div className="w-12 h-12 rounded-[16px] bg-amber-500/10 text-amber-400 border border-amber-500/30 flex items-center justify-center shrink-0">
-              <AlertTriangle className="w-6 h-6 stroke-[2.5]" />
+        <div className="max-w-7xl mx-auto bg-[#141414] border border-pink rounded-[12px] p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-[10px] bg-amber-500/10 text-amber-400 border border-amber-500/30 flex items-center justify-center shrink-0">
+              <AlertTriangle className="w-5 h-5" />
             </div>
-            <div className="space-y-1">
-              <span className="font-mono text-[10px] text-amber-400 font-extrabold uppercase tracking-widest block">
+            <div className="space-y-0.5">
+              <span className="font-mono text-[10px] text-amber-400 font-bold uppercase tracking-widest block">
                 WEAK-POINT ANALYTICS INSIGHT (LAST 20 SESSIONS)
               </span>
-              <p className="font-outfit text-sm text-white leading-relaxed">
-                Your <span className="text-pink font-bold uppercase">{weakestCategory}</span> accuracy ({lowestAcc.toFixed(1)}%) is your primary area for improvement. Recommended drill: <span className="text-white font-bold">{recommendedScenario.name}</span>.
+              <p className="font-sans-ui text-xs text-white leading-relaxed">
+                Your <span className="text-pink font-bold uppercase">{weakestCategory}</span> accuracy ({lowestAcc.toFixed(1)}%) is currently your lowest performance area. Recommended drill: <span className="text-white font-bold">{recommendedScenario.name}</span>.
               </p>
             </div>
           </div>
 
           <button
             onClick={() => onNavigate('arena', recommendedScenario.id)}
-            className="btn-editorial-pink px-6 py-3 text-xs font-syne font-extrabold tracking-wider flex items-center justify-center gap-2 shrink-0 shadow-lg glow-accent"
+            className="btn-editorial-pink px-4 py-2.5 text-xs font-bold uppercase flex items-center justify-center gap-2 shrink-0"
           >
-            <Play className="w-4 h-4 fill-black" /> PRACTICE WEAK POINT
+            <Play className="w-3.5 h-3.5 fill-[#0d0d0d]" /> PRACTICE WEAK POINT
           </button>
         </div>
       )}
 
-      {/* High Level Stats Tiles Row */}
+      {/* High Level Stats Row */}
       <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="glass-card glass-card-hover rounded-[20px] p-6 space-y-2">
-          <span className="text-neutral-400 font-mono text-xs flex items-center gap-2 font-bold">
-            <Activity className="w-4 h-4 text-pink" /> TOTAL SESSIONS
+        <div className="bg-[#141414] border border-[#262626] rounded-[12px] p-6 space-y-2">
+          <span className="text-neutral-400 font-mono text-xs flex items-center gap-1.5">
+            <Activity className="w-3.5 h-3.5 text-pink" /> TOTAL SESSIONS
           </span>
-          <div className="font-syne font-extrabold text-4xl text-white">{totalSessions}</div>
+          <div className="font-display font-bold text-4xl text-white">{totalSessions}</div>
         </div>
 
-        <div className="glass-card glass-card-hover rounded-[20px] p-6 space-y-2">
-          <span className="text-neutral-400 font-mono text-xs flex items-center gap-2 font-bold">
-            <Trophy className="w-4 h-4 text-pink" /> HIGH SCORE
+        <div className="bg-[#141414] border border-[#262626] rounded-[12px] p-6 space-y-2">
+          <span className="text-neutral-400 font-mono text-xs flex items-center gap-1.5">
+            <Trophy className="w-3.5 h-3.5 text-pink" /> ALL-TIME HIGH SCORE
           </span>
-          <div className="font-syne font-extrabold text-4xl text-pink">
+          <div className="font-display font-bold text-4xl text-pink">
             {highestScore.toLocaleString()}
           </div>
         </div>
 
-        <div className="glass-card glass-card-hover rounded-[20px] p-6 space-y-2">
-          <span className="text-neutral-400 font-mono text-xs flex items-center gap-2 font-bold">
-            <Target className="w-4 h-4 text-pink" /> AVG ACCURACY
+        <div className="bg-[#141414] border border-[#262626] rounded-[12px] p-6 space-y-2">
+          <span className="text-neutral-400 font-mono text-xs flex items-center gap-1.5">
+            <Target className="w-3.5 h-3.5 text-pink" /> AVG ACCURACY
           </span>
-          <div className="font-syne font-extrabold text-4xl text-white">{avgAccuracy}%</div>
+          <div className="font-display font-bold text-4xl text-white">{avgAccuracy}%</div>
         </div>
 
-        <div className="glass-card glass-card-hover rounded-[20px] p-6 space-y-2">
-          <span className="text-neutral-400 font-mono text-xs flex items-center gap-2 font-bold">
-            <Calendar className="w-4 h-4 text-pink" /> DAILY STREAK
+        <div className="bg-[#141414] border border-[#262626] rounded-[12px] p-6 space-y-2">
+          <span className="text-neutral-400 font-mono text-xs flex items-center gap-1.5">
+            <Calendar className="w-3.5 h-3.5 text-pink" /> DAILY STREAK
           </span>
-          <div className="font-syne font-extrabold text-4xl text-white">
+          <div className="font-display font-bold text-4xl text-white">
             {dailyStreak.streakCount} DAYS
           </div>
         </div>
       </div>
 
       {/* 30-Day Activity Heatmap Grid */}
-      <div className="max-w-7xl mx-auto glass-card rounded-[20px] p-6 space-y-4">
+      <div className="max-w-7xl mx-auto bg-[#141414] border border-[#262626] rounded-[12px] p-6 space-y-4">
         <div className="flex items-center justify-between">
-          <h3 className="font-syne font-bold text-xs text-pink uppercase tracking-widest flex items-center gap-2">
+          <h3 className="font-mono text-xs text-pink uppercase tracking-widest flex items-center gap-2">
             <Calendar className="w-4 h-4 text-pink" /> 30-DAY PRACTICE ACTIVITY HEATMAP
           </h3>
-          <span className="text-xs font-mono text-neutral-400 font-bold">{dailyStreak.historyDates.length} ACTIVE DAYS</span>
+          <span className="text-xs font-mono text-neutral-400">{dailyStreak.historyDates.length} ACTIVE DAYS</span>
         </div>
 
-        <div className="flex flex-wrap gap-2.5 pt-2">
+        <div className="flex flex-wrap gap-2 pt-2">
           {past30Days.map((dateStr) => {
             const isCompleted = dailyStreak.historyDates.includes(dateStr);
             return (
               <div
                 key={dateStr}
                 title={dateStr}
-                className={`w-7 h-7 rounded-[8px] border transition-all ${
+                className={`w-6 h-6 rounded-[4px] border transition-all ${
                   isCompleted
-                    ? 'bg-pink border-pink shadow-md'
-                    : 'bg-white/[0.03] border-white/10'
+                    ? 'bg-pink border-pink shadow-sm'
+                    : 'bg-[#0d0d0d] border-[#262626]'
                 }`}
-                style={isCompleted ? { boxShadow: `0 0 12px ${themeAccentColor}60` } : {}}
+                style={isCompleted ? { boxShadow: `0 1px 6px ${themeAccentColor}50` } : {}}
               />
             );
           })}
@@ -243,10 +234,9 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
 
       {/* Main Analytics Graph Section */}
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Score Trajectory */}
-        <div className="glass-card rounded-[24px] p-8 space-y-6">
-          <h3 className="font-syne font-extrabold text-sm text-pink uppercase tracking-widest flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-pink" /> HISTORICAL SCORE TRAJECTORY
+        <div className="bg-[#141414] border border-[#262626] rounded-[12px] p-8 space-y-6">
+          <h3 className="font-mono text-xs text-pink uppercase tracking-widest">
+            HISTORICAL SCORE TRAJECTORY
           </h3>
           {chartData.length > 0 ? (
             <div className="h-64 w-full">
@@ -262,19 +252,19 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
                   <YAxis stroke="#666666" fontSize={10} tickLine={false} />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: '#0a0a0d',
+                      backgroundColor: '#0d0d0d',
                       borderColor: themeAccentColor,
-                      borderRadius: '14px',
+                      borderRadius: '12px',
                       color: '#ffffff',
                       fontSize: '12px',
-                      fontFamily: 'Outfit',
+                      fontFamily: 'Space Grotesk',
                     }}
                   />
                   <Area
                     type="monotone"
                     dataKey="score"
                     stroke={themeAccentColor}
-                    strokeWidth={3}
+                    strokeWidth={2.5}
                     fillOpacity={1}
                     fill="url(#scoreAccentGrad)"
                   />
@@ -282,16 +272,16 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
               </ResponsiveContainer>
             </div>
           ) : (
-            <div className="py-16 text-center text-xs font-mono text-neutral-500">
+            <div className="py-12 text-center text-xs font-mono text-neutral-500">
               NO SESSIONS RECORDED YET
             </div>
           )}
         </div>
 
-        {/* Benchmark Rating Line Chart */}
-        <div className="glass-card rounded-[24px] p-8 space-y-6">
-          <h3 className="font-syne font-extrabold text-sm text-pink uppercase tracking-widest flex items-center gap-2">
-            <Award className="w-4 h-4 text-pink" /> BENCHMARK RATING PROGRESSION
+        {/* Benchmark Progression Line Chart */}
+        <div className="bg-[#141414] border border-[#262626] rounded-[12px] p-8 space-y-6">
+          <h3 className="font-mono text-xs text-pink uppercase tracking-widest">
+            BENCHMARK RATING PROGRESSION
           </h3>
           {benchmarkChartData.length > 0 ? (
             <div className="h-64 w-full">
@@ -301,20 +291,20 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
                   <YAxis stroke="#666666" fontSize={10} tickLine={false} domain={[0, 1000]} />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: '#0a0a0d',
+                      backgroundColor: '#0d0d0d',
                       borderColor: themeAccentColor,
-                      borderRadius: '14px',
+                      borderRadius: '12px',
                       color: '#ffffff',
                       fontSize: '12px',
-                      fontFamily: 'Outfit',
+                      fontFamily: 'Space Grotesk',
                     }}
                   />
-                  <Line type="monotone" dataKey="score" stroke={themeAccentColor} strokeWidth={3} dot={{ fill: themeAccentColor, r: 5 }} />
+                  <Line type="monotone" dataKey="score" stroke={themeAccentColor} strokeWidth={3} dot={{ fill: themeAccentColor, r: 4 }} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
           ) : (
-            <div className="py-16 text-center text-xs font-mono text-neutral-500">
+            <div className="py-12 text-center text-xs font-mono text-neutral-500">
               NO BENCHMARK TESTS COMPLETED YET
             </div>
           )}

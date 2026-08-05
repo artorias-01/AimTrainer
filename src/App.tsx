@@ -87,7 +87,7 @@ export function App() {
   };
 
   return (
-    <div className="relative min-h-screen bg-[#030303] text-white flex flex-col font-sans-ui selection:bg-pink selection:text-[#0d0d0d]">
+    <div className="relative min-h-screen bg-[#0d0d0d] text-white flex flex-col font-sans-ui selection:bg-pink selection:text-[#0d0d0d]">
       {/* 3D Intro Transition (played once per session) */}
       {showIntro && <IntroTransition onComplete={() => setShowIntro(false)} />}
 
@@ -105,13 +105,7 @@ export function App() {
       {activePage !== 'arena' && activePage !== 'landing' && <ParticleBackground />}
 
       {/* Persistent Global Header Navbar */}
-      {activePage !== 'arena' && (
-        <Navbar
-          activePage={activePage}
-          onNavigate={handleNavigate}
-          onOpenCommandPalette={() => setShowCommandPalette(true)}
-        />
-      )}
+      {activePage !== 'arena' && <Navbar activePage={activePage} onNavigate={handleNavigate} />}
 
       {/* Main Game Content Area */}
       <main className="relative z-10 flex-1 w-full">

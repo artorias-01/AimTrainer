@@ -73,112 +73,119 @@ export const LiveHUD: React.FC = () => {
       {/* Top Header Section */}
       <div className="flex items-start justify-between">
         {/* Top-Left Stack: Scenario Info + Motion-inspired Floating Stats Card */}
-        <div className="flex flex-col gap-2.5 max-w-xs">
+        <div className="flex flex-col gap-3 max-w-xs">
           {/* Current Scenario Header */}
-          <div className="flex flex-col bg-[#0d0d0d]/90 text-white px-5 py-3 rounded-[12px] border border-[#262626] backdrop-blur-md">
-            <div className="flex items-center justify-between font-mono text-[10px] tracking-widest text-accent uppercase">
-              <span>CURRENT SCENARIO</span>
-              <span className="text-[9px] text-neutral-500 font-bold bg-[#141414] px-2 py-0.5 rounded-[6px] border border-[#262626]">
-                {pauseKey} to pause
+          <div className="-skew-x-6 bg-[#0d0d0d]/95 text-white px-5 py-3 border-2 border-pink/60 shadow-[4px_4px_0_0_#000] backdrop-blur-md">
+            <div className="skew-x-6 flex flex-col">
+              <div className="flex items-center justify-between font-mono text-[10px] tracking-widest text-accent uppercase font-bold">
+                <span>CURRENT SCENARIO</span>
+                <span className="text-[9px] text-neutral-400 font-bold bg-[#181818] px-2 py-0.5 border border-[#333]">
+                  {pauseKey} to pause
+                </span>
+              </div>
+              <span className="font-display font-black text-lg text-white uppercase tracking-wide">
+                {activeScenario.name}
               </span>
             </div>
-            <span className="font-display font-extrabold text-lg text-white">
-              {activeScenario.name}
-            </span>
           </div>
 
-          {/* Compact Floating Stats Card - Category Driven */}
+          {/* Compact Floating Stats Card - Persona Slanted Style */}
           <motion.div
             initial={performanceMode ? false : { opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.35, ease: 'easeOut' }}
-            className="bg-[#0d0d0d]/95 backdrop-blur-md border border-[#262626] border-l-2 border-l-accent rounded-[12px] p-3.5 flex items-center justify-between gap-3 text-xs font-mono shadow-lg"
+            className="-skew-x-6 bg-[#0d0d0d]/95 backdrop-blur-md border-2 border-[#262626] border-l-4 border-l-pink p-3.5 shadow-[4px_4px_0_0_#000]"
           >
-            {isTrackingMode ? (
-              <>
-                <div className="flex flex-col">
-                  <span className="text-[9px] text-neutral-400 font-bold uppercase">TIME ON TARGET</span>
-                  <span className="font-extrabold text-white text-sm">
-                    {timeTrackedSec.toFixed(1)}s
-                  </span>
-                </div>
+            <div className="skew-x-6 flex items-center justify-between gap-3 text-xs font-mono">
+              {isTrackingMode ? (
+                <>
+                  <div className="flex flex-col">
+                    <span className="text-[9px] text-neutral-400 font-bold uppercase">TIME ON TARGET</span>
+                    <span className="font-extrabold text-white text-sm">
+                      {timeTrackedSec.toFixed(1)}s
+                    </span>
+                  </div>
 
-                <div className="h-6 w-px bg-[#262626]" />
+                  <div className="h-6 w-px bg-[#262626]" />
 
-                <div className="flex flex-col">
-                  <span className="text-[9px] text-neutral-400 font-bold uppercase">LOCK STREAK</span>
-                  <span className="font-extrabold text-neutral-300 text-sm">
-                    {currentStreakSec.toFixed(1)}s
-                  </span>
-                </div>
+                  <div className="flex flex-col">
+                    <span className="text-[9px] text-neutral-400 font-bold uppercase">LOCK STREAK</span>
+                    <span className="font-extrabold text-neutral-300 text-sm">
+                      {currentStreakSec.toFixed(1)}s
+                    </span>
+                  </div>
 
-                <div className="h-6 w-px bg-[#262626]" />
+                  <div className="h-6 w-px bg-[#262626]" />
 
-                <div className="flex flex-col">
-                  <span className="text-[9px] text-accent font-bold uppercase">TARGET LOCK</span>
-                  <span className="font-extrabold text-accent text-sm">
-                    <AnimatedNumber value={liveTrackingAcc} />%
-                  </span>
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="flex flex-col">
-                  <span className="text-[9px] text-neutral-400 font-bold uppercase">HITS</span>
-                  <span className="font-extrabold text-white text-sm">
-                    <AnimatedNumber value={hits} />
-                  </span>
-                </div>
+                  <div className="flex flex-col">
+                    <span className="text-[9px] text-pink font-bold uppercase">TARGET LOCK</span>
+                    <span className="font-extrabold text-pink text-sm">
+                      <AnimatedNumber value={liveTrackingAcc} />%
+                    </span>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="flex flex-col">
+                    <span className="text-[9px] text-neutral-400 font-bold uppercase">HITS</span>
+                    <span className="font-extrabold text-white text-sm">
+                      <AnimatedNumber value={hits} />
+                    </span>
+                  </div>
 
-                <div className="h-6 w-px bg-[#262626]" />
+                  <div className="h-6 w-px bg-[#262626]" />
 
-                <div className="flex flex-col">
-                  <span className="text-[9px] text-neutral-400 font-bold uppercase">MISSES</span>
-                  <span className="font-extrabold text-neutral-400 text-sm">
-                    <AnimatedNumber value={misses} />
-                  </span>
-                </div>
+                  <div className="flex flex-col">
+                    <span className="text-[9px] text-neutral-400 font-bold uppercase">MISSES</span>
+                    <span className="font-extrabold text-neutral-400 text-sm">
+                      <AnimatedNumber value={misses} />
+                    </span>
+                  </div>
 
-                <div className="h-6 w-px bg-[#262626]" />
+                  <div className="h-6 w-px bg-[#262626]" />
 
-                <div className="flex flex-col">
-                  <span className="text-[9px] text-accent font-bold uppercase">ACCURACY</span>
-                  <span className="font-extrabold text-accent text-sm">
-                    <AnimatedNumber value={accuracy} />%
-                  </span>
-                </div>
-              </>
-            )}
+                  <div className="flex flex-col">
+                    <span className="text-[9px] text-pink font-bold uppercase">ACCURACY</span>
+                    <span className="font-extrabold text-pink text-sm">
+                      <AnimatedNumber value={accuracy} />%
+                    </span>
+                  </div>
+                </>
+              )}
+            </div>
           </motion.div>
-
         </div>
 
         {/* Top-Right Prominent Metrics Grid */}
         <div className="flex items-center gap-3">
           {/* Timer - Primary Prominent */}
-          <div className="flex items-center gap-2.5 bg-[#0d0d0d]/90 backdrop-blur-md text-white px-4 py-2.5 rounded-[12px] border border-pink/40 shadow-sm">
-            <Timer className="w-4 h-4 text-pink" />
-            <div className="flex flex-col">
-              <span className="text-[9px] font-mono text-neutral-400">TIME</span>
-              <span className="font-mono font-extrabold text-lg text-white">{formatTime(timeLeft)}</span>
+          <div className="-skew-x-6 flex items-center gap-2.5 bg-[#0d0d0d]/95 backdrop-blur-md text-white px-4 py-2.5 border-2 border-pink/50 shadow-[4px_4px_0_0_#000]">
+            <div className="skew-x-6 flex items-center gap-2.5">
+              <Timer className="w-4 h-4 text-pink" />
+              <div className="flex flex-col">
+                <span className="text-[9px] font-mono text-neutral-400 font-bold">TIME</span>
+                <span className="font-mono font-extrabold text-lg text-white">{formatTime(timeLeft)}</span>
+              </div>
             </div>
           </div>
 
           {/* Live Score - Primary Prominent */}
-          <div className="flex items-center gap-2.5 bg-[#0d0d0d]/90 backdrop-blur-md text-white px-5 py-2.5 rounded-[12px] border border-pink shadow-sm">
-            <Zap className="w-4 h-4 text-pink" />
-            <div className="flex flex-col">
-              <span className="text-[9px] font-mono text-pink">SCORE</span>
-              <span className="font-mono font-extrabold text-xl text-white tracking-wider">
-                <AnimatedNumber value={score} />
-              </span>
+          <div className="-skew-x-6 flex items-center gap-2.5 bg-[#0d0d0d]/95 backdrop-blur-md text-white px-5 py-2.5 border-2 border-pink shadow-[4px_4px_0_0_var(--accent-color)]">
+            <div className="skew-x-6 flex items-center gap-2.5">
+              <Zap className="w-4 h-4 text-pink" />
+              <div className="flex flex-col">
+                <span className="text-[9px] font-mono text-pink font-bold">SCORE</span>
+                <span className="font-mono font-extrabold text-xl text-white tracking-wider">
+                  <AnimatedNumber value={score} />
+                </span>
+              </div>
             </div>
           </div>
 
-          {/* Streak Combo */}
+          {/* Streak Combo - Persona Style */}
           {streak > 2 && (
-            <div className="flex items-center justify-center bg-pink text-[#0d0d0d] px-3.5 py-2.5 rounded-[12px] font-mono font-extrabold text-xs tracking-wider animate-bounce">
-              <span>{streak}X STREAK</span>
+            <div className="-skew-x-6 flex items-center justify-center bg-pink text-[#0d0d0d] px-4 py-2.5 border-2 border-[#0d0d0d] font-mono font-black text-xs tracking-wider animate-bounce shadow-[4px_4px_0_0_#000]">
+              <span className="skew-x-6">{streak}X STREAK!</span>
             </div>
           )}
 
@@ -190,9 +197,11 @@ export const LiveHUD: React.FC = () => {
                 pauseSession();
               }}
               onMouseEnter={() => soundManager.playHover()}
-              className="pointer-events-auto bg-[#0d0d0d]/90 hover:bg-pink hover:text-[#0d0d0d] text-white p-3 rounded-[12px] border border-[#262626] hover:border-pink transition-all duration-150 active:scale-95 backdrop-blur-md"
+              className="pointer-events-auto -skew-x-6 bg-[#0d0d0d]/95 hover:bg-pink hover:text-[#0d0d0d] text-white p-3 border-2 border-[#262626] hover:border-pink transition-all duration-150 active:scale-95 shadow-[3px_3px_0_0_#000] backdrop-blur-md"
             >
-              <Pause className="w-4 h-4" />
+              <div className="skew-x-6">
+                <Pause className="w-4 h-4" />
+              </div>
             </button>
           )}
         </div>
@@ -200,12 +209,12 @@ export const LiveHUD: React.FC = () => {
 
       {/* Countdown Overlay */}
       {status === 'countdown' && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/80 backdrop-blur-sm z-30 transition-all duration-200">
-          <div className="flex flex-col items-center gap-4">
-            <span className="font-display text-8xl md:text-9xl font-extrabold text-pink animate-pulse drop-shadow-lg">
+        <div className="absolute inset-0 flex items-center justify-center bg-black/85 backdrop-blur-md z-30 transition-all duration-200 bg-persona-dots">
+          <div className="flex flex-col items-center gap-4 -skew-x-6 bg-[#0d0d0d] border-4 border-pink p-8 shadow-[8px_8px_0_0_#000]">
+            <span className="skew-x-6 font-display text-8xl md:text-9xl font-black text-pink animate-pulse drop-shadow-[4px_4px_0_#000]">
               {countdown}
             </span>
-            <span className="font-mono text-sm tracking-widest text-white uppercase">
+            <span className="skew-x-6 font-mono text-sm tracking-widest text-white uppercase font-extrabold bg-pink text-[#0d0d0d] px-4 py-1">
               GET READY // TARGETS SPAWNING
             </span>
           </div>

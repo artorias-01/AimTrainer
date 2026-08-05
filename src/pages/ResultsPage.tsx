@@ -259,23 +259,31 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ onNavigate }) => {
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Left Column: Grade Card & Score Breakdown (5 Cols) */}
         <div className="lg:col-span-5 space-y-6">
-          {/* Grade Card */}
-          <div className="bg-[#141414] border border-[#262626] rounded-[12px] p-8 flex items-center justify-between">
-            <div className="space-y-2">
-              <span className="text-xs font-mono text-neutral-400">PERFORMANCE RATING</span>
-              <div className="font-display font-extrabold text-6xl md:text-7xl text-white">
+          {/* Persona Grade Card */}
+          <div className="-skew-x-6 bg-[#141414] border-2 border-pink/60 p-8 flex items-center justify-between shadow-[6px_6px_0_0_#000] relative overflow-hidden bg-persona-dots">
+            <div className="skew-x-6 space-y-2 relative z-10">
+              <span className="text-xs font-mono font-bold text-pink uppercase tracking-widest block bg-[#0d0d0d] px-2 py-0.5 border border-pink/30 w-fit">
+                PERFORMANCE RATING
+              </span>
+              <div className="font-display font-black text-6xl md:text-7xl text-white drop-shadow-[4px_4px_0_#000]">
                 {summary.score.toLocaleString()}
               </div>
-              <span className="text-xs font-mono text-neutral-400 block">
+              <span className="text-xs font-mono text-neutral-400 font-bold block">
                 {isTrackingMode
                   ? `TIME ON TARGET: ${summary.accuracy}%`
                   : `${summary.hits} HITS // ${summary.misses} MISSES`}
               </span>
             </div>
 
-            <div className="w-24 h-24 rounded-[12px] bg-pink text-[#0d0d0d] flex items-center justify-center font-display font-extrabold text-5xl shrink-0">
-              {summary.grade}
-            </div>
+            {/* Persona Starburst Grade Badge */}
+            <motion.div
+              initial={{ scale: 0.3, rotate: -20, opacity: 0 }}
+              animate={{ scale: 1, rotate: -6, opacity: 1 }}
+              transition={{ type: 'spring', stiffness: 260, damping: 18 }}
+              className="w-28 h-28 bg-pink text-[#0d0d0d] border-4 border-[#0d0d0d] flex items-center justify-center font-display font-black text-6xl shrink-0 shadow-[6px_6px_0_0_#000] relative z-10"
+            >
+              <span className="skew-x-6">{summary.grade}</span>
+            </motion.div>
           </div>
 
           {/* Detailed Metrics Table - Category Aware */}
