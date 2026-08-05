@@ -108,15 +108,15 @@ export function App() {
       {/* Persistent Global Header Navbar */}
       {activePage !== 'arena' && <Navbar activePage={activePage} onNavigate={handleNavigate} />}
 
-      {/* Main Game Content Area with React Bits style Smooth Page Route Transitions */}
+      {/* Main Game Content Area with High-Performance 60FPS Page Route Transitions */}
       <main className="relative z-10 flex-1 w-full overflow-hidden">
         <AnimatePresence mode="wait">
           <motion.div
             key={activePage}
-            initial={{ opacity: 0, y: 12, scale: 0.985, filter: 'blur(4px)' }}
-            animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
-            exit={{ opacity: 0, y: -12, scale: 0.985, filter: 'blur(4px)' }}
-            transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.15, ease: 'easeOut' }}
             className="w-full h-full"
           >
             {activePage === 'landing' && <LandingPage onNavigate={handleNavigate} />}
