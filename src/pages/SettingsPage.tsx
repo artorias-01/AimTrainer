@@ -9,7 +9,6 @@ import { soundManager } from '../utils/audio';
 import { saveCustomBackgroundImage, clearCustomBackgroundImage } from '../utils/db';
 import {
   Sliders,
-  Crosshair,
   Volume2,
   VolumeX,
   User,
@@ -238,57 +237,53 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
         {activeCategory === null ? (
           <motion.div
             key="options-landing"
-            initial={{ opacity: 0, y: 6 }}
+            initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -6 }}
-            transition={{ duration: 0.15, ease: 'easeOut' }}
-            className="max-w-md mx-auto text-center space-y-8 py-8"
+            exit={{ opacity: 0, y: -15 }}
+            transition={{ duration: 0.2 }}
+            className="max-w-md mx-auto text-center space-y-10 py-12"
           >
             {/* Options Title & Ornamental Line Divider */}
-            <div className="space-y-3">
-              <h1 className="font-display font-extrabold text-4xl md:text-5xl tracking-wider text-white">
+            <div className="space-y-4">
+              <h1 className="font-display font-extrabold text-4xl md:text-6xl tracking-wider text-white">
                 OPTIONS
               </h1>
-              <div className="flex items-center justify-center gap-3 w-40 mx-auto opacity-75">
+              <div className="flex items-center justify-center gap-3 w-48 mx-auto opacity-75">
                 <div className="h-px bg-gradient-to-r from-transparent to-pink flex-1" />
                 <span className="text-pink text-xs font-mono">◆</span>
                 <div className="h-px bg-gradient-to-l from-transparent to-pink flex-1" />
               </div>
             </div>
 
-            {/* Vertical Editorial Option Cards */}
-            <div className="flex flex-col gap-3 max-w-sm mx-auto py-2">
+            {/* Vertical Text-First Menu List */}
+            <div className="flex flex-col items-center gap-6 py-2">
               {[
-                { id: 'game', label: 'GAME & SENSITIVITY', icon: Sliders },
-                { id: 'crosshair', label: 'CROSSHAIR STUDIO', icon: Crosshair },
-                { id: 'audio', label: 'AUDIO & SOUNDS', icon: Volume2 },
-                { id: 'video', label: 'GRAPHICS & BACKDROP', icon: Tv },
-                { id: 'controls', label: 'CONTROLS & KEYBINDS', icon: Gamepad2 },
-              ].map((cat) => {
-                const IconComp = cat.icon;
-                return (
-                  <button
-                    key={cat.id}
-                    onClick={() => {
-                      soundManager.playClick();
-                      setActiveCategory(cat.id as any);
-                    }}
-                    onMouseEnter={() => soundManager.playHover()}
-                    className="group w-full px-5 py-3.5 rounded-[12px] bg-[#121212]/90 border border-[#262626] hover:border-pink hover:bg-pink/10 font-display font-bold text-sm tracking-wider text-neutral-200 hover:text-white flex items-center justify-between transition-all duration-150 active:scale-[0.98] focus:outline-none"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-[8px] bg-[#1a1a1a] text-pink group-hover:bg-pink group-hover:text-[#0d0d0d] flex items-center justify-center transition-colors">
-                        <IconComp className="w-4 h-4" />
-                      </div>
-                      <span className="uppercase text-left">{cat.label}</span>
-                    </div>
-                    <span className="text-pink font-mono text-sm group-hover:translate-x-1 transition-transform duration-150">→</span>
-                  </button>
-                );
-              })}
+                { id: 'game', label: 'GAME' },
+                { id: 'crosshair', label: 'CROSSHAIR' },
+                { id: 'audio', label: 'AUDIO' },
+                { id: 'video', label: 'VIDEO' },
+                { id: 'controls', label: 'CONTROLS' },
+              ].map((cat) => (
+                <button
+                  key={cat.id}
+                  onClick={() => {
+                    soundManager.playClick();
+                    setActiveCategory(cat.id as any);
+                  }}
+                  onMouseEnter={() => soundManager.playHover()}
+                  className="group relative font-display font-extrabold text-xl md:text-3xl tracking-widest text-neutral-300 hover:text-pink transition-colors duration-200 py-1 flex items-center justify-center gap-3 focus:outline-none"
+                >
+                  <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-pink font-mono text-base">‹</span>
+                  <span className="relative">
+                    {cat.label}
+                    <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-pink group-hover:w-full transition-all duration-250 ease-out" />
+                  </span>
+                  <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-pink font-mono text-base">›</span>
+                </button>
+              ))}
 
               {/* BACK Option */}
-              <div className="pt-4">
+              <div className="pt-8">
                 <button
                   onClick={() => {
                     soundManager.playClick();
@@ -299,9 +294,14 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
                     }
                   }}
                   onMouseEnter={() => soundManager.playHover()}
-                  className="w-full py-3 rounded-[12px] bg-[#141414] border border-[#262626] hover:border-neutral-500 font-display font-bold text-xs tracking-widest text-neutral-400 hover:text-white transition-all active:scale-[0.98]"
+                  className="group relative font-display font-bold text-lg md:text-2xl tracking-widest text-neutral-400 hover:text-white transition-colors duration-200 py-1 flex items-center justify-center gap-2 focus:outline-none"
                 >
-                  ← RETURN TO MAIN MENU
+                  <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-pink font-mono text-sm">‹</span>
+                  <span className="relative">
+                    BACK
+                    <span className="absolute bottom-0 left-0 w-0 h-[1.5px] bg-pink group-hover:w-full transition-all duration-250 ease-out" />
+                  </span>
+                  <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-pink font-mono text-sm">›</span>
                 </button>
               </div>
             </div>
@@ -310,14 +310,14 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
           /* LEVEL 2: SUB-CATEGORY SETTINGS CONTENT VIEW */
           <motion.div
             key={`category-${activeCategory}`}
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -6 }}
-            transition={{ duration: 0.15, ease: 'easeOut' }}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.2 }}
             className="max-w-4xl mx-auto space-y-8"
           >
-            {/* Category Breadcrumb & Quick Switch Bar */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-[#262626] pb-4 gap-4">
+            {/* Category Breadcrumb Bar */}
+            <div className="flex items-center justify-between border-b border-[#262626] pb-4">
               <div className="flex items-center gap-3 font-mono text-xs text-neutral-400">
                 <button
                   onClick={() => {
@@ -333,34 +333,16 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
                 <span className="text-white font-bold uppercase tracking-widest">{activeCategory}</span>
               </div>
 
-              {/* Quick Tab Switcher */}
-              <div className="flex items-center gap-1 overflow-x-auto py-1">
-                {[
-                  { id: 'game', label: 'GAME' },
-                  { id: 'crosshair', label: 'CROSSHAIR' },
-                  { id: 'audio', label: 'AUDIO' },
-                  { id: 'video', label: 'VIDEO' },
-                  { id: 'controls', label: 'CONTROLS' },
-                ].map((tab) => (
-                  <button
-                    key={tab.id}
-                    onClick={() => {
-                      if (activeCategory !== tab.id) {
-                        soundManager.playClick();
-                        setActiveCategory(tab.id as any);
-                      }
-                    }}
-                    onMouseEnter={() => soundManager.playHover()}
-                    className={`px-3 py-1 rounded-[8px] text-[10px] font-mono font-bold uppercase transition-all active:scale-95 ${
-                      activeCategory === tab.id
-                        ? 'bg-pink text-[#0d0d0d] shadow-sm'
-                        : 'bg-[#141414] text-neutral-400 hover:text-white border border-[#262626]'
-                    }`}
-                  >
-                    {tab.label}
-                  </button>
-                ))}
-              </div>
+              <button
+                onClick={() => {
+                  soundManager.playClick();
+                  setActiveCategory(null);
+                }}
+                onMouseEnter={() => soundManager.playHover()}
+                className="text-xs font-mono text-neutral-400 hover:text-pink transition-colors"
+              >
+                RETURN TO CATEGORIES
+              </button>
             </div>
 
             {/* CATEGORY 1: GAME */}

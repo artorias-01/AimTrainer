@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { Navbar } from './components/ui/Navbar';
 import { Footer } from './components/ui/Footer';
 import { ParticleBackground } from './components/ui/ParticleBackground';
@@ -108,25 +107,14 @@ export function App() {
       {/* Persistent Global Header Navbar */}
       {activePage !== 'arena' && <Navbar activePage={activePage} onNavigate={handleNavigate} />}
 
-      {/* Main Game Content Area with High-Performance 60FPS Page Route Transitions */}
-      <main className="relative z-10 flex-1 w-full overflow-hidden">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activePage}
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -6 }}
-            transition={{ duration: 0.15, ease: 'easeOut' }}
-            className="w-full h-full"
-          >
-            {activePage === 'landing' && <LandingPage onNavigate={handleNavigate} />}
-            {activePage === 'library' && <LibraryPage onNavigate={handleNavigate} />}
-            {activePage === 'arena' && <ArenaPage onNavigate={handleNavigate} />}
-            {activePage === 'results' && <ResultsPage onNavigate={handleNavigate} />}
-            {activePage === 'dashboard' && <DashboardPage onNavigate={handleNavigate} />}
-            {activePage === 'settings' && <SettingsPage onNavigate={handleNavigate} />}
-          </motion.div>
-        </AnimatePresence>
+      {/* Main Game Content Area */}
+      <main className="relative z-10 flex-1 w-full">
+        {activePage === 'landing' && <LandingPage onNavigate={handleNavigate} />}
+        {activePage === 'library' && <LibraryPage onNavigate={handleNavigate} />}
+        {activePage === 'arena' && <ArenaPage onNavigate={handleNavigate} />}
+        {activePage === 'results' && <ResultsPage onNavigate={handleNavigate} />}
+        {activePage === 'dashboard' && <DashboardPage onNavigate={handleNavigate} />}
+        {activePage === 'settings' && <SettingsPage onNavigate={handleNavigate} />}
       </main>
 
       {/* Persistent Global Footer */}
