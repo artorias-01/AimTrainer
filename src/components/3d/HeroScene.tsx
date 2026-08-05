@@ -3,51 +3,12 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useSettingsStore } from '../../store/useSettingsStore';
 
-interface CameraControllerProps {
-  scrollProgress: number;
-}
-
-const CameraController: React.FC<CameraControllerProps> = ({ scrollProgress }) => {
-  useFrame(({ camera, pointer }) => {
-    let targetX = 0;
-    let targetY = 0;
-    let targetZ = 7.0;
-
-    if (scrollProgress <= 0.33) {
-      const p = scrollProgress / 0.33;
-      targetX = THREE.MathUtils.lerp(0, 1.4, p);
-      targetY = THREE.MathUtils.lerp(0, -0.7, p);
-      targetZ = THREE.MathUtils.lerp(7.0, 4.0, p);
-    } else if (scrollProgress <= 0.66) {
-      const p = (scrollProgress - 0.33) / 0.33;
-      targetX = THREE.MathUtils.lerp(1.4, -2.4, p);
-      targetY = THREE.MathUtils.lerp(-0.7, 0.5, p);
-      targetZ = THREE.MathUtils.lerp(4.0, 5.6, p);
-    } else {
-      const p = (scrollProgress - 0.66) / 0.34;
-      targetX = THREE.MathUtils.lerp(-2.4, 0, p);
-      targetY = THREE.MathUtils.lerp(0.5, -0.2, p);
-      targetZ = THREE.MathUtils.lerp(5.6, 6.2, p);
-    }
-
-    const px = pointer.x * 0.4;
-    const py = pointer.y * 0.4;
-
-    camera.position.x = THREE.MathUtils.lerp(camera.position.x, targetX + px, 0.08);
-    camera.position.y = THREE.MathUtils.lerp(camera.position.y, targetY + py, 0.08);
-    camera.position.z = THREE.MathUtils.lerp(camera.position.z, targetZ, 0.08);
-    camera.lookAt(0, -0.5, 0);
-  });
-
-  return null;
-};
-
-const AmbientParticles: React.FC<{ scrollProgress: number }> = ({ scrollProgress }) => {
+const AmbientParticles: React.FC = () => {
   const pointsRef = useRef<THREE.Points>(null);
   const themeAccentColor = useSettingsStore((s) => s.themeAccentColor) || '#f5b8c9';
 
   const [positions, colors] = useMemo(() => {
-    const count = 110;
+    const count = 140;
     const pos = new Float32Array(count * 3);
     const col = new Float32Array(count * 3);
     const accentHex = new THREE.Color(themeAccentColor);
@@ -58,7 +19,7 @@ const AmbientParticles: React.FC<{ scrollProgress: number }> = ({ scrollProgress
       pos[i * 3 + 1] = (Math.random() - 0.5) * 12 - 1;
       pos[i * 3 + 2] = (Math.random() - 0.5) * 10 - 2;
 
-      const mixCol = Math.random() > 0.4 ? accentHex : whiteHex;
+      const mixCol = Math.random() > 0.35 ? accentHex : whiteHex;
       col[i * 3] = mixCol.r;
       col[i * 3 + 1] = mixCol.g;
       col[i * 3 + 2] = mixCol.b;
@@ -66,12 +27,11 @@ const AmbientParticles: React.FC<{ scrollProgress: number }> = ({ scrollProgress
     return [pos, col];
   }, [themeAccentColor]);
 
-  useFrame(({ clock }) => {
+  useFrame(({ clock, pointer }) => {
     if (pointsRef.current) {
       const t = clock.getElapsedTime();
-      const speedMult = 0.03 + scrollProgress * 0.06;
-      pointsRef.current.rotation.y = t * speedMult;
-      pointsRef.current.rotation.x = Math.sin(t * 0.05) * 0.03;
+      pointsRef.current.rotation.y = t * 0.02 + pointer.x * 0.05;
+      pointsRef.current.rotation.x = Math.sin(t * 0.04) * 0.02 - pointer.y * 0.05;
     }
   });
 
@@ -92,7 +52,73 @@ const AmbientParticles: React.FC<{ scrollProgress: number }> = ({ scrollProgress
   );
 };
 
-const OrbCluster: React.FC<{ scrollProgress: number }> = ({ scrollProgress }) => {
+const ArmillaryRings: React.FC = () => {
+  const ring1Ref = useRef<THREE.Mesh>(null);
+  const ring2Ref = useRef<THREE.Mesh>(null);
+  const ring3Ref = useRef<THREE.Mesh>(null);
+  const themeAccentColor = useSettingsStore((s) => s.themeAccentColor) || '#f5b8c9';
+
+  useFrame(({ clock }) => {
+    const t = clock.getElapsedTime();
+    if (ring1Ref.current) {
+      ring1Ref.current.rotation.z = t * 0.15;
+      ring1Ref.current.rotation.y = t * 0.08;
+    }
+    if (ring2Ref.current) {
+      ring2Ref.current.rotation.x = t * 0.12;
+      ring2Ref.current.rotation.z = -t * 0.1;
+    }
+    if (ring3Ref.current) {
+      ring3Ref.current.rotation.y = -t * 0.14;
+      ring3Ref.current.rotation.x = t * 0.09;
+    }
+  });
+
+  return (
+    <group position={[0, -1.2, -0.5]}>
+      {/* Outer Ethereal Celestial Ring */}
+      <mesh ref={ring1Ref}>
+        <torusGeometry args={[2.6, 0.012, 16, 120]} />
+        <meshStandardMaterial
+          color={themeAccentColor}
+          emissive={themeAccentColor}
+          emissiveIntensity={0.6}
+          transparent
+          opacity={0.4}
+          roughness={0.1}
+        />
+      </mesh>
+
+      {/* Mid Armillary Ring */}
+      <mesh ref={ring2Ref} rotation={[Math.PI / 4, Math.PI / 6, 0]}>
+        <torusGeometry args={[2.1, 0.01, 16, 120]} />
+        <meshStandardMaterial
+          color="#ffffff"
+          emissive={themeAccentColor}
+          emissiveIntensity={0.4}
+          transparent
+          opacity={0.35}
+          roughness={0.1}
+        />
+      </mesh>
+
+      {/* Inner Delicate Ring */}
+      <mesh ref={ring3Ref} rotation={[-Math.PI / 3, 0, Math.PI / 4]}>
+        <torusGeometry args={[1.6, 0.008, 16, 120]} />
+        <meshStandardMaterial
+          color={themeAccentColor}
+          emissive={themeAccentColor}
+          emissiveIntensity={0.7}
+          transparent
+          opacity={0.45}
+          roughness={0.1}
+        />
+      </mesh>
+    </group>
+  );
+};
+
+const OrbCluster: React.FC = () => {
   const groupRef = useRef<THREE.Group>(null);
   const targetRef = useRef<THREE.Mesh>(null);
   const lightRef = useRef<THREE.PointLight>(null);
@@ -102,21 +128,22 @@ const OrbCluster: React.FC<{ scrollProgress: number }> = ({ scrollProgress }) =>
 
   useFrame(({ clock, pointer }) => {
     const t = clock.getElapsedTime();
-    const rotSpeed = 0.004 + scrollProgress * 0.01;
     if (groupRef.current) {
-      groupRef.current.rotation.y += rotSpeed + pointer.x * 0.008;
-      groupRef.current.rotation.x = Math.sin(t * 0.2) * 0.1 - pointer.y * 0.1;
+      // AAA smooth lerp camera tilt responding to pointer
+      groupRef.current.rotation.y = THREE.MathUtils.lerp(groupRef.current.rotation.y, pointer.x * 0.25, 0.05);
+      groupRef.current.rotation.x = THREE.MathUtils.lerp(groupRef.current.rotation.x, -pointer.y * 0.2, 0.05);
     }
     if (targetRef.current) {
-      targetRef.current.position.x = Math.sin(t * 1.0 + scrollProgress * Math.PI) * (1.1 + scrollProgress * 0.5);
+      // Smooth floating motion baseline y = -1.2
+      targetRef.current.position.x = Math.sin(t * 1.0) * 1.1;
       targetRef.current.position.y = -1.2 + Math.cos(t * 1.5) * 0.35;
       if (targetShapeConfig?.idleRotation !== false) {
-        targetRef.current.rotation.y = t * (0.8 + scrollProgress * 1.0);
+        targetRef.current.rotation.y = t * 0.8;
         targetRef.current.rotation.x = t * 0.4;
       }
     }
     if (lightRef.current) {
-      lightRef.current.intensity = 1.8 + Math.sin(t * 2.5 + scrollProgress * 4) * 0.8;
+      lightRef.current.intensity = 2.0 + Math.sin(t * 2.5) * 0.7;
     }
   });
 
@@ -125,7 +152,10 @@ const OrbCluster: React.FC<{ scrollProgress: number }> = ({ scrollProgress }) =>
 
   return (
     <group ref={groupRef}>
-      <pointLight ref={lightRef} position={[0, -1, 3]} intensity={2.0} color={themeAccentColor} />
+      <pointLight ref={lightRef} position={[0, -1, 3]} intensity={2.2} color={themeAccentColor} />
+
+      {/* Armillary Orbital Rings */}
+      <ArmillaryRings />
 
       {/* Central Hero Dynamic Target Geometry */}
       <mesh ref={targetRef} position={[0, -1.2, 0]}>
@@ -148,13 +178,13 @@ const OrbCluster: React.FC<{ scrollProgress: number }> = ({ scrollProgress }) =>
           color={targetColor}
           wireframe={wireframe}
           roughness={0.15}
-          metalness={0.3}
+          metalness={0.35}
           emissive={targetColor === '#ffffff' ? themeAccentColor : targetColor}
-          emissiveIntensity={emissiveIntensity ?? 0.6}
+          emissiveIntensity={emissiveIntensity ?? 0.65}
         />
       </mesh>
 
-      {/* Orbiting Target Objects */}
+      {/* Orbiting Editorial Target Objects */}
       {[
         [-2.8, 0.8, -1],
         [3.0, -2.4, 0.5],
@@ -192,35 +222,33 @@ const OrbCluster: React.FC<{ scrollProgress: number }> = ({ scrollProgress }) =>
       })}
 
       {/* Ambient Floating Particle Dust */}
-      <AmbientParticles scrollProgress={scrollProgress} />
+      <AmbientParticles />
 
       {/* Editorial Grid Floor */}
-      <gridHelper args={[26, 26, themeAccentColor, '#262626']} position={[0, -4, 0]} />
+      <gridHelper args={[24, 24, themeAccentColor, '#262626']} position={[0, -4, 0]} />
     </group>
   );
 };
 
 interface HeroSceneProps {
   className?: string;
-  scrollProgress?: number;
 }
 
-export const HeroScene: React.FC<HeroSceneProps> = ({ className, scrollProgress = 0 }) => {
+export const HeroScene: React.FC<HeroSceneProps> = ({ className }) => {
   const themeAccentColor = useSettingsStore((s) => s.themeAccentColor) || '#f5b8c9';
 
   return (
     <div
       className={
         className ||
-        'w-full h-full rounded-[12px] overflow-hidden bg-[#0d0d0d] relative pointer-events-none'
+        'w-full h-full min-h-[420px] rounded-[12px] overflow-hidden bg-[#0d0d0d] relative pointer-events-none'
       }
     >
       <Canvas camera={{ position: [0, 0, 7], fov: 50 }} dpr={[1, 1.5]}>
         <ambientLight intensity={1.5} />
         <directionalLight position={[10, 10, 10]} intensity={2.0} color="#ffffff" />
         <pointLight position={[-10, -10, -5]} intensity={1.5} color={themeAccentColor} />
-        <CameraController scrollProgress={scrollProgress} />
-        <OrbCluster scrollProgress={scrollProgress} />
+        <OrbCluster />
       </Canvas>
     </div>
   );
