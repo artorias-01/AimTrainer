@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Navbar } from './components/ui/Navbar';
 import { Footer } from './components/ui/Footer';
 import { ParticleBackground } from './components/ui/ParticleBackground';
@@ -107,14 +108,25 @@ export function App() {
       {/* Persistent Global Header Navbar */}
       {activePage !== 'arena' && <Navbar activePage={activePage} onNavigate={handleNavigate} />}
 
-      {/* Main Game Content Area */}
-      <main className="relative z-10 flex-1 w-full">
-        {activePage === 'landing' && <LandingPage onNavigate={handleNavigate} />}
-        {activePage === 'library' && <LibraryPage onNavigate={handleNavigate} />}
-        {activePage === 'arena' && <ArenaPage onNavigate={handleNavigate} />}
-        {activePage === 'results' && <ResultsPage onNavigate={handleNavigate} />}
-        {activePage === 'dashboard' && <DashboardPage onNavigate={handleNavigate} />}
-        {activePage === 'settings' && <SettingsPage onNavigate={handleNavigate} />}
+      {/* Main Game Content Area with React Bits style Smooth Page Route Transitions */}
+      <main className="relative z-10 flex-1 w-full overflow-hidden">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activePage}
+            initial={{ opacity: 0, y: 12, scale: 0.985, filter: 'blur(4px)' }}
+            animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
+            exit={{ opacity: 0, y: -12, scale: 0.985, filter: 'blur(4px)' }}
+            transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+            className="w-full h-full"
+          >
+            {activePage === 'landing' && <LandingPage onNavigate={handleNavigate} />}
+            {activePage === 'library' && <LibraryPage onNavigate={handleNavigate} />}
+            {activePage === 'arena' && <ArenaPage onNavigate={handleNavigate} />}
+            {activePage === 'results' && <ResultsPage onNavigate={handleNavigate} />}
+            {activePage === 'dashboard' && <DashboardPage onNavigate={handleNavigate} />}
+            {activePage === 'settings' && <SettingsPage onNavigate={handleNavigate} />}
+          </motion.div>
+        </AnimatePresence>
       </main>
 
       {/* Persistent Global Footer */}

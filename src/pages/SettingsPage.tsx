@@ -237,35 +237,56 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
         {activeCategory === null ? (
           <motion.div
             key="options-landing"
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -15 }}
-            transition={{ duration: 0.2 }}
+            initial={{ opacity: 0, scale: 0.97, filter: 'blur(4px)' }}
+            animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
+            exit={{ opacity: 0, scale: 0.97, filter: 'blur(4px)' }}
+            transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
             className="max-w-md mx-auto text-center space-y-10 py-12"
           >
             {/* Options Title & Ornamental Line Divider */}
-            <div className="space-y-4">
+            <motion.div
+              initial={{ opacity: 0, y: -12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+              className="space-y-4"
+            >
               <h1 className="font-display font-extrabold text-4xl md:text-6xl tracking-wider text-white">
                 OPTIONS
               </h1>
               <div className="flex items-center justify-center gap-3 w-48 mx-auto opacity-75">
                 <div className="h-px bg-gradient-to-r from-transparent to-pink flex-1" />
-                <span className="text-pink text-xs font-mono">◆</span>
+                <motion.span
+                  animate={{ rotate: [0, 180, 360] }}
+                  transition={{ duration: 10, repeat: Infinity, ease: 'linear' }}
+                  className="text-pink text-xs font-mono inline-block"
+                >
+                  ◆
+                </motion.span>
                 <div className="h-px bg-gradient-to-l from-transparent to-pink flex-1" />
               </div>
-            </div>
+            </motion.div>
 
-            {/* Vertical Text-First Menu List */}
-            <div className="flex flex-col items-center gap-6 py-2">
+            {/* Vertical Text-First Menu List with Staggered Motion */}
+            <div className="flex flex-col items-center gap-5 py-2">
               {[
                 { id: 'game', label: 'GAME' },
                 { id: 'crosshair', label: 'CROSSHAIR' },
                 { id: 'audio', label: 'AUDIO' },
                 { id: 'video', label: 'VIDEO' },
                 { id: 'controls', label: 'CONTROLS' },
-              ].map((cat) => (
-                <button
+              ].map((cat, idx) => (
+                <motion.button
                   key={cat.id}
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{
+                    duration: 0.3,
+                    delay: 0.08 + idx * 0.05,
+                    type: 'spring',
+                    stiffness: 280,
+                  }}
+                  whileHover={{ scale: 1.06 }}
+                  whileTap={{ scale: 0.95 }}
                   onClick={() => {
                     soundManager.playClick();
                     setActiveCategory(cat.id as any);
@@ -273,18 +294,25 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
                   onMouseEnter={() => soundManager.playHover()}
                   className="group relative font-display font-extrabold text-xl md:text-3xl tracking-widest text-neutral-300 hover:text-pink transition-colors duration-200 py-1 flex items-center justify-center gap-3 focus:outline-none"
                 >
-                  <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-pink font-mono text-base">‹</span>
+                  <span className="opacity-0 group-hover:opacity-100 transition-all duration-200 text-pink font-mono text-base -translate-x-1 group-hover:translate-x-0">‹</span>
                   <span className="relative">
                     {cat.label}
                     <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-pink group-hover:w-full transition-all duration-250 ease-out" />
                   </span>
-                  <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-pink font-mono text-base">›</span>
-                </button>
+                  <span className="opacity-0 group-hover:opacity-100 transition-all duration-200 text-pink font-mono text-base translate-x-1 group-hover:translate-x-0">›</span>
+                </motion.button>
               ))}
 
               {/* BACK Option */}
-              <div className="pt-8">
-                <button
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.3, delay: 0.35 }}
+                className="pt-6"
+              >
+                <motion.button
+                  whileHover={{ scale: 1.04 }}
+                  whileTap={{ scale: 0.95 }}
                   onClick={() => {
                     soundManager.playClick();
                     if (onNavigate) {
@@ -302,24 +330,25 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
                     <span className="absolute bottom-0 left-0 w-0 h-[1.5px] bg-pink group-hover:w-full transition-all duration-250 ease-out" />
                   </span>
                   <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-pink font-mono text-sm">›</span>
-                </button>
-              </div>
+                </motion.button>
+              </motion.div>
             </div>
           </motion.div>
         ) : (
           /* LEVEL 2: SUB-CATEGORY SETTINGS CONTENT VIEW */
           <motion.div
             key={`category-${activeCategory}`}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.2 }}
+            initial={{ opacity: 0, x: 24, filter: 'blur(4px)' }}
+            animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
+            exit={{ opacity: 0, x: -24, filter: 'blur(4px)' }}
+            transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
             className="max-w-4xl mx-auto space-y-8"
           >
-            {/* Category Breadcrumb Bar */}
-            <div className="flex items-center justify-between border-b border-[#262626] pb-4">
+            {/* Category Breadcrumb & Quick Switch Bar */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-[#262626] pb-4 gap-4">
               <div className="flex items-center gap-3 font-mono text-xs text-neutral-400">
-                <button
+                <motion.button
+                  whileHover={{ x: -3 }}
                   onClick={() => {
                     soundManager.playClick();
                     setActiveCategory(null);
@@ -328,21 +357,41 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
                   className="text-pink hover:text-white font-bold transition-colors flex items-center gap-1.5 focus:outline-none"
                 >
                   <ArrowLeft className="w-4 h-4" /> OPTIONS
-                </button>
+                </motion.button>
                 <span>/</span>
                 <span className="text-white font-bold uppercase tracking-widest">{activeCategory}</span>
               </div>
 
-              <button
-                onClick={() => {
-                  soundManager.playClick();
-                  setActiveCategory(null);
-                }}
-                onMouseEnter={() => soundManager.playHover()}
-                className="text-xs font-mono text-neutral-400 hover:text-pink transition-colors"
-              >
-                RETURN TO CATEGORIES
-              </button>
+              {/* Quick Tab Switcher */}
+              <div className="flex items-center gap-1 overflow-x-auto py-1">
+                {[
+                  { id: 'game', label: 'GAME' },
+                  { id: 'crosshair', label: 'CROSSHAIR' },
+                  { id: 'audio', label: 'AUDIO' },
+                  { id: 'video', label: 'VIDEO' },
+                  { id: 'controls', label: 'CONTROLS' },
+                ].map((tab) => (
+                  <motion.button
+                    key={tab.id}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => {
+                      if (activeCategory !== tab.id) {
+                        soundManager.playClick();
+                        setActiveCategory(tab.id as any);
+                      }
+                    }}
+                    onMouseEnter={() => soundManager.playHover()}
+                    className={`px-3 py-1 rounded-[8px] text-[10px] font-mono font-bold uppercase transition-all ${
+                      activeCategory === tab.id
+                        ? 'bg-pink text-[#0d0d0d] shadow-sm'
+                        : 'bg-[#141414] text-neutral-400 hover:text-white border border-[#262626]'
+                    }`}
+                  >
+                    {tab.label}
+                  </motion.button>
+                ))}
+              </div>
             </div>
 
             {/* CATEGORY 1: GAME */}
