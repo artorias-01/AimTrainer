@@ -1,15 +1,15 @@
 @import "tailwindcss";
 
 :root {
-  --accent-color: #f5b8c9;
-  --accent-color-rgb: 245, 184, 201;
+  --accent-color: #00d2ff;
+  --accent-color-rgb: 0, 210, 255;
   --color-paper: #ffffff;
-  --color-ink: #0d0d0d;
+  --color-ink: #040a12;
   --color-pink: var(--accent-color);
-  --color-pink-hover: #e89ba9;
+  --color-pink-hover: #54e2ff;
   --color-pink-muted: rgba(var(--accent-color-rgb), 0.2);
-  --color-ink-muted: #1c1c1c;
-  --color-ink-border: #2a2a2a;
+  --color-ink-muted: #081424;
+  --color-ink-border: #102a4a;
   --color-paper-border: #e2e2e2;
   --radius-editorial: 12px;
 }
@@ -20,8 +20,8 @@
 }
 
 body {
-  background-color: var(--color-paper);
-  color: var(--color-ink);
+  background-color: #040a12;
+  color: #ffffff;
   font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   letter-spacing: -0.01em;
   margin: 0;
@@ -44,50 +44,59 @@ h1, h2, h3, .font-serif-display {
   letter-spacing: -0.01em;
 }
 
-/* Persona 5 / P3R Aesthetic Design Tokens & Utilities */
+/* Persona 3 Reload (P3R) Aesthetic Design Tokens & Keyframe Animations */
 .shadow-persona {
   box-shadow: 4px 4px 0px #000000 !important;
 }
 
-.shadow-persona-accent, .shadow-persona-pink {
-  box-shadow: 4px 4px 0px var(--accent-color) !important;
+.shadow-persona-accent, .shadow-persona-cyan {
+  box-shadow: 4px 4px 0px #00d2ff !important;
 }
 
-.shadow-persona-lg {
-  box-shadow: 6px 6px 0px #000000 !important;
+.shadow-p3r-glow {
+  box-shadow: 0 0 25px rgba(0, 210, 255, 0.4), 4px 4px 0px #000000 !important;
 }
 
-.shadow-persona-white {
-  box-shadow: 4px 4px 0px #ffffff !important;
+.bg-p3r-dots {
+  background-image: radial-gradient(rgba(0, 210, 255, 0.15) 1.5px, transparent 1.5px);
+  background-size: 18px 18px;
 }
 
-.bg-persona-dots {
-  background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1.5px, transparent 1.5px);
-  background-size: 16px 16px;
+.bg-p3r-glass {
+  background: rgba(8, 20, 36, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1.5px solid rgba(0, 210, 255, 0.3);
 }
 
-.bg-persona-stripes {
-  background-image: repeating-linear-gradient(45deg, transparent, transparent 8px, rgba(0, 0, 0, 0.2) 8px, rgba(0, 0, 0, 0.2) 16px);
+.p3r-skew {
+  transform: skewX(-12deg);
 }
 
-.persona-skew {
-  transform: skewX(-6deg);
+.p3r-unskew {
+  transform: skewX(12deg);
 }
 
-.persona-unskew {
-  transform: skewX(6deg);
+/* P3R Wave Animation Keyframes */
+@keyframes p3r-wave-flow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
-.persona-hover-lift {
-  transition: transform 0.15s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.15s cubic-bezier(0.2, 0, 0, 1) !important;
+@keyframes p3r-float-shard {
+  0% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-8px) rotate(3deg); }
+  100% { transform: translateY(0px) rotate(0deg); }
 }
 
-.persona-hover-lift:hover {
-  transform: translate(-3px, -3px) !important;
+.animate-p3r-wave {
+  background: linear-gradient(-45deg, #040a12, #081a30, #0077ff, #00d2ff);
+  background-size: 400% 400%;
+  animation: p3r-wave-flow 10s ease infinite;
 }
 
-.persona-hover-lift:active {
-  transform: translate(0px, 0px) !important;
+.animate-p3r-float {
+  animation: p3r-float-shard 4s ease-in-out infinite;
 }
 
 /* Base Semantic Accent Classes (Bound to var(--accent-color)) */

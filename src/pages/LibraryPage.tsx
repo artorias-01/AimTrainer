@@ -148,37 +148,37 @@ export const LibraryPage: React.FC<LibraryPageProps> = ({ onNavigate }) => {
       </div>
 
       {/* Primary Section Mode Tabs */}
-      <div className="max-w-7xl mx-auto flex items-center justify-between border-b border-[#262626] pb-4">
+      <div className="max-w-7xl mx-auto flex items-center justify-between border-b border-[#102a4a] pb-4">
         <div className="flex gap-4 font-mono text-xs">
           <button
             onClick={() => setActiveTab('drills')}
-            className={`-skew-x-6 px-4 py-2 font-black uppercase tracking-widest transition-all border-2 ${
+            className={`-skew-x-12 px-5 py-2.5 font-black uppercase tracking-widest transition-all border-2 ${
               activeTab === 'drills'
-                ? 'bg-pink text-[#0d0d0d] border-pink shadow-[3px_3px_0_0_#000]'
-                : 'bg-[#141414] text-neutral-400 border-[#262626] hover:text-white'
+                ? 'bg-[#00d2ff] text-[#040a12] border-[#00d2ff] shadow-[0_0_20px_rgba(0,210,255,0.4),3px_3px_0_0_#000]'
+                : 'bg-[#081424] text-neutral-300 border-[#102a4a] hover:text-[#00d2ff] hover:border-[#00d2ff]/50'
             }`}
           >
-            <span className="skew-x-6 block">INDIVIDUAL DRILLS ({allScenarios.length})</span>
+            <span className="skew-x-12 block">INDIVIDUAL DRILLS ({allScenarios.length})</span>
           </button>
           <button
             onClick={() => setActiveTab('routines')}
-            className={`-skew-x-6 px-4 py-2 font-black uppercase tracking-widest transition-all border-2 ${
+            className={`-skew-x-12 px-5 py-2.5 font-black uppercase tracking-widest transition-all border-2 ${
               activeTab === 'routines'
-                ? 'bg-pink text-[#0d0d0d] border-pink shadow-[3px_3px_0_0_#000]'
-                : 'bg-[#141414] text-neutral-400 border-[#262626] hover:text-white'
+                ? 'bg-[#00d2ff] text-[#040a12] border-[#00d2ff] shadow-[0_0_20px_rgba(0,210,255,0.4),3px_3px_0_0_#000]'
+                : 'bg-[#081424] text-neutral-300 border-[#102a4a] hover:text-[#00d2ff] hover:border-[#00d2ff]/50'
             }`}
           >
-            <span className="skew-x-6 block">WARMUP ROUTINES ({routinesList.length})</span>
+            <span className="skew-x-12 block">WARMUP ROUTINES ({routinesList.length})</span>
           </button>
           <button
             onClick={() => setActiveTab('benchmark')}
-            className={`-skew-x-6 px-4 py-2 font-black uppercase tracking-widest transition-all border-2 ${
+            className={`-skew-x-12 px-5 py-2.5 font-black uppercase tracking-widest transition-all border-2 ${
               activeTab === 'benchmark'
-                ? 'bg-pink text-[#0d0d0d] border-pink shadow-[3px_3px_0_0_#000]'
-                : 'bg-[#141414] text-neutral-400 border-[#262626] hover:text-white'
+                ? 'bg-[#00d2ff] text-[#040a12] border-[#00d2ff] shadow-[0_0_20px_rgba(0,210,255,0.4),3px_3px_0_0_#000]'
+                : 'bg-[#081424] text-neutral-300 border-[#102a4a] hover:text-[#00d2ff] hover:border-[#00d2ff]/50'
             }`}
           >
-            <span className="skew-x-6 block">BENCHMARK TEST</span>
+            <span className="skew-x-12 block">BENCHMARK TEST</span>
           </button>
         </div>
       </div>
@@ -186,7 +186,7 @@ export const LibraryPage: React.FC<LibraryPageProps> = ({ onNavigate }) => {
       {/* TAB 1: INDIVIDUAL DRILLS GRID */}
       {activeTab === 'drills' && (
         <div className="space-y-8 max-w-7xl mx-auto">
-          {/* Category Filter Pills - Persona Style */}
+          {/* Category Filter Pills - Persona 3 Reload Style */}
           <div className="flex flex-wrap gap-3">
             {categories.map((cat) => (
               <button
@@ -196,13 +196,13 @@ export const LibraryPage: React.FC<LibraryPageProps> = ({ onNavigate }) => {
                   setActiveCategory(cat.id);
                 }}
                 onMouseEnter={() => soundManager.playHover()}
-                className={`-skew-x-6 px-5 py-2.5 text-xs font-mono font-black tracking-wider transition-all duration-150 border-2 shadow-[3px_3px_0_0_#000] active:translate-x-0 ${
+                className={`-skew-x-12 px-5 py-2.5 text-xs font-mono font-black tracking-wider transition-all duration-150 border-2 shadow-[3px_3px_0_0_#000] active:translate-x-0 ${
                   activeCategory === cat.id
-                    ? 'bg-pink text-[#0d0d0d] border-pink'
-                    : 'bg-[#141414] text-neutral-300 border-[#262626] hover:text-pink hover:border-pink/60'
+                    ? 'bg-[#00d2ff] text-[#040a12] border-[#00d2ff] shadow-[0_0_15px_rgba(0,210,255,0.5)]'
+                    : 'bg-[#081424] text-neutral-300 border-[#102a4a] hover:text-[#00d2ff] hover:border-[#00d2ff]/60'
                 }`}
               >
-                <span className="skew-x-6 block">{cat.label}</span>
+                <span className="skew-x-12 block">{cat.label}</span>
               </button>
             ))}
           </div>

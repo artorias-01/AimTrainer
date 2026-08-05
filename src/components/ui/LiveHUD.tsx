@@ -75,11 +75,11 @@ export const LiveHUD: React.FC = () => {
         {/* Top-Left Stack: Scenario Info + Motion-inspired Floating Stats Card */}
         <div className="flex flex-col gap-3 max-w-xs">
           {/* Current Scenario Header */}
-          <div className="-skew-x-6 bg-[#0d0d0d]/95 text-white px-5 py-3 border-2 border-pink/60 shadow-[4px_4px_0_0_#000] backdrop-blur-md">
-            <div className="skew-x-6 flex flex-col">
-              <div className="flex items-center justify-between font-mono text-[10px] tracking-widest text-accent uppercase font-bold">
+          <div className="-skew-x-12 bg-[#081424]/95 text-white px-5 py-3 border-2 border-[#00d2ff]/60 shadow-[0_0_20px_rgba(0,210,255,0.3),4px_4px_0_0_#000] backdrop-blur-md">
+            <div className="skew-x-12 flex flex-col">
+              <div className="flex items-center justify-between font-mono text-[10px] tracking-widest text-[#00d2ff] uppercase font-bold">
                 <span>CURRENT SCENARIO</span>
-                <span className="text-[9px] text-neutral-400 font-bold bg-[#181818] px-2 py-0.5 border border-[#333]">
+                <span className="text-[9px] text-neutral-300 font-bold bg-[#040a12] px-2 py-0.5 border border-[#102a4a]">
                   {pauseKey} to pause
                 </span>
               </div>
@@ -89,14 +89,14 @@ export const LiveHUD: React.FC = () => {
             </div>
           </div>
 
-          {/* Compact Floating Stats Card - Persona Slanted Style */}
+          {/* Compact Floating Stats Card - Persona 3 Reload Style */}
           <motion.div
             initial={performanceMode ? false : { opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.35, ease: 'easeOut' }}
-            className="-skew-x-6 bg-[#0d0d0d]/95 backdrop-blur-md border-2 border-[#262626] border-l-4 border-l-pink p-3.5 shadow-[4px_4px_0_0_#000]"
+            className="-skew-x-12 bg-[#081424]/95 backdrop-blur-md border-2 border-[#102a4a] border-l-4 border-l-[#00d2ff] p-3.5 shadow-[0_0_15px_rgba(0,210,255,0.2),4px_4px_0_0_#000]"
           >
-            <div className="skew-x-6 flex items-center justify-between gap-3 text-xs font-mono">
+            <div className="skew-x-12 flex items-center justify-between gap-3 text-xs font-mono">
               {isTrackingMode ? (
                 <>
                   <div className="flex flex-col">
@@ -106,7 +106,7 @@ export const LiveHUD: React.FC = () => {
                     </span>
                   </div>
 
-                  <div className="h-6 w-px bg-[#262626]" />
+                  <div className="h-6 w-px bg-[#102a4a]" />
 
                   <div className="flex flex-col">
                     <span className="text-[9px] text-neutral-400 font-bold uppercase">LOCK STREAK</span>
@@ -115,11 +115,11 @@ export const LiveHUD: React.FC = () => {
                     </span>
                   </div>
 
-                  <div className="h-6 w-px bg-[#262626]" />
+                  <div className="h-6 w-px bg-[#102a4a]" />
 
                   <div className="flex flex-col">
-                    <span className="text-[9px] text-pink font-bold uppercase">TARGET LOCK</span>
-                    <span className="font-extrabold text-pink text-sm">
+                    <span className="text-[9px] text-[#00d2ff] font-bold uppercase">TARGET LOCK</span>
+                    <span className="font-extrabold text-[#00d2ff] text-sm">
                       <AnimatedNumber value={liveTrackingAcc} />%
                     </span>
                   </div>
@@ -133,7 +133,7 @@ export const LiveHUD: React.FC = () => {
                     </span>
                   </div>
 
-                  <div className="h-6 w-px bg-[#262626]" />
+                  <div className="h-6 w-px bg-[#102a4a]" />
 
                   <div className="flex flex-col">
                     <span className="text-[9px] text-neutral-400 font-bold uppercase">MISSES</span>
@@ -142,11 +142,11 @@ export const LiveHUD: React.FC = () => {
                     </span>
                   </div>
 
-                  <div className="h-6 w-px bg-[#262626]" />
+                  <div className="h-6 w-px bg-[#102a4a]" />
 
                   <div className="flex flex-col">
-                    <span className="text-[9px] text-pink font-bold uppercase">ACCURACY</span>
-                    <span className="font-extrabold text-pink text-sm">
+                    <span className="text-[9px] text-[#00d2ff] font-bold uppercase">ACCURACY</span>
+                    <span className="font-extrabold text-[#00d2ff] text-sm">
                       <AnimatedNumber value={accuracy} />%
                     </span>
                   </div>
@@ -159,9 +159,9 @@ export const LiveHUD: React.FC = () => {
         {/* Top-Right Prominent Metrics Grid */}
         <div className="flex items-center gap-3">
           {/* Timer - Primary Prominent */}
-          <div className="-skew-x-6 flex items-center gap-2.5 bg-[#0d0d0d]/95 backdrop-blur-md text-white px-4 py-2.5 border-2 border-pink/50 shadow-[4px_4px_0_0_#000]">
-            <div className="skew-x-6 flex items-center gap-2.5">
-              <Timer className="w-4 h-4 text-pink" />
+          <div className="-skew-x-12 flex items-center gap-2.5 bg-[#081424]/95 backdrop-blur-md text-white px-4 py-2.5 border-2 border-[#00d2ff]/50 shadow-[0_0_15px_rgba(0,210,255,0.2),4px_4px_0_0_#000]">
+            <div className="skew-x-12 flex items-center gap-2.5">
+              <Timer className="w-4 h-4 text-[#00d2ff]" />
               <div className="flex flex-col">
                 <span className="text-[9px] font-mono text-neutral-400 font-bold">TIME</span>
                 <span className="font-mono font-extrabold text-lg text-white">{formatTime(timeLeft)}</span>
@@ -170,11 +170,11 @@ export const LiveHUD: React.FC = () => {
           </div>
 
           {/* Live Score - Primary Prominent */}
-          <div className="-skew-x-6 flex items-center gap-2.5 bg-[#0d0d0d]/95 backdrop-blur-md text-white px-5 py-2.5 border-2 border-pink shadow-[4px_4px_0_0_var(--accent-color)]">
-            <div className="skew-x-6 flex items-center gap-2.5">
-              <Zap className="w-4 h-4 text-pink" />
+          <div className="-skew-x-12 flex items-center gap-2.5 bg-[#081424]/95 backdrop-blur-md text-white px-5 py-2.5 border-2 border-[#00d2ff] shadow-[0_0_20px_rgba(0,210,255,0.4),4px_4px_0_0_#000]">
+            <div className="skew-x-12 flex items-center gap-2.5">
+              <Zap className="w-4 h-4 text-[#00d2ff]" />
               <div className="flex flex-col">
-                <span className="text-[9px] font-mono text-pink font-bold">SCORE</span>
+                <span className="text-[9px] font-mono text-[#00d2ff] font-bold">SCORE</span>
                 <span className="font-mono font-extrabold text-xl text-white tracking-wider">
                   <AnimatedNumber value={score} />
                 </span>
@@ -182,10 +182,10 @@ export const LiveHUD: React.FC = () => {
             </div>
           </div>
 
-          {/* Streak Combo - Persona Style */}
+          {/* Streak Combo - Persona 3 Reload Style */}
           {streak > 2 && (
-            <div className="-skew-x-6 flex items-center justify-center bg-pink text-[#0d0d0d] px-4 py-2.5 border-2 border-[#0d0d0d] font-mono font-black text-xs tracking-wider animate-bounce shadow-[4px_4px_0_0_#000]">
-              <span className="skew-x-6">{streak}X STREAK!</span>
+            <div className="-skew-x-12 flex items-center justify-center bg-[#00d2ff] text-[#040a12] px-4 py-2.5 border-2 border-[#040a12] font-mono font-black text-xs tracking-wider animate-bounce shadow-[0_0_20px_rgba(0,210,255,0.6),4px_4px_0_0_#000]">
+              <span className="skew-x-12">{streak}X STREAK!</span>
             </div>
           )}
 
@@ -197,9 +197,9 @@ export const LiveHUD: React.FC = () => {
                 pauseSession();
               }}
               onMouseEnter={() => soundManager.playHover()}
-              className="pointer-events-auto -skew-x-6 bg-[#0d0d0d]/95 hover:bg-pink hover:text-[#0d0d0d] text-white p-3 border-2 border-[#262626] hover:border-pink transition-all duration-150 active:scale-95 shadow-[3px_3px_0_0_#000] backdrop-blur-md"
+              className="pointer-events-auto -skew-x-12 bg-[#081424]/95 hover:bg-[#00d2ff] hover:text-[#040a12] text-white p-3 border-2 border-[#102a4a] hover:border-[#00d2ff] transition-all duration-150 active:scale-95 shadow-[3px_3px_0_0_#000] backdrop-blur-md"
             >
-              <div className="skew-x-6">
+              <div className="skew-x-12">
                 <Pause className="w-4 h-4" />
               </div>
             </button>
@@ -209,12 +209,12 @@ export const LiveHUD: React.FC = () => {
 
       {/* Countdown Overlay */}
       {status === 'countdown' && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/85 backdrop-blur-md z-30 transition-all duration-200 bg-persona-dots">
-          <div className="flex flex-col items-center gap-4 -skew-x-6 bg-[#0d0d0d] border-4 border-pink p-8 shadow-[8px_8px_0_0_#000]">
-            <span className="skew-x-6 font-display text-8xl md:text-9xl font-black text-pink animate-pulse drop-shadow-[4px_4px_0_#000]">
+        <div className="absolute inset-0 flex items-center justify-center bg-[#040a12]/90 backdrop-blur-md z-30 transition-all duration-200 bg-p3r-dots">
+          <div className="flex flex-col items-center gap-4 -skew-x-12 bg-[#081424] border-4 border-[#00d2ff] p-8 shadow-[0_0_40px_rgba(0,210,255,0.5),8px_8px_0_0_#000]">
+            <span className="skew-x-12 font-display text-8xl md:text-9xl font-black text-[#00d2ff] animate-pulse drop-shadow-[0_0_25px_rgba(0,210,255,0.8)]">
               {countdown}
             </span>
-            <span className="skew-x-6 font-mono text-sm tracking-widest text-white uppercase font-extrabold bg-pink text-[#0d0d0d] px-4 py-1">
+            <span className="skew-x-12 font-mono text-sm tracking-widest text-[#040a12] uppercase font-extrabold bg-[#00d2ff] px-4 py-1">
               GET READY // TARGETS SPAWNING
             </span>
           </div>
