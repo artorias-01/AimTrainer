@@ -112,7 +112,7 @@ const initialShapeConfig = getStoredTargetShapeConfig();
 const initialTargetColor = localStorage.getItem('aimtt_target_color_v1') || '#f5b8c9';
 const initialBackdrop = (localStorage.getItem('aimtt_arena_backdrop_v1') as ArenaBackdrop) || 'grid-room';
 const initialArenaColor = localStorage.getItem('aimtt_arena_color_v1') || '#121212';
-const initialThemeAccent = localStorage.getItem('aimtt_theme_accent_v1') || '#00d2ff';
+const initialThemeAccent = localStorage.getItem('aimtt_theme_accent_v1') || '#f5b8c9';
 const initialCrosshairMap = getScenarioCrosshairMap();
 
 applyThemeAccent(initialThemeAccent);

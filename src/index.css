@@ -1,15 +1,15 @@
 @import "tailwindcss";
 
 :root {
-  --accent-color: #00d2ff;
-  --accent-color-rgb: 0, 210, 255;
+  --accent-color: #f5b8c9;
+  --accent-color-rgb: 245, 184, 201;
   --color-paper: #ffffff;
-  --color-ink: #040a12;
+  --color-ink: #0d0d0d;
   --color-pink: var(--accent-color);
-  --color-pink-hover: #54e2ff;
+  --color-pink-hover: #e89ba9;
   --color-pink-muted: rgba(var(--accent-color-rgb), 0.2);
-  --color-ink-muted: #081424;
-  --color-ink-border: #102a4a;
+  --color-ink-muted: #1c1c1c;
+  --color-ink-border: #2a2a2a;
   --color-paper-border: #e2e2e2;
   --radius-editorial: 12px;
 }
@@ -20,8 +20,8 @@
 }
 
 body {
-  background-color: #040a12;
-  color: #ffffff;
+  background-color: var(--color-paper);
+  color: var(--color-ink);
   font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   letter-spacing: -0.01em;
   margin: 0;
@@ -44,59 +44,11 @@ h1, h2, h3, .font-serif-display {
   letter-spacing: -0.01em;
 }
 
-/* Persona 3 Reload (P3R) Aesthetic Design Tokens & Keyframe Animations */
-.shadow-persona {
-  box-shadow: 4px 4px 0px #000000 !important;
-}
-
-.shadow-persona-accent, .shadow-persona-cyan {
-  box-shadow: 4px 4px 0px #00d2ff !important;
-}
-
-.shadow-p3r-glow {
-  box-shadow: 0 0 25px rgba(0, 210, 255, 0.4), 4px 4px 0px #000000 !important;
-}
-
-.bg-p3r-dots {
-  background-image: radial-gradient(rgba(0, 210, 255, 0.15) 1.5px, transparent 1.5px);
-  background-size: 18px 18px;
-}
-
-.bg-p3r-glass {
-  background: rgba(8, 20, 36, 0.85);
-  backdrop-filter: blur(12px);
-  border: 1.5px solid rgba(0, 210, 255, 0.3);
-}
-
-.p3r-skew {
-  transform: skewX(-12deg);
-}
-
-.p3r-unskew {
-  transform: skewX(12deg);
-}
-
-/* P3R Wave Animation Keyframes */
-@keyframes p3r-wave-flow {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-@keyframes p3r-float-shard {
-  0% { transform: translateY(0px) rotate(0deg); }
-  50% { transform: translateY(-8px) rotate(3deg); }
-  100% { transform: translateY(0px) rotate(0deg); }
-}
-
-.animate-p3r-wave {
-  background: linear-gradient(-45deg, #040a12, #081a30, #0077ff, #00d2ff);
-  background-size: 400% 400%;
-  animation: p3r-wave-flow 10s ease infinite;
-}
-
-.animate-p3r-float {
-  animation: p3r-float-shard 4s ease-in-out infinite;
+/* Strict 12px border radius */
+.editorial-card, .editorial-btn, .editorial-tag, .editorial-input {
+  border-radius: 12px !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
 }
 
 /* Base Semantic Accent Classes (Bound to var(--accent-color)) */
@@ -234,73 +186,77 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   color: #0d0d0d;
 }
 
-/* Custom Persona Buttons with Dynamic Kinetic Hover & Active States */
-.btn-editorial-primary, .btn-editorial-secondary, .btn-editorial-pink, .persona-btn {
-  transform: skewX(-6deg);
-  transition: all 0.2s cubic-bezier(0.2, 0, 0, 1) !important;
-  box-shadow: 3px 3px 0px #000000 !important;
+/* Custom Editorial Buttons with Focus & Active States */
+.btn-editorial-primary {
+  background-color: #0d0d0d;
+  color: #ffffff;
+  border: 1px solid #0d0d0d;
+  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: all 0.2s ease-in-out;
   cursor: pointer;
+  box-shadow: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
   outline: none;
 }
 
-.btn-editorial-primary:hover, .persona-btn:hover {
-  background-color: var(--accent-color) !important;
-  color: #0d0d0d !important;
-  border-color: var(--accent-color) !important;
-  transform: skewX(-8deg) translate(-3px, -3px) !important;
-  box-shadow: 6px 6px 0px #000000 !important;
+.btn-editorial-primary:hover {
+  background-color: var(--accent-color);
+  color: #0d0d0d;
+  border-color: var(--accent-color);
+}
+
+.btn-editorial-primary:active {
+  transform: scale(0.97);
+}
+
+.btn-editorial-primary:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--accent-color) !important;
+}
+
+.btn-editorial-secondary {
+  background-color: #141414;
+  color: #ffffff;
+  border: 1px solid #262626;
+  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+  box-shadow: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  outline: none;
 }
 
 .btn-editorial-secondary:hover {
-  background-color: #ffffff !important;
-  color: #0d0d0d !important;
-  border-color: #ffffff !important;
-  transform: skewX(-8deg) translate(-3px, -3px) !important;
-  box-shadow: 6px 6px 0px var(--accent-color) !important;
+  background-color: #1f1f1f;
+  color: #ffffff;
+  border-color: var(--accent-color);
 }
 
-.btn-editorial-pink:hover {
-  background-color: #ffffff !important;
-  color: #0d0d0d !important;
-  border-color: #ffffff !important;
-  transform: skewX(-8deg) translate(-3px, -3px) !important;
-  box-shadow: 6px 6px 0px #000000 !important;
+.btn-editorial-secondary:active {
+  transform: scale(0.97);
 }
 
-.btn-editorial-primary:active, .btn-editorial-secondary:active, .btn-editorial-pink:active, .persona-btn:active {
-  transform: skewX(-6deg) translate(0px, 0px) !important;
-  box-shadow: 0px 0px 0px #000000 !important;
-}
-
-/* Persona Menu Option Banner */
-.persona-menu-card {
-  transform: skewX(-6deg);
-  transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
-  box-shadow: 4px 4px 0px #000000;
-}
-
-.persona-menu-card:hover {
-  transform: skewX(-10deg) translate(-4px, -4px) scale(1.03);
-  box-shadow: 8px 8px 0px var(--accent-color);
-  background-color: var(--accent-color) !important;
-  color: #0d0d0d !important;
-  border-color: var(--accent-color) !important;
-}
-
-.persona-menu-card:active {
-  transform: skewX(-6deg) translate(0px, 0px) scale(1.0);
-  box-shadow: 0px 0px 0px #000000;
-}
-
-/* Starburst Badge Spin Keyframe */
-@keyframes persona-star-spin {
-  0% { transform: rotate(0deg) scale(1); }
-  50% { transform: rotate(180deg) scale(1.1); }
-  100% { transform: rotate(360deg) scale(1); }
-}
-
-.animate-persona-spin {
-  animation: persona-star-spin 12s linear infinite;
+.btn-editorial-secondary:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--accent-color) !important;
 }
 
 .btn-editorial-pink {

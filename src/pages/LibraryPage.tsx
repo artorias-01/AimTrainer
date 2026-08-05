@@ -148,37 +148,37 @@ export const LibraryPage: React.FC<LibraryPageProps> = ({ onNavigate }) => {
       </div>
 
       {/* Primary Section Mode Tabs */}
-      <div className="max-w-7xl mx-auto flex items-center justify-between border-b border-[#102a4a] pb-4">
+      <div className="max-w-7xl mx-auto flex items-center justify-between border-b border-[#262626] pb-4">
         <div className="flex gap-4 font-mono text-xs">
           <button
             onClick={() => setActiveTab('drills')}
-            className={`-skew-x-12 px-5 py-2.5 font-black uppercase tracking-widest transition-all border-2 ${
+            className={`pb-2 font-bold uppercase tracking-widest transition-all ${
               activeTab === 'drills'
-                ? 'bg-[#00d2ff] text-[#040a12] border-[#00d2ff] shadow-[0_0_20px_rgba(0,210,255,0.4),3px_3px_0_0_#000]'
-                : 'bg-[#081424] text-neutral-300 border-[#102a4a] hover:text-[#00d2ff] hover:border-[#00d2ff]/50'
+                ? 'text-pink border-b-2 border-pink'
+                : 'text-neutral-400 hover:text-white'
             }`}
           >
-            <span className="skew-x-12 block">INDIVIDUAL DRILLS ({allScenarios.length})</span>
+            INDIVIDUAL DRILLS ({allScenarios.length})
           </button>
           <button
             onClick={() => setActiveTab('routines')}
-            className={`-skew-x-12 px-5 py-2.5 font-black uppercase tracking-widest transition-all border-2 ${
+            className={`pb-2 font-bold uppercase tracking-widest transition-all ${
               activeTab === 'routines'
-                ? 'bg-[#00d2ff] text-[#040a12] border-[#00d2ff] shadow-[0_0_20px_rgba(0,210,255,0.4),3px_3px_0_0_#000]'
-                : 'bg-[#081424] text-neutral-300 border-[#102a4a] hover:text-[#00d2ff] hover:border-[#00d2ff]/50'
+                ? 'text-pink border-b-2 border-pink'
+                : 'text-neutral-400 hover:text-white'
             }`}
           >
-            <span className="skew-x-12 block">WARMUP ROUTINES ({routinesList.length})</span>
+            WARMUP ROUTINES ({routinesList.length})
           </button>
           <button
             onClick={() => setActiveTab('benchmark')}
-            className={`-skew-x-12 px-5 py-2.5 font-black uppercase tracking-widest transition-all border-2 ${
+            className={`pb-2 font-bold uppercase tracking-widest transition-all ${
               activeTab === 'benchmark'
-                ? 'bg-[#00d2ff] text-[#040a12] border-[#00d2ff] shadow-[0_0_20px_rgba(0,210,255,0.4),3px_3px_0_0_#000]'
-                : 'bg-[#081424] text-neutral-300 border-[#102a4a] hover:text-[#00d2ff] hover:border-[#00d2ff]/50'
+                ? 'text-pink border-b-2 border-pink'
+                : 'text-neutral-400 hover:text-white'
             }`}
           >
-            <span className="skew-x-12 block">BENCHMARK TEST</span>
+            BENCHMARK TEST
           </button>
         </div>
       </div>
@@ -186,8 +186,8 @@ export const LibraryPage: React.FC<LibraryPageProps> = ({ onNavigate }) => {
       {/* TAB 1: INDIVIDUAL DRILLS GRID */}
       {activeTab === 'drills' && (
         <div className="space-y-8 max-w-7xl mx-auto">
-          {/* Category Filter Pills - Persona 3 Reload Style */}
-          <div className="flex flex-wrap gap-3">
+          {/* Category Filter Pills */}
+          <div className="flex flex-wrap gap-2">
             {categories.map((cat) => (
               <button
                 key={cat.id}
@@ -196,13 +196,13 @@ export const LibraryPage: React.FC<LibraryPageProps> = ({ onNavigate }) => {
                   setActiveCategory(cat.id);
                 }}
                 onMouseEnter={() => soundManager.playHover()}
-                className={`-skew-x-12 px-5 py-2.5 text-xs font-mono font-black tracking-wider transition-all duration-150 border-2 shadow-[3px_3px_0_0_#000] active:translate-x-0 ${
+                className={`px-5 py-2.5 rounded-[12px] text-xs font-mono font-bold tracking-wider transition-all duration-150 active:scale-95 border focus-visible:ring-2 focus-visible:ring-pink ${
                   activeCategory === cat.id
-                    ? 'bg-[#00d2ff] text-[#040a12] border-[#00d2ff] shadow-[0_0_15px_rgba(0,210,255,0.5)]'
-                    : 'bg-[#081424] text-neutral-300 border-[#102a4a] hover:text-[#00d2ff] hover:border-[#00d2ff]/60'
+                    ? 'bg-pink text-[#0d0d0d] border-pink'
+                    : 'bg-[#141414] text-neutral-400 border-[#262626] hover:text-white hover:border-pink/50'
                 }`}
               >
-                <span className="skew-x-12 block">{cat.label}</span>
+                {cat.label}
               </button>
             ))}
           </div>
@@ -219,45 +219,45 @@ export const LibraryPage: React.FC<LibraryPageProps> = ({ onNavigate }) => {
                     setSelectedModalScenario(sc);
                   }}
                   onMouseEnter={() => soundManager.playHover()}
-                  className="-skew-x-3 bg-[#141414] border-2 border-[#262626] p-8 flex flex-col justify-between space-y-6 hover:border-pink hover:bg-[#181818] shadow-[5px_5px_0_0_#000] hover:shadow-[8px_8px_0_0_var(--accent-color)] hover:-translate-y-2 hover:-translate-x-1 transition-all duration-200 group active:translate-x-0 active:translate-y-0 relative bg-persona-dots"
+                  className="bg-[#141414] border border-[#262626] rounded-[12px] p-8 flex flex-col justify-between space-y-6 hover:border-pink transition-all duration-200 group active:scale-[0.99] relative"
                 >
-                  <div className="skew-x-3 space-y-4">
+                  <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <span className="-skew-x-6 text-[10px] font-mono font-black text-[#0d0d0d] bg-pink px-2.5 py-1 shadow-[2px_2px_0_0_#000]">
-                          <span className="skew-x-6 block">{sc.category.toUpperCase()}</span>
+                        <span className="text-[10px] font-mono font-bold text-[#0d0d0d] bg-pink px-2.5 py-1 rounded-[6px]">
+                          {sc.category.toUpperCase()}
                         </span>
                         {sc.isCustom && (
-                          <span className="-skew-x-6 text-[10px] font-mono font-black text-white bg-pink-600 px-2 py-0.5 shadow-[2px_2px_0_0_#000]">
-                            <span className="skew-x-6 block">CUSTOM</span>
+                          <span className="text-[10px] font-mono font-bold text-white bg-pink-600 px-2 py-0.5 rounded-[6px]">
+                            CUSTOM
                           </span>
                         )}
                       </div>
-                      <span className="text-xs font-mono text-neutral-300 font-bold bg-[#0d0d0d] px-2.5 py-1 border border-[#333]">
+                      <span className="text-xs font-mono text-neutral-400 bg-[#0d0d0d] px-2.5 py-1 rounded-[12px] border border-[#262626]">
                         {sc.difficulty}
                       </span>
                     </div>
 
                     <div className="space-y-2">
-                      <h3 className="font-display font-black text-2xl text-white group-hover:text-pink transition-colors uppercase tracking-tight">
+                      <h3 className="font-display font-bold text-2xl text-white group-hover:text-pink transition-colors">
                         {sc.name}
                       </h3>
-                      <p className="font-sans-ui text-sm text-neutral-300 leading-relaxed">
+                      <p className="font-sans-ui text-sm text-neutral-400 leading-relaxed">
                         {sc.description}
                       </p>
                     </div>
                   </div>
 
-                  <div className="skew-x-3 space-y-4 pt-4 border-t border-[#262626]">
+                  <div className="space-y-4 pt-4 border-t border-[#262626]">
                     {pb ? (
-                      <div className="flex items-center justify-between text-xs font-mono text-neutral-300 bg-[#0d0d0d] p-3 border border-[#333]">
+                      <div className="flex items-center justify-between text-xs font-mono text-neutral-300 bg-[#0d0d0d] p-3 rounded-[12px] border border-[#262626]">
                         <span className="flex items-center gap-1.5 text-pink font-bold">
                           <Trophy className="w-3.5 h-3.5" /> PB: {pb.highScore.toLocaleString()}
                         </span>
-                        <span className="text-neutral-400 font-bold">{pb.bestAccuracy}% ACC</span>
+                        <span className="text-neutral-400">{pb.bestAccuracy}% ACC</span>
                       </div>
                     ) : (
-                      <div className="text-[11px] font-mono text-neutral-500 bg-[#0d0d0d] p-3 border border-[#333] font-bold uppercase">
+                      <div className="text-[11px] font-mono text-neutral-500 bg-[#0d0d0d] p-3 rounded-[12px] border border-[#262626]">
                         NO COMPLETED SESSIONS YET
                       </div>
                     )}
@@ -273,7 +273,7 @@ export const LibraryPage: React.FC<LibraryPageProps> = ({ onNavigate }) => {
                           onNavigate('arena', sc.id);
                         }}
                         onMouseEnter={() => soundManager.playHover()}
-                        className="btn-editorial-pink flex-1 py-3 flex items-center justify-center gap-2 text-xs font-black uppercase tracking-wider shadow-[3px_3px_0_0_#000]"
+                        className="btn-editorial-pink flex-1 py-3 flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-wider active:scale-95"
                       >
                         <Play className="w-4 h-4 fill-[#0d0d0d]" />
                         LAUNCH DRILL ({sc.durationSeconds}S)
