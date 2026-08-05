@@ -186,25 +186,25 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
     <div
       tabIndex={0}
       onKeyDown={handleKeyDownRebind}
-      className="relative w-full bg-[#0d0d0d] text-white min-h-screen py-12 px-6 md:px-16 focus:outline-none select-none overflow-hidden"
+      className="relative w-full bg-[#030303] text-white min-h-screen pt-24 pb-16 px-6 md:px-16 focus:outline-none select-none overflow-hidden"
     >
       {/* Background 3D Real-Time Scene for Settings Atmosphere */}
-      <div className="fixed inset-0 z-0 opacity-35 pointer-events-none">
+      <div className="fixed inset-0 z-0 opacity-30 pointer-events-none">
         <HeroScene />
       </div>
 
       {/* Radial Dark Vignette Overlay */}
-      <div className="fixed inset-0 z-0 bg-gradient-to-t from-[#0d0d0d] via-[#0d0d0d]/85 to-[#0d0d0d]/95 pointer-events-none" />
+      <div className="fixed inset-0 z-0 bg-gradient-to-t from-[#030303] via-[#030303]/85 to-[#030303]/95 pointer-events-none" />
 
       {/* Settings Content Layer */}
       <div className="relative z-10">
         {/* Save Confirmation Toast */}
-      {saveToast && (
-        <div className="fixed bottom-6 right-6 z-50 bg-[#141414] border border-pink text-white px-4 py-3 rounded-[12px] text-xs font-mono flex items-center gap-2.5 shadow-xl animate-fade-in">
-          <CheckCircle2 className="w-4 h-4 text-pink" />
-          <span>{saveToast}</span>
-        </div>
-      )}
+        {saveToast && (
+          <div className="fixed bottom-6 right-6 z-50 glass-card border border-pink text-white px-5 py-3.5 rounded-[16px] text-xs font-mono flex items-center gap-3 shadow-2xl glow-accent">
+            <CheckCircle2 className="w-4.5 h-4.5 text-pink" />
+            <span className="font-bold tracking-wider">{saveToast}</span>
+          </div>
+        )}
 
       {/* Clear History Confirmation Modal */}
       {showClearConfirm && (
@@ -245,7 +245,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
           >
             {/* Options Title & Ornamental Line Divider */}
             <div className="space-y-4">
-              <h1 className="font-display font-extrabold text-4xl md:text-6xl tracking-wider text-white">
+              <h1 className="font-syne font-extrabold text-5xl md:text-7xl tracking-wider text-white">
                 OPTIONS
               </h1>
               <div className="flex items-center justify-center gap-3 w-48 mx-auto opacity-75">
@@ -271,7 +271,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
                     setActiveCategory(cat.id as any);
                   }}
                   onMouseEnter={() => soundManager.playHover()}
-                  className="group relative font-display font-extrabold text-xl md:text-3xl tracking-widest text-neutral-300 hover:text-pink transition-colors duration-200 py-1 flex items-center justify-center gap-3 focus:outline-none"
+                  className="group relative font-syne font-extrabold text-2xl md:text-4xl tracking-widest text-neutral-300 hover:text-pink transition-colors duration-200 py-1 flex items-center justify-center gap-3 focus:outline-none"
                 >
                   <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-pink font-mono text-base">‹</span>
                   <span className="relative">
