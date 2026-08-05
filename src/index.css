@@ -225,77 +225,73 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   color: #0d0d0d;
 }
 
-/* Custom Editorial Buttons with Focus & Active States */
-.btn-editorial-primary {
-  background-color: #0d0d0d;
-  color: #ffffff;
-  border: 1px solid #0d0d0d;
-  padding: 0.75rem 1.5rem;
-  border-radius: 12px;
-  font-family: 'Space Grotesk', sans-serif;
-  font-weight: 700;
-  font-size: 0.875rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  transition: all 0.2s ease-in-out;
+/* Custom Persona Buttons with Dynamic Kinetic Hover & Active States */
+.btn-editorial-primary, .btn-editorial-secondary, .btn-editorial-pink, .persona-btn {
+  transform: skewX(-6deg);
+  transition: all 0.2s cubic-bezier(0.2, 0, 0, 1) !important;
+  box-shadow: 3px 3px 0px #000000 !important;
   cursor: pointer;
-  box-shadow: none;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
   outline: none;
 }
 
-.btn-editorial-primary:hover {
-  background-color: var(--accent-color);
-  color: #0d0d0d;
-  border-color: var(--accent-color);
-}
-
-.btn-editorial-primary:active {
-  transform: scale(0.97);
-}
-
-.btn-editorial-primary:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 2px var(--accent-color) !important;
-}
-
-.btn-editorial-secondary {
-  background-color: #141414;
-  color: #ffffff;
-  border: 1px solid #262626;
-  padding: 0.75rem 1.5rem;
-  border-radius: 12px;
-  font-family: 'Space Grotesk', sans-serif;
-  font-weight: 700;
-  font-size: 0.875rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  transition: all 0.2s ease-in-out;
-  cursor: pointer;
-  box-shadow: none;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  outline: none;
+.btn-editorial-primary:hover, .persona-btn:hover {
+  background-color: var(--accent-color) !important;
+  color: #0d0d0d !important;
+  border-color: var(--accent-color) !important;
+  transform: skewX(-8deg) translate(-3px, -3px) !important;
+  box-shadow: 6px 6px 0px #000000 !important;
 }
 
 .btn-editorial-secondary:hover {
-  background-color: #1f1f1f;
-  color: #ffffff;
-  border-color: var(--accent-color);
+  background-color: #ffffff !important;
+  color: #0d0d0d !important;
+  border-color: #ffffff !important;
+  transform: skewX(-8deg) translate(-3px, -3px) !important;
+  box-shadow: 6px 6px 0px var(--accent-color) !important;
 }
 
-.btn-editorial-secondary:active {
-  transform: scale(0.97);
+.btn-editorial-pink:hover {
+  background-color: #ffffff !important;
+  color: #0d0d0d !important;
+  border-color: #ffffff !important;
+  transform: skewX(-8deg) translate(-3px, -3px) !important;
+  box-shadow: 6px 6px 0px #000000 !important;
 }
 
-.btn-editorial-secondary:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 2px var(--accent-color) !important;
+.btn-editorial-primary:active, .btn-editorial-secondary:active, .btn-editorial-pink:active, .persona-btn:active {
+  transform: skewX(-6deg) translate(0px, 0px) !important;
+  box-shadow: 0px 0px 0px #000000 !important;
+}
+
+/* Persona Menu Option Banner */
+.persona-menu-card {
+  transform: skewX(-6deg);
+  transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+  box-shadow: 4px 4px 0px #000000;
+}
+
+.persona-menu-card:hover {
+  transform: skewX(-10deg) translate(-4px, -4px) scale(1.03);
+  box-shadow: 8px 8px 0px var(--accent-color);
+  background-color: var(--accent-color) !important;
+  color: #0d0d0d !important;
+  border-color: var(--accent-color) !important;
+}
+
+.persona-menu-card:active {
+  transform: skewX(-6deg) translate(0px, 0px) scale(1.0);
+  box-shadow: 0px 0px 0px #000000;
+}
+
+/* Starburst Badge Spin Keyframe */
+@keyframes persona-star-spin {
+  0% { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(180deg) scale(1.1); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+
+.animate-persona-spin {
+  animation: persona-star-spin 12s linear infinite;
 }
 
 .btn-editorial-pink {

@@ -219,45 +219,45 @@ export const LibraryPage: React.FC<LibraryPageProps> = ({ onNavigate }) => {
                     setSelectedModalScenario(sc);
                   }}
                   onMouseEnter={() => soundManager.playHover()}
-                  className="bg-[#141414] border border-[#262626] rounded-[12px] p-8 flex flex-col justify-between space-y-6 hover:border-pink transition-all duration-200 group active:scale-[0.99] relative"
+                  className="-skew-x-3 bg-[#141414] border-2 border-[#262626] p-8 flex flex-col justify-between space-y-6 hover:border-pink hover:bg-[#181818] shadow-[5px_5px_0_0_#000] hover:shadow-[8px_8px_0_0_var(--accent-color)] hover:-translate-y-2 hover:-translate-x-1 transition-all duration-200 group active:translate-x-0 active:translate-y-0 relative bg-persona-dots"
                 >
-                  <div className="space-y-4">
+                  <div className="skew-x-3 space-y-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-mono font-bold text-[#0d0d0d] bg-pink px-2.5 py-1 rounded-[6px]">
-                          {sc.category.toUpperCase()}
+                        <span className="-skew-x-6 text-[10px] font-mono font-black text-[#0d0d0d] bg-pink px-2.5 py-1 shadow-[2px_2px_0_0_#000]">
+                          <span className="skew-x-6 block">{sc.category.toUpperCase()}</span>
                         </span>
                         {sc.isCustom && (
-                          <span className="text-[10px] font-mono font-bold text-white bg-pink-600 px-2 py-0.5 rounded-[6px]">
-                            CUSTOM
+                          <span className="-skew-x-6 text-[10px] font-mono font-black text-white bg-pink-600 px-2 py-0.5 shadow-[2px_2px_0_0_#000]">
+                            <span className="skew-x-6 block">CUSTOM</span>
                           </span>
                         )}
                       </div>
-                      <span className="text-xs font-mono text-neutral-400 bg-[#0d0d0d] px-2.5 py-1 rounded-[12px] border border-[#262626]">
+                      <span className="text-xs font-mono text-neutral-300 font-bold bg-[#0d0d0d] px-2.5 py-1 border border-[#333]">
                         {sc.difficulty}
                       </span>
                     </div>
 
                     <div className="space-y-2">
-                      <h3 className="font-display font-bold text-2xl text-white group-hover:text-pink transition-colors">
+                      <h3 className="font-display font-black text-2xl text-white group-hover:text-pink transition-colors uppercase tracking-tight">
                         {sc.name}
                       </h3>
-                      <p className="font-sans-ui text-sm text-neutral-400 leading-relaxed">
+                      <p className="font-sans-ui text-sm text-neutral-300 leading-relaxed">
                         {sc.description}
                       </p>
                     </div>
                   </div>
 
-                  <div className="space-y-4 pt-4 border-t border-[#262626]">
+                  <div className="skew-x-3 space-y-4 pt-4 border-t border-[#262626]">
                     {pb ? (
-                      <div className="flex items-center justify-between text-xs font-mono text-neutral-300 bg-[#0d0d0d] p-3 rounded-[12px] border border-[#262626]">
+                      <div className="flex items-center justify-between text-xs font-mono text-neutral-300 bg-[#0d0d0d] p-3 border border-[#333]">
                         <span className="flex items-center gap-1.5 text-pink font-bold">
                           <Trophy className="w-3.5 h-3.5" /> PB: {pb.highScore.toLocaleString()}
                         </span>
-                        <span className="text-neutral-400">{pb.bestAccuracy}% ACC</span>
+                        <span className="text-neutral-400 font-bold">{pb.bestAccuracy}% ACC</span>
                       </div>
                     ) : (
-                      <div className="text-[11px] font-mono text-neutral-500 bg-[#0d0d0d] p-3 rounded-[12px] border border-[#262626]">
+                      <div className="text-[11px] font-mono text-neutral-500 bg-[#0d0d0d] p-3 border border-[#333] font-bold uppercase">
                         NO COMPLETED SESSIONS YET
                       </div>
                     )}
@@ -273,7 +273,7 @@ export const LibraryPage: React.FC<LibraryPageProps> = ({ onNavigate }) => {
                           onNavigate('arena', sc.id);
                         }}
                         onMouseEnter={() => soundManager.playHover()}
-                        className="btn-editorial-pink flex-1 py-3 flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-wider active:scale-95"
+                        className="btn-editorial-pink flex-1 py-3 flex items-center justify-center gap-2 text-xs font-black uppercase tracking-wider shadow-[3px_3px_0_0_#000]"
                       >
                         <Play className="w-4 h-4 fill-[#0d0d0d]" />
                         LAUNCH DRILL ({sc.durationSeconds}S)

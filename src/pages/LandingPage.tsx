@@ -236,14 +236,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
               </div>
             </div>
 
-            {/* Main Menu Buttons */}
+            {/* Main Menu Buttons - Persona Style Slanted Action Banners */}
             <motion.div
               key="main-menu"
-              initial={{ opacity: 0, y: 15 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -15 }}
-              transition={{ duration: 0.2 }}
-              className="flex flex-col items-center gap-5 max-w-xs mx-auto py-2"
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.25 }}
+              className="flex flex-col items-stretch gap-4 max-w-sm mx-auto py-2 w-full"
             >
               {/* Option 1: START DRILL */}
               <button
@@ -252,14 +252,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
                   setShowDrillMenu(true);
                 }}
                 onMouseEnter={() => soundManager.playHover()}
-                className="group relative font-display font-extrabold text-2xl md:text-3xl tracking-widest text-white hover:text-accent transition-colors duration-200 py-1 flex items-center justify-center gap-2 focus:outline-none focus-visible:outline-accent"
+                className="-skew-x-8 bg-pink text-[#0d0d0d] border-2 border-[#0d0d0d] py-3.5 px-6 font-display font-black text-xl md:text-2xl tracking-widest uppercase flex items-center justify-between shadow-[5px_5px_0_0_#000] hover:-translate-y-1.5 hover:-translate-x-1 hover:bg-white hover:text-[#0d0d0d] hover:shadow-[8px_8px_0_0_var(--accent-color)] active:translate-x-0 active:translate-y-0 transition-all duration-150 group"
               >
-                <span className="text-accent font-mono text-base transition-transform group-hover:-translate-x-1">‹</span>
-                <span className="relative">
-                  START DRILL
-                  <span className="absolute bottom-0 left-0 w-0 h-[2.5px] bg-accent group-hover:w-full transition-all duration-250 ease-out" />
-                </span>
-                <span className="text-accent font-mono text-base transition-transform group-hover:translate-x-1">›</span>
+                <span className="skew-x-8 group-hover:scale-105 transition-transform">START DRILL</span>
+                <span className="skew-x-8 font-mono text-sm group-hover:translate-x-1.5 transition-transform">▶</span>
               </button>
 
               {/* Option 2: DRILL LIBRARY */}
@@ -269,14 +265,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
                   onNavigate('library');
                 }}
                 onMouseEnter={() => soundManager.playHover()}
-                className="group relative font-display font-bold text-lg md:text-2xl tracking-widest text-neutral-300 hover:text-accent transition-colors duration-200 py-1 flex items-center justify-center gap-2 focus:outline-none focus-visible:outline-accent"
+                className="-skew-x-8 bg-[#141414] text-white border-2 border-[#262626] py-3 px-6 font-display font-black text-lg md:text-xl tracking-widest uppercase flex items-center justify-between shadow-[4px_4px_0_0_#000] hover:-translate-y-1.5 hover:-translate-x-1 hover:bg-pink hover:text-[#0d0d0d] hover:border-pink hover:shadow-[7px_7px_0_0_#000] active:translate-x-0 active:translate-y-0 transition-all duration-150 group"
               >
-                <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-accent font-mono text-sm">‹</span>
-                <span className="relative">
-                  DRILL LIBRARY
-                  <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-accent group-hover:w-full transition-all duration-250 ease-out" />
-                </span>
-                <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-accent font-mono text-sm">›</span>
+                <span className="skew-x-8 group-hover:scale-105 transition-transform">DRILL LIBRARY</span>
+                <span className="skew-x-8 font-mono text-sm opacity-0 group-hover:opacity-100 group-hover:translate-x-1.5 transition-all">▶</span>
               </button>
 
               {/* Option 3: ANALYTICS */}
@@ -286,14 +278,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
                   onNavigate('dashboard');
                 }}
                 onMouseEnter={() => soundManager.playHover()}
-                className="group relative font-display font-bold text-lg md:text-2xl tracking-widest text-neutral-300 hover:text-accent transition-colors duration-200 py-1 flex items-center justify-center gap-2 focus:outline-none focus-visible:outline-accent"
+                className="-skew-x-8 bg-[#141414] text-white border-2 border-[#262626] py-3 px-6 font-display font-black text-lg md:text-xl tracking-widest uppercase flex items-center justify-between shadow-[4px_4px_0_0_#000] hover:-translate-y-1.5 hover:-translate-x-1 hover:bg-pink hover:text-[#0d0d0d] hover:border-pink hover:shadow-[7px_7px_0_0_#000] active:translate-x-0 active:translate-y-0 transition-all duration-150 group"
               >
-                <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-accent font-mono text-sm">‹</span>
-                <span className="relative">
-                  ANALYTICS
-                  <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-accent group-hover:w-full transition-all duration-250 ease-out" />
-                </span>
-                <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-accent font-mono text-sm">›</span>
+                <span className="skew-x-8 group-hover:scale-105 transition-transform">ANALYTICS</span>
+                <span className="skew-x-8 font-mono text-sm opacity-0 group-hover:opacity-100 group-hover:translate-x-1.5 transition-all">▶</span>
               </button>
 
               {/* Option 4: OPTIONS */}
@@ -303,14 +291,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
                   onNavigate('settings');
                 }}
                 onMouseEnter={() => soundManager.playHover()}
-                className="group relative font-display font-bold text-lg md:text-2xl tracking-widest text-neutral-300 hover:text-accent transition-colors duration-200 py-1 flex items-center justify-center gap-2 focus:outline-none focus-visible:outline-accent"
+                className="-skew-x-8 bg-[#141414] text-white border-2 border-[#262626] py-3 px-6 font-display font-black text-lg md:text-xl tracking-widest uppercase flex items-center justify-between shadow-[4px_4px_0_0_#000] hover:-translate-y-1.5 hover:-translate-x-1 hover:bg-pink hover:text-[#0d0d0d] hover:border-pink hover:shadow-[7px_7px_0_0_#000] active:translate-x-0 active:translate-y-0 transition-all duration-150 group"
               >
-                <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-accent font-mono text-sm">‹</span>
-                <span className="relative">
-                  OPTIONS
-                  <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-accent group-hover:w-full transition-all duration-250 ease-out" />
-                </span>
-                <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-accent font-mono text-sm">›</span>
+                <span className="skew-x-8 group-hover:scale-105 transition-transform">OPTIONS</span>
+                <span className="skew-x-8 font-mono text-sm opacity-0 group-hover:opacity-100 group-hover:translate-x-1.5 transition-all">▶</span>
               </button>
             </motion.div>
           </>
