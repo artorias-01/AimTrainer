@@ -108,10 +108,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
   return (
     <div
       ref={containerRef}
-      onClick={() => {
-        if (!isPointerLocked) requestPointerLock();
-      }}
-      className="relative w-full h-[calc(100vh-73px)] max-h-[calc(100vh-73px)] bg-[#0d0d0d] text-white overflow-hidden select-none cursor-crosshair"
+      className="relative w-full h-[calc(100vh-73px)] max-h-[calc(100vh-73px)] bg-[#0d0d0d] text-white overflow-hidden select-none"
     >
       {/* 3D Spatial Aim-to-Select Background & Node Scene */}
       <div className="absolute inset-0 z-0">
@@ -128,46 +125,48 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
       {/* Radial Dark Vignette Overlay */}
       <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,transparent_35%,rgba(13,13,13,0.88)_100%)] pointer-events-none" />
 
-      {/* Central Screen Crosshair Reticle Overlay */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 pointer-events-none flex flex-col items-center justify-center">
-        {/* Dynamic Lock-On Brackets around Crosshair */}
-        <div
-          className={`relative transition-all duration-200 flex items-center justify-center ${
-            lockedNodeData ? 'scale-110' : 'scale-100'
-          }`}
-        >
-          {lockedNodeData && (
-            <>
-              {/* Target Lock Animated Brackets */}
-              <div className="absolute -inset-4 border-2 border-accent rounded-[12px] opacity-80 animate-pulse shadow-[0_0_20px_var(--accent-color)]" />
-              <div className="absolute -top-7 font-mono text-[9px] font-extrabold text-accent uppercase tracking-widest bg-[#0d0d0d]/90 px-2 py-0.5 rounded border border-accent/40 shadow-md">
-                LOCKED: {lockedNodeData.title}
-              </div>
-            </>
-          )}
+      {/* Central Screen Crosshair Reticle Overlay (Only visible when pointer locked) */}
+      {isPointerLocked && (
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 pointer-events-none flex flex-col items-center justify-center">
+          {/* Dynamic Lock-On Brackets around Crosshair */}
+          <div
+            className={`relative transition-all duration-200 flex items-center justify-center ${
+              lockedNodeData ? 'scale-110' : 'scale-100'
+            }`}
+          >
+            {lockedNodeData && (
+              <div className="absolute -inset-4 border-2 border-accent rounded-[12px] opacity-85 animate-pulse shadow-[0_0_20px_var(--accent-color)]" />
+            )}
 
-          {/* Player Active Crosshair */}
-          <CrosshairPreview config={crosshairConfig} sizePx={64} transparent />
+            {/* Player Active Crosshair */}
+            <CrosshairPreview config={crosshairConfig} sizePx={64} transparent />
+          </div>
         </div>
-      </div>
-
-      {/* 2D HUD Chrome Header Top Left */}
-      <div className="absolute top-6 left-6 z-20 pointer-events-none space-y-1.5">
-        <h1 className="font-display font-extrabold text-3xl md:text-4xl tracking-tight leading-none text-white drop-shadow-[0_0_20px_rgba(var(--accent-color-rgb),0.35)]">
-          AIM <span className="text-accent">//</span> TT
-        </h1>
-        <div className="flex items-center gap-2">
-          <span className="text-accent text-[10px] font-mono font-bold animate-pulse">◆</span>
-          <span className="font-mono text-[10px] text-neutral-400 tracking-widest uppercase font-bold bg-[#0d0d0d]/80 px-2.5 py-1 rounded-[8px] border border-[#262626]">
-            {pageMode === 'main-menu' ? '3D AIM-LOCK MENU' : '3D DRILL SELECTOR'}
-          </span>
-        </div>
-      </div>
+      )}
 
       {/* 2D HUD Chrome Header Top Right */}
-      <div className="absolute top-6 right-6 z-20 pointer-events-none flex items-center gap-3">
+      <div className="absolute top-6 right-6 z-20 pointer-events-auto flex items-center gap-3">
+        {/* Optional Aim Lock Mode Toggle Button */}
+        <button
+          onClick={() => {
+            if (isPointerLocked) {
+              document.exitPointerLock();
+            } else {
+              requestPointerLock();
+            }
+          }}
+          className={`px-3.5 py-1.5 rounded-[12px] text-xs font-mono font-bold flex items-center gap-2 border transition-all ${
+            isPointerLocked
+              ? 'bg-accent text-[#0d0d0d] border-accent shadow-[0_0_15px_var(--accent-color)] font-extrabold'
+              : 'bg-[#0d0d0d]/80 text-neutral-300 border-[#262626] hover:border-accent hover:text-white'
+          }`}
+        >
+          <MousePointer className="w-3.5 h-3.5" />
+          <span>{isPointerLocked ? '3D AIM MODE ACTIVE [ESC]' : 'ENABLE 3D AIM MODE'}</span>
+        </button>
+
         {/* Daily Streak Badge */}
-        <div className="px-3.5 py-1.5 rounded-[12px] bg-[#0d0d0d]/90 border border-accent/40 text-xs font-mono font-bold flex items-center justify-center gap-2 text-accent backdrop-blur-md shadow-[0_0_15px_rgba(var(--accent-color-rgb),0.15)] tracking-wider">
+        <div className="px-3.5 py-1.5 rounded-[12px] bg-[#0d0d0d]/90 border border-accent/40 text-xs font-mono font-bold flex items-center justify-center gap-2 text-accent backdrop-blur-md shadow-[0_0_15px_rgba(var(--accent-color-rgb),0.15)] tracking-wider pointer-events-none">
           <Flame className="w-3.5 h-3.5 text-accent animate-bounce" />
           <span>
             {dailyStreak.streakCount > 0
@@ -176,29 +175,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
           </span>
         </div>
 
-        {/* ESC Key release hint */}
-        <div className="px-3 py-1.5 rounded-[12px] bg-[#0d0d0d]/80 border border-[#262626] text-[10px] font-mono text-neutral-400 flex items-center gap-1.5">
-          <Key className="w-3 h-3 text-accent" />
-          <span>[ESC] {isPointerLocked ? 'RELEASE LOCK' : 'BACK'}</span>
-        </div>
+        {/* ESC Key release hint when pointer locked */}
+        {isPointerLocked && (
+          <div className="px-3 py-1.5 rounded-[12px] bg-[#0d0d0d]/80 border border-[#262626] text-[10px] font-mono text-neutral-400 flex items-center gap-1.5 pointer-events-none">
+            <Key className="w-3 h-3 text-accent" />
+            <span>[ESC] UNLOCK</span>
+          </div>
+        )}
       </div>
-
-      {/* Center Prompt when Pointer Lock is Inactive */}
-      {!isPointerLocked && (
-        <div className="absolute bottom-12 left-1/2 -translate-x-1/2 z-30 pointer-events-none flex flex-col items-center gap-2">
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="px-5 py-2.5 rounded-[14px] bg-[#0d0d0d]/95 border border-accent/50 text-xs font-mono font-extrabold text-accent flex items-center gap-2 shadow-[0_0_30px_rgba(var(--accent-color-rgb),0.25)] animate-pulse tracking-wider"
-          >
-            <MousePointer className="w-4 h-4 text-accent" />
-            <span>CLICK ANYWHERE TO ENGAGE 3D AIM-LOCK NAVIGATION</span>
-          </motion.div>
-          <span className="text-[10px] font-mono text-neutral-400">
-            OR TAP / CLICK DIRECTLY ON ANY 3D TARGET NODE
-          </span>
-        </div>
-      )}
 
       {/* Drill Selector 2D Category Filter Bar (Bottom Center in Drill-Select Mode) */}
       {pageMode === 'drill-select' && (
@@ -215,7 +199,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
             }}
             className="px-3 py-1.5 rounded-[10px] bg-[#141414] hover:bg-[#262626] text-neutral-300 hover:text-white border border-[#262626] font-mono text-xs font-bold flex items-center gap-1 transition-all"
           >
-            <ChevronLeft className="w-3.5 h-3.5 text-accent" /> BACK
+            <ChevronLeft className="w-3.5 h-3.5 text-accent" /> BACK TO MAIN MENU
           </button>
 
           <div className="h-4 w-px bg-[#262626] mx-1" />
