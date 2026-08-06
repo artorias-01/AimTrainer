@@ -2,6 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { HeroScene } from '../components/3d/HeroScene';
 import { Card3DTilt } from '../components/3d/Card3DTilt';
+import { ScreenWipe } from '../components/ui/ScreenWipe';
 import { getDailyStreak } from '../utils/storage';
 import { useGameStore } from '../store/useGameStore';
 import { soundManager } from '../utils/audio';
@@ -18,10 +19,6 @@ import { getAllScenarios } from '../utils/scenarios';
 import type { ScenarioCategory } from '../utils/scenarios';
 import {
   springPunch,
-  irisWipeVariants,
-  cardShuffleWipeVariants,
-  scanlineWipeVariants,
-  diagonalWipeVariants,
   kineticStaggerContainer,
   kineticCascadeItem,
 } from '../utils/motion';
@@ -34,6 +31,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
   const [pageMode, setPageMode] = useState<'main-menu' | 'drill-select'>('main-menu');
   const [activeCategory, setActiveCategory] = useState<ScenarioCategory | 'all'>('all');
   const [activeWipe, setActiveWipe] = useState<'iris' | 'card' | 'scanline' | 'diagonal' | null>(null);
+  const [pendingNavigation, setPendingNavigation] = useState<{ page: string; scenarioId?: string } | null>(null);
 
   // Hover states for the 4 bespoke menu choices
   const [hoveredChoice, setHoveredChoice] = useState<string | null>(null);
@@ -63,27 +61,28 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
         setActiveWipe('iris');
         setTimeout(() => {
           setPageMode('drill-select');
-          setActiveWipe(null);
-        }, 220);
+        }, 120);
       } else if (key === 'library') {
         setActiveWipe('card');
-        setTimeout(() => {
-          onNavigate('library');
-        }, 220);
+        setPendingNavigation({ page: 'library' });
       } else if (key === 'dashboard') {
         setActiveWipe('scanline');
-        setTimeout(() => {
-          onNavigate('dashboard');
-        }, 220);
+        setPendingNavigation({ page: 'dashboard' });
       } else if (key === 'settings') {
         setActiveWipe('diagonal');
-        setTimeout(() => {
-          onNavigate('settings');
-        }, 220);
+        setPendingNavigation({ page: 'settings' });
       }
     },
-    [onNavigate]
+    []
   );
+
+  const handleWipeComplete = useCallback(() => {
+    setActiveWipe(null);
+    if (pendingNavigation) {
+      onNavigate(pendingNavigation.page, pendingNavigation.scenarioId);
+      setPendingNavigation(null);
+    }
+  }, [pendingNavigation, onNavigate]);
 
   const handleSelectScenarioId = useCallback(
     (scenarioId: string) => {
@@ -97,18 +96,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
     [onNavigate, setScenario]
   );
 
-  // Determine active transition wipe variants
-  const activeWipeVariant =
-    activeWipe === 'iris'
-      ? irisWipeVariants
-      : activeWipe === 'card'
-      ? cardShuffleWipeVariants
-      : activeWipe === 'scanline'
-      ? scanlineWipeVariants
-      : activeWipe === 'diagonal'
-      ? diagonalWipeVariants
-      : undefined;
-
   return (
     <div className="relative w-full h-[calc(100vh-73px)] max-h-[calc(100vh-73px)] bg-[#0d0d0d] text-white overflow-hidden select-none">
       {/* 3D Atmospheric Background Scene */}
@@ -119,19 +106,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
       {/* Dark Vignette Overlay */}
       <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,transparent_30%,rgba(13,13,13,0.92)_100%)] pointer-events-none" />
 
-      {/* Screen Transition Wipe Overlay */}
-      <AnimatePresence>
-        {activeWipe && activeWipeVariant && (
-          <motion.div
-            key={activeWipe}
-            variants={activeWipeVariant}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-            className="fixed inset-0 z-50 bg-accent pointer-events-none"
-          />
-        )}
-      </AnimatePresence>
+      {/* Screen Transition Wipe Overlay (Self-Cleaning, Dark Tactical Aesthetics) */}
+      <ScreenWipe activeWipe={activeWipe} onComplete={handleWipeComplete} />
 
       {/* Top Right Streak Badge */}
       <div className="absolute top-6 right-6 z-20 pointer-events-auto flex items-center gap-3">
