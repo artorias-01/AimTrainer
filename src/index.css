@@ -304,6 +304,14 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   box-shadow: 0 0 0 2px #ffffff !important;
 }
 
+/* Global Custom Cursor Hide Rule for Menu Screens */
+html.custom-cursor-active,
+html.custom-cursor-active *,
+body.custom-cursor-active,
+body.custom-cursor-active * {
+  cursor: none !important;
+}
+
 /* Card Hover Lift Utility */
 .hover-lift {
   transition: transform 0.2s ease-out, box-shadow 0.2s ease-out, border-color 0.2s ease-out;
