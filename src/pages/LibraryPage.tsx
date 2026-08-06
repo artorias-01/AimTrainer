@@ -197,7 +197,7 @@ export const LibraryPage: React.FC<LibraryPageProps> = ({ onNavigate }) => {
                   setActiveCategory(cat.id);
                 }}
                 onMouseEnter={() => soundManager.playHover()}
-                className={`px-5 py-2.5 rounded-[12px] text-xs font-mono font-bold tracking-wider transition-all duration-150 active:scale-95 border focus-visible:ring-2 focus-visible:ring-pink ${
+                className={`px-5 py-2.5 clip-corner-tr text-xs font-mono font-bold tracking-wider transition-all duration-150 active:scale-95 border focus-visible:ring-2 focus-visible:ring-pink ${
                   activeCategory === cat.id
                     ? 'bg-pink text-[#0d0d0d] border-pink'
                     : 'bg-[#141414] text-neutral-400 border-[#262626] hover:text-white hover:border-pink/50'
@@ -225,21 +225,21 @@ export const LibraryPage: React.FC<LibraryPageProps> = ({ onNavigate }) => {
                       setSelectedModalScenario(sc);
                     }}
                     onMouseEnter={() => soundManager.playHover()}
-                    className="bg-[#141414] border border-[#262626] rounded-[12px] p-8 flex flex-col justify-between space-y-6 hover:border-pink transition-all duration-200 group active:scale-[0.99] relative h-full"
+                    className="bg-[#141414] border border-[#262626] clip-corner-diagonal p-8 flex flex-col justify-between space-y-6 hover:border-pink transition-all duration-200 group active:scale-[0.99] relative h-full"
                   >
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-mono font-bold text-[#0d0d0d] bg-pink px-2.5 py-1 rounded-[6px]">
+                        <span className="text-[10px] font-mono font-extrabold text-[#0d0d0d] bg-pink px-3 py-1 clip-tag-ribbon uppercase">
                           {sc.category.toUpperCase()}
                         </span>
                         {sc.isCustom && (
-                          <span className="text-[10px] font-mono font-bold text-white bg-pink-600 px-2 py-0.5 rounded-[6px]">
+                          <span className="text-[10px] font-mono font-extrabold text-white bg-accent/30 border border-accent/60 px-2 py-0.5 clip-corner-tr">
                             CUSTOM
                           </span>
                         )}
                       </div>
-                      <span className="text-xs font-mono text-neutral-400 bg-[#0d0d0d] px-2.5 py-1 rounded-[12px] border border-[#262626]">
+                      <span className="text-xs font-mono text-neutral-400 bg-[#0d0d0d] px-2.5 py-1 clip-corner-tr border border-[#262626] font-bold uppercase">
                         {sc.difficulty}
                       </span>
                     </div>
@@ -256,7 +256,7 @@ export const LibraryPage: React.FC<LibraryPageProps> = ({ onNavigate }) => {
 
                   <div className="space-y-4 pt-4 border-t border-[#262626]">
                     {pb ? (
-                      <div className="flex items-center justify-between text-xs font-mono text-neutral-300 bg-[#0d0d0d] p-3 rounded-[12px] border border-[#262626]">
+                      <div className="flex items-center justify-between text-xs font-mono text-neutral-300 bg-[#0d0d0d] p-3 clip-corner-tr border border-[#262626]">
                         <span className="flex items-center gap-1.5 text-pink font-bold">
                           <Trophy className="w-3.5 h-3.5" /> PB: {pb.highScore.toLocaleString()}
                         </span>

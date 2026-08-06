@@ -260,14 +260,14 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ onNavigate }) => {
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Left Column: Grade Card & Score Breakdown (5 Cols) */}
         <div className="lg:col-span-5 space-y-6">
-          {/* Grade Card */}
-          <div className="bg-[#141414] border border-[#262626] rounded-[12px] p-8 flex items-center justify-between">
+          {/* Grade Card with Angled Cut Corner */}
+          <div className="bg-[#141414] border border-[#262626] clip-corner-diagonal p-8 flex items-center justify-between shadow-lg">
             <div className="space-y-2">
-              <span className="text-xs font-mono text-neutral-400">PERFORMANCE RATING</span>
-              <div className="font-display font-extrabold text-6xl md:text-7xl text-white">
+              <span className="text-xs font-mono text-neutral-400 font-bold uppercase tracking-wider">PERFORMANCE RATING</span>
+              <div className="font-mono font-extrabold text-5xl md:text-6xl text-white tracking-tight">
                 {summary.score.toLocaleString()}
               </div>
-              <span className="text-xs font-mono text-neutral-400 block">
+              <span className="text-xs font-mono text-neutral-400 block font-bold">
                 {isTrackingMode
                   ? `TIME ON TARGET: ${summary.accuracy}%`
                   : `${summary.hits} HITS // ${summary.misses} MISSES`}
@@ -278,7 +278,7 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ onNavigate }) => {
               variants={stampSealVariants}
               initial="hidden"
               animate="visible"
-              className="w-24 h-24 rounded-[12px] bg-pink text-[#0d0d0d] flex items-center justify-center font-display font-extrabold text-5xl shrink-0 shadow-[0_0_30px_rgba(var(--accent-color-rgb),0.5)] border-2 border-white ring-4 ring-pink/30"
+              className="w-24 h-24 clip-corner-tr bg-pink text-[#0d0d0d] flex items-center justify-center font-display font-extrabold text-5xl shrink-0 shadow-[0_0_30px_rgba(var(--accent-color-rgb),0.5)] border-2 border-white"
             >
               {summary.grade}
             </motion.div>

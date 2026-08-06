@@ -111,7 +111,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
 
       {/* Top Right Streak Badge */}
       <div className="absolute top-6 right-6 z-20 pointer-events-auto flex items-center gap-3">
-        <div className="px-3.5 py-1.5 rounded-[12px] bg-[#0d0d0d]/90 border border-accent/40 text-xs font-mono font-bold flex items-center justify-center gap-2 text-accent backdrop-blur-md shadow-[0_0_15px_rgba(var(--accent-color-rgb),0.15)] tracking-wider">
+        <div className="px-3.5 py-1.5 clip-corner-tr bg-[#0d0d0d]/90 border border-accent/40 text-xs font-mono font-bold flex items-center justify-center gap-2 text-accent backdrop-blur-md shadow-[0_0_15px_rgba(var(--accent-color-rgb),0.15)] tracking-wider">
           <Flame className="w-3.5 h-3.5 text-accent animate-bounce" />
           <span>
             {dailyStreak.streakCount > 0 ? `${dailyStreak.streakCount} DAY STREAK` : 'NO STREAK'}
@@ -130,22 +130,25 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
             exit={{ opacity: 0 }}
             className="relative z-10 w-full h-full flex flex-col items-center justify-center p-6"
           >
-            {/* Center Main Header Branding */}
-            <div className="text-center space-y-1.5 mb-8">
+            {/* Center Main Header Branding with Signature Diagonal Pink Accent Slash Bar */}
+            <div className="relative text-center space-y-1.5 mb-8">
+              {/* Skewed Accent Bar Motif */}
+              <div className="absolute -inset-x-6 top-1/2 -translate-y-1/2 h-14 bg-accent/10 border-y border-accent/30 -skew-x-12 pointer-events-none -z-10" />
+
               <motion.h1
                 initial={{ opacity: 0, y: -20, scale: 0.95 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 transition={springPunch}
-                className="font-display font-black text-4xl md:text-6xl tracking-tighter text-white drop-shadow-[0_0_30px_rgba(var(--accent-color-rgb),0.4)]"
+                className="font-display font-black text-5xl md:text-7xl tracking-tighter text-white drop-shadow-[0_0_35px_rgba(var(--accent-color-rgb),0.4)]"
               >
                 AIM <span className="text-accent">//</span> TT
               </motion.h1>
-              <p className="font-mono text-[10px] text-neutral-400 uppercase tracking-[0.3em] font-bold">
+              <p className="font-mono text-[10px] text-accent uppercase tracking-[0.35em] font-extrabold">
                 TACTICAL 3D EDITORIAL TRAINER
               </p>
             </div>
 
-            {/* 4 BESPOKE MAIN MENU OPTIONS (PROPORTIONATE SCALE) */}
+            {/* 4 BESPOKE MAIN MENU OPTIONS (PROPORTIONATE SCALE & KINETIC CUT CORNERS) */}
             <motion.div
               variants={kineticStaggerContainer}
               initial="hidden"
@@ -161,7 +164,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
                   setHoveredChoice('select-mode');
                 }}
                 onMouseLeave={() => setHoveredChoice(null)}
-                className="group relative w-full py-2.5 px-4 rounded-[12px] bg-[#141414]/90 hover:bg-accent hover:text-[#0d0d0d] border border-[#262626] hover:border-accent font-display font-extrabold text-sm md:text-base tracking-wider uppercase transition-all duration-200 shadow-lg flex items-center justify-between overflow-hidden cursor-pointer"
+                className="kinetic-btn group relative w-full py-2.5 px-4 bg-[#141414]/90 hover:bg-accent hover:text-[#0d0d0d] border border-[#262626] hover:border-accent font-display font-extrabold text-base tracking-wider uppercase shadow-lg flex items-center justify-between overflow-hidden cursor-pointer"
               >
                 <div className="flex items-center gap-2.5">
                   <Play className="w-4 h-4 text-accent group-hover:text-[#0d0d0d] transition-colors" />
@@ -208,7 +211,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
                   setHoveredChoice('library');
                 }}
                 onMouseLeave={() => setHoveredChoice(null)}
-                className="group relative w-full py-2.5 px-4 rounded-[12px] bg-[#141414]/90 hover:bg-white hover:text-[#0d0d0d] border border-[#262626] hover:border-white font-display font-extrabold text-sm md:text-base tracking-wider uppercase transition-all duration-200 shadow-lg flex items-center justify-between overflow-hidden cursor-pointer"
+                className="kinetic-btn group relative w-full py-2.5 px-4 bg-[#141414]/90 hover:bg-white hover:text-[#0d0d0d] border border-[#262626] hover:border-white font-display font-extrabold text-base tracking-wider uppercase shadow-lg flex items-center justify-between overflow-hidden cursor-pointer"
               >
                 <div className="flex items-center gap-2.5">
                   <Layers className="w-4 h-4 text-accent group-hover:text-[#0d0d0d] transition-colors" />
@@ -221,17 +224,17 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
                     <motion.div
                       initial={{ rotate: 0, x: 0 }}
                       animate={{ rotate: -12, x: -3 }}
-                      className="w-3 h-5 bg-[#0d0d0d] rounded-[2px] border border-white"
+                      className="w-3 h-5 bg-[#0d0d0d] border border-white"
                     />
                     <motion.div
                       initial={{ rotate: 0, x: 0 }}
                       animate={{ rotate: 0, y: -2 }}
-                      className="w-3 h-5 bg-[#0d0d0d] rounded-[2px] border border-white"
+                      className="w-3 h-5 bg-[#0d0d0d] border border-white"
                     />
                     <motion.div
                       initial={{ rotate: 0, x: 0 }}
                       animate={{ rotate: 12, x: 3 }}
-                      className="w-3 h-5 bg-[#0d0d0d] rounded-[2px] border border-white"
+                      className="w-3 h-5 bg-[#0d0d0d] border border-white"
                     />
                   </div>
                 )}
@@ -250,7 +253,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
                   setHoveredChoice('analytics');
                 }}
                 onMouseLeave={() => setHoveredChoice(null)}
-                className="group relative w-full py-2.5 px-4 rounded-[12px] bg-[#141414]/90 hover:bg-accent hover:text-[#0d0d0d] border border-[#262626] hover:border-accent font-display font-extrabold text-sm md:text-base tracking-wider uppercase transition-all duration-200 shadow-lg flex items-center justify-between overflow-hidden cursor-pointer"
+                className="kinetic-btn group relative w-full py-2.5 px-4 bg-[#141414]/90 hover:bg-accent hover:text-[#0d0d0d] border border-[#262626] hover:border-accent font-display font-extrabold text-base tracking-wider uppercase shadow-lg flex items-center justify-between overflow-hidden cursor-pointer"
               >
                 <div className="flex items-center gap-2.5">
                   <BarChart3 className="w-4 h-4 text-accent group-hover:text-[#0d0d0d] transition-colors" />
@@ -286,7 +289,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
                   setHoveredChoice('options');
                 }}
                 onMouseLeave={() => setHoveredChoice(null)}
-                className="group relative w-full py-2.5 px-4 rounded-[12px] bg-[#141414]/90 hover:bg-white hover:text-[#0d0d0d] border border-[#262626] hover:border-white font-display font-extrabold text-sm md:text-base tracking-wider uppercase transition-all duration-200 shadow-lg flex items-center justify-between overflow-hidden cursor-pointer"
+                className="kinetic-btn group relative w-full py-2.5 px-4 bg-[#141414]/90 hover:bg-white hover:text-[#0d0d0d] border border-[#262626] hover:border-white font-display font-extrabold text-base tracking-wider uppercase shadow-lg flex items-center justify-between overflow-hidden cursor-pointer"
               >
                 <div className="flex items-center gap-2.5">
                   <motion.div
