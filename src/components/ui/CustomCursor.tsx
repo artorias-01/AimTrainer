@@ -3,7 +3,7 @@ import { useSettingsStore } from '../../store/useSettingsStore';
 
 export const CustomCursor: React.FC = () => {
   const cursorRef = useRef<HTMLDivElement>(null);
-  const ringRef = useRef<SVGSVGElement>(null);
+  const triRef = useRef<SVGSVGElement>(null);
   const [isVisible, setIsVisible] = useState(false);
   const themeAccentColor = useSettingsStore((s) => s.themeAccentColor) || '#f5b8c9';
 
@@ -20,7 +20,7 @@ export const CustomCursor: React.FC = () => {
 
     const isReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    // Direct 1:1 DOM position update with zero React re-renders or throttling
+    // Direct 1:1 DOM position update with zero React re-renders or latency
     const handleMouseMove = (e: MouseEvent) => {
       if (cursorRef.current) {
         cursorRef.current.style.transform = `translate3d(${e.clientX - 12}px, ${e.clientY - 12}px, 0)`;
@@ -29,16 +29,16 @@ export const CustomCursor: React.FC = () => {
 
     // Direct DOM click pulse animation
     const handleMouseDown = () => {
-      if (ringRef.current && !isReducedMotion) {
-        ringRef.current.style.transform = 'scale(0.84)';
-        ringRef.current.style.filter = `drop-shadow(0 0 12px ${themeAccentColor})`;
+      if (triRef.current && !isReducedMotion) {
+        triRef.current.style.transform = 'scale(0.82)';
+        triRef.current.style.filter = `drop-shadow(0 0 14px ${themeAccentColor})`;
       }
     };
 
     const handleMouseUp = () => {
-      if (ringRef.current && !isReducedMotion) {
-        ringRef.current.style.transform = 'scale(1)';
-        ringRef.current.style.filter = `drop-shadow(0 0 6px ${themeAccentColor})`;
+      if (triRef.current && !isReducedMotion) {
+        triRef.current.style.transform = 'scale(1)';
+        triRef.current.style.filter = `drop-shadow(0 0 6px ${themeAccentColor})`;
       }
     };
 
@@ -63,7 +63,7 @@ export const CustomCursor: React.FC = () => {
       style={{ willChange: 'transform' }}
     >
       <svg
-        ref={ringRef}
+        ref={triRef}
         width="24"
         height="24"
         viewBox="0 0 24 24"
@@ -73,26 +73,44 @@ export const CustomCursor: React.FC = () => {
           willChange: 'transform, filter',
         }}
       >
-        {/* High-Contrast Outer Black Shadow Ring */}
-        <circle cx="12" cy="12" r="9" fill="none" stroke="#000000" strokeWidth="2.5" opacity="0.6" />
+        {/* High-Contrast Outer Black Shadow Triangle */}
+        <polygon
+          points="12,3 21,19 3,19"
+          fill="none"
+          stroke="#000000"
+          strokeWidth="3"
+          strokeLinejoin="round"
+          opacity="0.6"
+        />
 
-        {/* Minimalist Target Lock Ring */}
-        <circle cx="12" cy="12" r="9" fill="none" stroke={themeAccentColor} strokeWidth="1.25" />
+        {/* Dynamic Theme Accent Triangular Reticle Chevron */}
+        <polygon
+          points="12,3 21,19 3,19"
+          fill="rgba(var(--accent-color-rgb), 0.08)"
+          stroke={themeAccentColor}
+          strokeWidth="1.5"
+          strokeLinejoin="round"
+        />
 
-        {/* Tactical Crosshair Tick Marks */}
-        <g stroke={themeAccentColor} strokeWidth="1.25" strokeLinecap="round">
-          {/* Top Tick */}
-          <line x1="12" y1="2" x2="12" y2="4.5" />
-          {/* Bottom Tick */}
-          <line x1="12" y1="19.5" x2="12" y2="22" />
-          {/* Left Tick */}
-          <line x1="2" y1="12" x2="4.5" y2="12" />
-          {/* Right Tick */}
-          <line x1="19.5" y1="12" x2="22" y2="12" />
+        {/* Tactical Vertex Corner Accents */}
+        <g stroke={themeAccentColor} strokeWidth="1.5" strokeLinecap="round">
+          {/* Top Vertex Pointer Extension */}
+          <line x1="12" y1="1" x2="12" y2="4" />
+          {/* Bottom Left Corner Accent */}
+          <line x1="1.5" y1="20" x2="4" y2="18.5" />
+          {/* Bottom Right Corner Accent */}
+          <line x1="22.5" y1="20" x2="20" y2="18.5" />
         </g>
 
-        {/* Crisp Center Aim Dot */}
-        <circle cx="12" cy="12" r="1.25" fill={themeAccentColor} stroke="#000000" strokeWidth="0.5" />
+        {/* Center Target Aim Dot */}
+        <circle
+          cx="12"
+          cy="13"
+          r="1.25"
+          fill={themeAccentColor}
+          stroke="#000000"
+          strokeWidth="0.5"
+        />
       </svg>
     </div>
   );
