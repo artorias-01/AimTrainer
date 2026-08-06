@@ -8,7 +8,6 @@ import { HeatmapChart } from '../components/ui/HeatmapChart';
 import { ReactionTimeHistogram } from '../components/ui/ReactionTimeHistogram';
 import { AnimatedCountUp } from '../components/ui/AnimatedCountUp';
 import { DigitScramble } from '../components/ui/DigitScramble';
-import { triggerAutoFullscreen } from '../utils/fullscreen';
 import confetti from 'canvas-confetti';
 import { soundManager } from '../utils/audio';
 import {
@@ -394,7 +393,6 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ onNavigate }) => {
               <button
                 onClick={() => {
                   soundManager.playClick();
-                  triggerAutoFullscreen();
                   setScenario(nextScenario.id);
                   startSession();
                   onNavigate('arena');
@@ -411,7 +409,6 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ onNavigate }) => {
               <button
                 onClick={() => {
                   soundManager.playClick();
-                  triggerAutoFullscreen();
                   startSession();
                   onNavigate('arena');
                 }}

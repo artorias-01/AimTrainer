@@ -7,7 +7,6 @@ import { Card3DTilt } from '../components/3d/Card3DTilt';
 import { useStatsStore } from '../store/useStatsStore';
 import { useGameStore } from '../store/useGameStore';
 import { soundManager } from '../utils/audio';
-import { triggerAutoFullscreen } from '../utils/fullscreen';
 import { Play, Trophy, Filter, Plus, Layers, Award, Trash2 } from 'lucide-react';
 import { CustomScenarioModal } from '../components/ui/CustomScenarioModal';
 import { RoutineBuilderModal } from '../components/ui/RoutineBuilderModal';
@@ -69,14 +68,12 @@ export const LibraryPage: React.FC<LibraryPageProps> = ({ onNavigate }) => {
 
   const handleStartRoutine = (routine: WarmupRoutine) => {
     soundManager.playClick();
-    triggerAutoFullscreen();
     startRoutine(routine);
     onNavigate('arena');
   };
 
   const handleStartBenchmark = () => {
     soundManager.playClick();
-    triggerAutoFullscreen();
     startBenchmark();
     onNavigate('arena');
   };
@@ -276,7 +273,6 @@ export const LibraryPage: React.FC<LibraryPageProps> = ({ onNavigate }) => {
                               onClick={(e) => {
                                 e.stopPropagation();
                                 soundManager.playClick();
-                                triggerAutoFullscreen();
                                 onNavigate('arena', sc.id);
                               }}
                               onMouseEnter={() => soundManager.playHover()}
@@ -461,7 +457,6 @@ export const LibraryPage: React.FC<LibraryPageProps> = ({ onNavigate }) => {
               <button
                 onClick={() => {
                   soundManager.playClick();
-                  triggerAutoFullscreen();
                   onNavigate('arena', selectedModalScenario.id);
                   setSelectedModalScenario(null);
                 }}
