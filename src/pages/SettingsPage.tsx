@@ -258,8 +258,8 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
               </p>
             </div>
 
-            {/* Vertical Text-First Menu List */}
-            <div className="flex flex-col items-center gap-5 py-2">
+            {/* Vertical Text-First Menu List with Aligned 3-Column Grid */}
+            <div className="flex flex-col items-center gap-4 w-full max-w-sm mx-auto py-2">
               {[
                 { id: 'game', label: 'GAME' },
                 { id: 'crosshair', label: 'CROSSHAIR' },
@@ -274,18 +274,22 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
                     setActiveCategory(cat.id as any);
                   }}
                   onMouseEnter={() => soundManager.playHover()}
-                  className="group relative font-display font-extrabold text-2xl md:text-3xl tracking-widest text-white hover:text-pink transition-colors duration-200 py-1 flex items-center justify-center gap-3 focus:outline-none"
+                  className="group relative w-full grid grid-cols-[36px_1fr_36px] items-center font-display font-extrabold text-2xl md:text-3xl tracking-widest text-white hover:text-pink transition-colors duration-200 py-1.5 focus:outline-none"
                 >
-                  <span className="text-pink font-mono text-base transition-transform group-hover:-translate-x-1.5">‹</span>
-                  <span className="relative">
+                  <span className="text-pink font-mono text-lg text-right pr-2 transition-transform group-hover:-translate-x-1.5">
+                    ‹
+                  </span>
+                  <span className="relative justify-self-center text-center">
                     {cat.label}
                     <span className="absolute bottom-0 left-0 w-0 h-[2.5px] bg-pink group-hover:w-full transition-all duration-250 ease-out shadow-[0_0_8px_var(--accent-color)]" />
                   </span>
-                  <span className="text-pink font-mono text-base transition-transform group-hover:translate-x-1.5">›</span>
+                  <span className="text-pink font-mono text-lg text-left pl-2 transition-transform group-hover:translate-x-1.5">
+                    ›
+                  </span>
                 </button>
               ))}
 
-              {/* BACK Option */}
+              {/* RETURN TO MAIN MENU Option aligned to identical 3-column grid */}
               <div className="pt-6 border-t border-[#262626] w-full">
                 <button
                   onClick={() => {
@@ -297,14 +301,18 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
                     }
                   }}
                   onMouseEnter={() => soundManager.playHover()}
-                  className="group relative font-display font-bold text-lg md:text-xl tracking-widest text-neutral-300 hover:text-white transition-colors duration-200 py-1 flex items-center justify-center gap-2 focus:outline-none"
+                  className="group relative w-full grid grid-cols-[36px_1fr_36px] items-center font-display font-bold text-base md:text-lg tracking-widest text-neutral-300 hover:text-white transition-colors duration-200 py-1.5 focus:outline-none"
                 >
-                  <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-pink font-mono text-sm">‹</span>
-                  <span className="relative">
+                  <span className="text-pink font-mono text-sm text-right pr-2 opacity-0 group-hover:opacity-100 transition-all duration-200 -translate-x-1 group-hover:translate-x-0">
+                    ‹
+                  </span>
+                  <span className="relative justify-self-center text-center">
                     RETURN TO MAIN MENU
                     <span className="absolute bottom-0 left-0 w-0 h-[1.5px] bg-pink group-hover:w-full transition-all duration-250 ease-out" />
                   </span>
-                  <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-pink font-mono text-sm">›</span>
+                  <span className="text-pink font-mono text-sm text-left pl-2 opacity-0 group-hover:opacity-100 transition-all duration-200 translate-x-1 group-hover:translate-x-0">
+                    ›
+                  </span>
                 </button>
               </div>
             </div>

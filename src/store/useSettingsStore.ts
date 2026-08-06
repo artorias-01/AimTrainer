@@ -232,6 +232,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
   },
 
   setThemeAccentColor: (color) => {
+    if (get().themeAccentColor === color) return;
     localStorage.setItem('aimtt_theme_accent_v1', color);
     applyThemeAccent(color);
     set({ themeAccentColor: color });
