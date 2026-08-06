@@ -3,6 +3,7 @@ import { useSettingsStore } from '../../store/useSettingsStore';
 
 export const CustomCursor: React.FC = () => {
   const cursorRef = useRef<HTMLDivElement>(null);
+  const ringRef = useRef<SVGSVGElement>(null);
   const [isVisible, setIsVisible] = useState(false);
   const themeAccentColor = useSettingsStore((s) => s.themeAccentColor) || '#f5b8c9';
 
@@ -17,56 +18,81 @@ export const CustomCursor: React.FC = () => {
     setIsVisible(true);
     document.documentElement.classList.add('custom-cursor-active');
 
+    const isReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // Direct 1:1 DOM position update with zero React re-renders or throttling
     const handleMouseMove = (e: MouseEvent) => {
       if (cursorRef.current) {
-        // Offset by -16px horizontally and -16px vertically so (16, 16) SVG center aligns with exact cursor tip
-        cursorRef.current.style.transform = `translate3d(${e.clientX - 16}px, ${e.clientY - 16}px, 0)`;
+        cursorRef.current.style.transform = `translate3d(${e.clientX - 12}px, ${e.clientY - 12}px, 0)`;
+      }
+    };
+
+    // Direct DOM click pulse animation
+    const handleMouseDown = () => {
+      if (ringRef.current && !isReducedMotion) {
+        ringRef.current.style.transform = 'scale(0.84)';
+        ringRef.current.style.filter = `drop-shadow(0 0 12px ${themeAccentColor})`;
+      }
+    };
+
+    const handleMouseUp = () => {
+      if (ringRef.current && !isReducedMotion) {
+        ringRef.current.style.transform = 'scale(1)';
+        ringRef.current.style.filter = `drop-shadow(0 0 6px ${themeAccentColor})`;
       }
     };
 
     window.addEventListener('mousemove', handleMouseMove, { passive: true });
+    window.addEventListener('mousedown', handleMouseDown, { passive: true });
+    window.addEventListener('mouseup', handleMouseUp, { passive: true });
 
     return () => {
       document.documentElement.classList.remove('custom-cursor-active');
       window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mousedown', handleMouseDown);
+      window.removeEventListener('mouseup', handleMouseUp);
     };
-  }, []);
+  }, [themeAccentColor]);
 
   if (!isVisible) return null;
 
   return (
     <div
       ref={cursorRef}
-      className="pointer-events-none fixed top-0 left-0 z-[9999] w-8 h-8 flex items-center justify-center select-none"
+      className="pointer-events-none fixed top-0 left-0 z-[9999] w-6 h-6 flex items-center justify-center select-none"
       style={{ willChange: 'transform' }}
     >
-      <svg width="32" height="32" viewBox="0 0 32 32" className="drop-shadow-md">
-        {/* High-Contrast Outer Black Outlines */}
-        <g stroke="#000000" strokeWidth="3" strokeLinecap="square">
-          {/* Top Line */}
-          <line x1="16" y1="4" x2="16" y2="11" />
-          {/* Bottom Line */}
-          <line x1="16" y1="21" x2="16" y2="28" />
-          {/* Left Line */}
-          <line x1="4" y1="16" x2="11" y2="16" />
-          {/* Right Line */}
-          <line x1="21" y1="16" x2="28" y2="16" />
+      <svg
+        ref={ringRef}
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        className="transition-transform duration-150 ease-out"
+        style={{
+          filter: `drop-shadow(0 0 6px ${themeAccentColor})`,
+          willChange: 'transform, filter',
+        }}
+      >
+        {/* High-Contrast Outer Black Shadow Ring */}
+        <circle cx="12" cy="12" r="9" fill="none" stroke="#000000" strokeWidth="2.5" opacity="0.6" />
+
+        {/* Minimalist Target Lock Ring */}
+        <circle cx="12" cy="12" r="9" fill="none" stroke={themeAccentColor} strokeWidth="1.25" />
+
+        {/* Tactical Crosshair Tick Marks */}
+        <g stroke={themeAccentColor} strokeWidth="1.25" strokeLinecap="round">
+          {/* Top Tick */}
+          <line x1="12" y1="2" x2="12" y2="4.5" />
+          {/* Bottom Tick */}
+          <line x1="12" y1="19.5" x2="12" y2="22" />
+          {/* Left Tick */}
+          <line x1="2" y1="12" x2="4.5" y2="12" />
+          {/* Right Tick */}
+          <line x1="19.5" y1="12" x2="22" y2="12" />
         </g>
 
-        {/* Dynamic Accent Color Inner Crosshair Lines */}
-        <g stroke={themeAccentColor} strokeWidth="1.5" strokeLinecap="square">
-          {/* Top Line */}
-          <line x1="16" y1="4.5" x2="16" y2="10.5" />
-          {/* Bottom Line */}
-          <line x1="16" y1="21.5" x2="16" y2="27.5" />
-          {/* Left Line */}
-          <line x1="4.5" y1="16" x2="10.5" y2="16" />
-          {/* Right Line */}
-          <line x1="21.5" y1="16" x2="27.5" y2="16" />
-        </g>
-
-        {/* Center Dot */}
-        <circle cx="16" cy="16" r="1.5" fill={themeAccentColor} stroke="#000000" strokeWidth="0.75" />
+        {/* Crisp Center Aim Dot */}
+        <circle cx="12" cy="12" r="1.25" fill={themeAccentColor} stroke="#000000" strokeWidth="0.5" />
       </svg>
     </div>
   );
