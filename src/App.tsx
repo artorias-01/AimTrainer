@@ -11,6 +11,7 @@ import { SettingsPage } from './pages/SettingsPage';
 import { OnboardingOverlay } from './components/ui/OnboardingOverlay';
 import { CommandPalette } from './components/ui/CommandPalette';
 import { IntroTransition } from './components/3d/IntroTransition';
+import { ErrorBoundary } from './components/ui/ErrorBoundary';
 import { useGameStore } from './store/useGameStore';
 import { getOnboardingCompleted } from './utils/storage';
 
@@ -109,12 +110,36 @@ export function App() {
 
       {/* Main Game Content Area */}
       <main className="relative z-10 flex-1 w-full">
-        {activePage === 'landing' && <LandingPage onNavigate={handleNavigate} />}
-        {activePage === 'library' && <LibraryPage onNavigate={handleNavigate} />}
-        {activePage === 'arena' && <ArenaPage onNavigate={handleNavigate} />}
-        {activePage === 'results' && <ResultsPage onNavigate={handleNavigate} />}
-        {activePage === 'dashboard' && <DashboardPage onNavigate={handleNavigate} />}
-        {activePage === 'settings' && <SettingsPage onNavigate={handleNavigate} />}
+        {activePage === 'landing' && (
+          <ErrorBoundary fallbackTitle="LANDING PAGE ERROR">
+            <LandingPage onNavigate={handleNavigate} />
+          </ErrorBoundary>
+        )}
+        {activePage === 'library' && (
+          <ErrorBoundary fallbackTitle="DRILL LIBRARY ERROR">
+            <LibraryPage onNavigate={handleNavigate} />
+          </ErrorBoundary>
+        )}
+        {activePage === 'arena' && (
+          <ErrorBoundary fallbackTitle="ARENA SESSION ERROR">
+            <ArenaPage onNavigate={handleNavigate} />
+          </ErrorBoundary>
+        )}
+        {activePage === 'results' && (
+          <ErrorBoundary fallbackTitle="RESULTS PAGE ERROR">
+            <ResultsPage onNavigate={handleNavigate} />
+          </ErrorBoundary>
+        )}
+        {activePage === 'dashboard' && (
+          <ErrorBoundary fallbackTitle="ANALYTICS DASHBOARD ERROR">
+            <DashboardPage onNavigate={handleNavigate} />
+          </ErrorBoundary>
+        )}
+        {activePage === 'settings' && (
+          <ErrorBoundary fallbackTitle="OPTIONS PAGE ERROR">
+            <SettingsPage onNavigate={handleNavigate} />
+          </ErrorBoundary>
+        )}
       </main>
 
       {/* Persistent Global Footer */}

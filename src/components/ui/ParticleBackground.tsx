@@ -1,15 +1,16 @@
 import React, { useEffect, useRef } from 'react';
 import { useSettingsStore } from '../../store/useSettingsStore';
 
-interface Particle {
+interface FloatingTarget {
   x: number;
   y: number;
   vx: number;
   vy: number;
-  radius: number;
-  color: string;
+  size: number;
+  rotation: number;
+  rotSpeed: number;
+  shapeType: 'target-ring' | 'crosshair' | 'cube' | 'diamond';
   alpha: number;
-  pulseSpeed: number;
 }
 
 export const ParticleBackground: React.FC = () => {
@@ -38,87 +39,156 @@ export const ParticleBackground: React.FC = () => {
     window.addEventListener('resize', handleResize);
 
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const particleCount = Math.min(50, Math.floor((width * height) / 22000));
-    const particles: Particle[] = [];
-    const colors = [themeAccentColor, '#ffffff', themeAccentColor];
 
-    for (let i = 0; i < particleCount; i++) {
-      particles.push({
+    // Create tactical floating geometric target elements
+    const targetShapes: FloatingTarget[] = [];
+    const shapeTypes: FloatingTarget['shapeType'][] = ['target-ring', 'crosshair', 'cube', 'diamond'];
+    const count = 16;
+
+    for (let i = 0; i < count; i++) {
+      targetShapes.push({
         x: Math.random() * width,
         y: Math.random() * height,
-        vx: (Math.random() - 0.5) * 0.3,
-        vy: (Math.random() - 0.5) * 0.3,
-        radius: Math.random() * 1.4 + 0.6,
-        color: colors[Math.floor(Math.random() * colors.length)],
-        alpha: Math.random() * 0.15 + 0.08,
-        pulseSpeed: (Math.random() - 0.5) * 0.005,
+        vx: (Math.random() - 0.5) * 0.25,
+        vy: (Math.random() - 0.5) * 0.25,
+        size: Math.random() * 14 + 10,
+        rotation: Math.random() * Math.PI * 2,
+        rotSpeed: (Math.random() - 0.5) * 0.015,
+        shapeType: shapeTypes[i % shapeTypes.length],
+        alpha: Math.random() * 0.18 + 0.08,
       });
     }
 
-    const drawParticles = () => {
+    let radarAngle = 0;
+
+    const renderTacticalBackground = () => {
       ctx.clearRect(0, 0, width, height);
 
-      for (let i = 0; i < particles.length; i++) {
-        const p = particles[i];
-        if (!prefersReducedMotion) {
-          p.x += p.vx;
-          p.y += p.vy;
-          p.alpha += p.pulseSpeed;
+      // 1. Draw Subtle Tactical Coordinate Grid Lines & Intersection Plus Icons
+      const gridSize = 80;
+      ctx.strokeStyle = '#262626';
+      ctx.lineWidth = 0.5;
+      ctx.globalAlpha = 0.15;
 
-          if (p.alpha > 0.25 || p.alpha < 0.05) {
-            p.pulseSpeed *= -1;
-          }
-
-          if (p.x < 0 || p.x > width) p.vx *= -1;
-          if (p.y < 0 || p.y > height) p.vy *= -1;
-        }
-
+      for (let x = 0; x < width; x += gridSize) {
         ctx.beginPath();
-        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-        ctx.fillStyle = p.color;
-        ctx.globalAlpha = p.alpha;
-        ctx.shadowColor = themeAccentColor;
-        ctx.shadowBlur = 4;
-        ctx.fill();
-        ctx.shadowBlur = 0;
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, height);
+        ctx.stroke();
+      }
 
-        for (let j = i + 1; j < particles.length; j++) {
-          const p2 = particles[j];
-          const dx = p.x - p2.x;
-          const dy = p.y - p2.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
+      for (let y = 0; y < height; y += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(width, y);
+        ctx.stroke();
+      }
 
-          if (dist < 90) {
-            ctx.beginPath();
-            ctx.moveTo(p.x, p.y);
-            ctx.lineTo(p2.x, p2.y);
-            ctx.strokeStyle = themeAccentColor;
-            ctx.globalAlpha = (1 - dist / 90) * 0.08;
-            ctx.lineWidth = 0.5;
-            ctx.stroke();
-          }
+      // Draw intersection '+' marks
+      ctx.strokeStyle = themeAccentColor;
+      ctx.globalAlpha = 0.22;
+      for (let x = gridSize; x < width; x += gridSize * 2) {
+        for (let y = gridSize; y < height; y += gridSize * 2) {
+          ctx.beginPath();
+          ctx.moveTo(x - 3, y);
+          ctx.lineTo(x + 3, y);
+          ctx.moveTo(x, y - 3);
+          ctx.lineTo(x, y + 3);
+          ctx.stroke();
         }
       }
-      ctx.globalAlpha = 1.0;
+
+      // 2. Draw Subtle Radar Sweep Line across Screen Center
+      if (!prefersReducedMotion) {
+        radarAngle += 0.008;
+        const centerX = width / 2;
+        const centerY = height / 2;
+        const sweepRadius = Math.max(width, height);
+
+        ctx.save();
+        ctx.translate(centerX, centerY);
+        ctx.rotate(radarAngle);
+
+        const gradient = ctx.createConicGradient(0, 0, 0);
+        gradient.addColorStop(0, 'transparent');
+        gradient.addColorStop(0.12, themeAccentColor);
+        gradient.addColorStop(0.13, 'transparent');
+
+        ctx.fillStyle = gradient;
+        ctx.globalAlpha = 0.04;
+        ctx.beginPath();
+        ctx.arc(0, 0, sweepRadius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      // 3. Draw Tactical Drifting Target Wireframe Geometry
+      for (let i = 0; i < targetShapes.length; i++) {
+        const item = targetShapes[i];
+
+        if (!prefersReducedMotion) {
+          item.x += item.vx;
+          item.y += item.vy;
+          item.rotation += item.rotSpeed;
+
+          if (item.x < -30) item.x = width + 30;
+          if (item.x > width + 30) item.x = -30;
+          if (item.y < -30) item.y = height + 30;
+          if (item.y > height + 30) item.y = -30;
+        }
+
+        ctx.save();
+        ctx.translate(item.x, item.y);
+        ctx.rotate(item.rotation);
+        ctx.strokeStyle = themeAccentColor;
+        ctx.globalAlpha = item.alpha;
+        ctx.lineWidth = 1;
+
+        const r = item.size;
+
+        if (item.shapeType === 'target-ring') {
+          ctx.beginPath();
+          ctx.arc(0, 0, r, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.arc(0, 0, r * 0.4, 0, Math.PI * 2);
+          ctx.stroke();
+        } else if (item.shapeType === 'crosshair') {
+          ctx.beginPath();
+          ctx.arc(0, 0, r * 0.7, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(-r, 0);
+          ctx.lineTo(r, 0);
+          ctx.moveTo(0, -r);
+          ctx.lineTo(0, r);
+          ctx.stroke();
+        } else if (item.shapeType === 'cube') {
+          ctx.strokeRect(-r * 0.7, -r * 0.7, r * 1.4, r * 1.4);
+        } else if (item.shapeType === 'diamond') {
+          ctx.beginPath();
+          ctx.moveTo(0, -r);
+          ctx.lineTo(r, 0);
+          ctx.moveTo(r, 0);
+          ctx.lineTo(0, r);
+          ctx.moveTo(0, r);
+          ctx.lineTo(-r, 0);
+          ctx.moveTo(-r, 0);
+          ctx.lineTo(0, -r);
+          ctx.stroke();
+        }
+
+        ctx.restore();
+      }
+
+      animationFrameId = requestAnimationFrame(renderTacticalBackground);
     };
 
-    if (prefersReducedMotion) {
-      drawParticles();
-      return () => {
-        window.removeEventListener('resize', handleResize);
-      };
-    }
-
-    const render = () => {
-      drawParticles();
-      animationFrameId = requestAnimationFrame(render);
-    };
-
-    render();
+    animationFrameId = requestAnimationFrame(renderTacticalBackground);
 
     return () => {
-      window.removeEventListener('resize', handleResize);
       cancelAnimationFrame(animationFrameId);
+      window.removeEventListener('resize', handleResize);
     };
   }, [performanceMode, themeAccentColor]);
 
@@ -127,7 +197,7 @@ export const ParticleBackground: React.FC = () => {
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 pointer-events-none z-0 opacity-40"
+      className="fixed inset-0 pointer-events-none z-0 opacity-80"
     />
   );
 };
