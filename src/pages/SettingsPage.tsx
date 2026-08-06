@@ -189,12 +189,12 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
       className="relative w-full bg-[#0d0d0d] text-white min-h-screen py-12 px-6 md:px-16 focus:outline-none select-none overflow-hidden"
     >
       {/* Background 3D Real-Time Scene for Settings Atmosphere */}
-      <div className="fixed inset-0 z-0 opacity-35 pointer-events-none">
+      <div className="fixed inset-0 z-0 opacity-25 pointer-events-none">
         <HeroScene />
       </div>
 
-      {/* Radial Dark Vignette Overlay */}
-      <div className="fixed inset-0 z-0 bg-gradient-to-t from-[#0d0d0d] via-[#0d0d0d]/85 to-[#0d0d0d]/95 pointer-events-none" />
+      {/* Radial Dark Vignette Overlay with Solid Dark Base */}
+      <div className="fixed inset-0 z-0 bg-[#0d0d0d]/95 pointer-events-none" />
 
       {/* Settings Content Layer */}
       <div className="relative z-10">
@@ -208,7 +208,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
 
       {/* Clear History Confirmation Modal */}
       {showClearConfirm && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
           <div className="bg-[#141414] border border-[#262626] rounded-[12px] p-6 max-w-md w-full space-y-4 shadow-2xl">
             <h3 className="font-display font-extrabold text-xl text-white">CLEAR SESSION HISTORY?</h3>
             <p className="font-sans-ui text-xs text-neutral-400">
@@ -241,22 +241,25 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -15 }}
             transition={{ duration: 0.2 }}
-            className="max-w-md mx-auto text-center space-y-10 py-12"
+            className="max-w-md mx-auto text-center space-y-8 py-10 my-8 bg-[#0d0d0d]/95 border border-[#262626] rounded-[20px] p-8 shadow-[0_0_50px_rgba(0,0,0,0.9)]"
           >
             {/* Options Title & Ornamental Line Divider */}
-            <div className="space-y-4">
-              <h1 className="font-display font-extrabold text-4xl md:text-6xl tracking-wider text-white">
+            <div className="space-y-3">
+              <h1 className="font-display font-extrabold text-4xl md:text-5xl tracking-widest text-white drop-shadow-[0_0_20px_rgba(var(--accent-color-rgb),0.3)]">
                 OPTIONS
               </h1>
-              <div className="flex items-center justify-center gap-3 w-48 mx-auto opacity-75">
-                <div className="h-px bg-gradient-to-r from-transparent to-pink flex-1" />
-                <span className="text-pink text-xs font-mono">◆</span>
-                <div className="h-px bg-gradient-to-l from-transparent to-pink flex-1" />
+              <div className="flex items-center justify-center gap-3 w-48 mx-auto opacity-80">
+                <div className="h-px bg-gradient-to-r from-transparent via-pink to-transparent flex-1" />
+                <span className="text-pink text-xs font-mono animate-pulse">◆</span>
+                <div className="h-px bg-gradient-to-l from-transparent via-pink to-transparent flex-1" />
               </div>
+              <p className="font-mono text-[10px] text-neutral-400 uppercase tracking-widest font-bold">
+                SYSTEM & GAME ENGINE CONFIGURATION
+              </p>
             </div>
 
             {/* Vertical Text-First Menu List */}
-            <div className="flex flex-col items-center gap-6 py-2">
+            <div className="flex flex-col items-center gap-5 py-2">
               {[
                 { id: 'game', label: 'GAME' },
                 { id: 'crosshair', label: 'CROSSHAIR' },
@@ -271,19 +274,19 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
                     setActiveCategory(cat.id as any);
                   }}
                   onMouseEnter={() => soundManager.playHover()}
-                  className="group relative font-display font-extrabold text-xl md:text-3xl tracking-widest text-neutral-300 hover:text-pink transition-colors duration-200 py-1 flex items-center justify-center gap-3 focus:outline-none"
+                  className="group relative font-display font-extrabold text-2xl md:text-3xl tracking-widest text-white hover:text-pink transition-colors duration-200 py-1 flex items-center justify-center gap-3 focus:outline-none"
                 >
-                  <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-pink font-mono text-base">‹</span>
+                  <span className="text-pink font-mono text-base transition-transform group-hover:-translate-x-1.5">‹</span>
                   <span className="relative">
                     {cat.label}
-                    <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-pink group-hover:w-full transition-all duration-250 ease-out" />
+                    <span className="absolute bottom-0 left-0 w-0 h-[2.5px] bg-pink group-hover:w-full transition-all duration-250 ease-out shadow-[0_0_8px_var(--accent-color)]" />
                   </span>
-                  <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-pink font-mono text-base">›</span>
+                  <span className="text-pink font-mono text-base transition-transform group-hover:translate-x-1.5">›</span>
                 </button>
               ))}
 
               {/* BACK Option */}
-              <div className="pt-8">
+              <div className="pt-6 border-t border-[#262626] w-full">
                 <button
                   onClick={() => {
                     soundManager.playClick();
@@ -294,11 +297,11 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
                     }
                   }}
                   onMouseEnter={() => soundManager.playHover()}
-                  className="group relative font-display font-bold text-lg md:text-2xl tracking-widest text-neutral-400 hover:text-white transition-colors duration-200 py-1 flex items-center justify-center gap-2 focus:outline-none"
+                  className="group relative font-display font-bold text-lg md:text-xl tracking-widest text-neutral-300 hover:text-white transition-colors duration-200 py-1 flex items-center justify-center gap-2 focus:outline-none"
                 >
                   <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-pink font-mono text-sm">‹</span>
                   <span className="relative">
-                    BACK
+                    RETURN TO MAIN MENU
                     <span className="absolute bottom-0 left-0 w-0 h-[1.5px] bg-pink group-hover:w-full transition-all duration-250 ease-out" />
                   </span>
                   <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-pink font-mono text-sm">›</span>
@@ -316,33 +319,49 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
             transition={{ duration: 0.2 }}
             className="max-w-4xl mx-auto space-y-8"
           >
-            {/* Category Breadcrumb Bar */}
-            <div className="flex items-center justify-between border-b border-[#262626] pb-4">
-              <div className="flex items-center gap-3 font-mono text-xs text-neutral-400">
-                <button
-                  onClick={() => {
-                    soundManager.playClick();
-                    setActiveCategory(null);
-                  }}
-                  onMouseEnter={() => soundManager.playHover()}
-                  className="text-pink hover:text-white font-bold transition-colors flex items-center gap-1.5 focus:outline-none"
-                >
-                  <ArrowLeft className="w-4 h-4" /> OPTIONS
-                </button>
-                <span>/</span>
-                <span className="text-white font-bold uppercase tracking-widest">{activeCategory}</span>
-              </div>
-
+            {/* Category Sidebar/Top Bar Persistent Navigation */}
+            <div className="flex flex-col sm:flex-row items-center justify-between border-b border-[#262626] pb-4 gap-4 bg-[#0d0d0d]/95 p-4 rounded-[16px] border border-[#262626] shadow-xl">
               <button
                 onClick={() => {
                   soundManager.playClick();
                   setActiveCategory(null);
                 }}
                 onMouseEnter={() => soundManager.playHover()}
-                className="text-xs font-mono text-neutral-400 hover:text-pink transition-colors"
+                className="text-pink hover:text-white font-mono text-xs font-bold transition-colors flex items-center gap-1.5 focus:outline-none shrink-0"
               >
-                RETURN TO CATEGORIES
+                <ArrowLeft className="w-4 h-4" /> ALL OPTIONS
               </button>
+
+              <div className="flex items-center gap-1.5 overflow-x-auto max-w-full pb-1 sm:pb-0 thin-pink-scrollbar">
+                {[
+                  { id: 'game', label: 'GAME' },
+                  { id: 'crosshair', label: 'CROSSHAIR' },
+                  { id: 'audio', label: 'AUDIO' },
+                  { id: 'video', label: 'VIDEO' },
+                  { id: 'controls', label: 'CONTROLS' },
+                ].map((cat) => (
+                  <button
+                    key={cat.id}
+                    onClick={() => {
+                      soundManager.playClick();
+                      setActiveCategory(cat.id as any);
+                    }}
+                    onMouseEnter={() => soundManager.playHover()}
+                    className={`relative px-4 py-2 rounded-[10px] font-mono text-xs font-bold tracking-wider uppercase transition-colors focus:outline-none ${
+                      activeCategory === cat.id ? 'text-[#0d0d0d]' : 'text-neutral-300 hover:text-white'
+                    }`}
+                  >
+                    {activeCategory === cat.id && (
+                      <motion.div
+                        layoutId="activeCategoryPill"
+                        className="absolute inset-0 bg-pink rounded-[10px] z-0"
+                        transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                      />
+                    )}
+                    <span className="relative z-10">{cat.label}</span>
+                  </button>
+                ))}
+              </div>
             </div>
 
             {/* CATEGORY 1: GAME */}

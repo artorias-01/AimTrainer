@@ -15,8 +15,11 @@ interface LandingPageProps {
 
 export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
   const [showDrillMenu, setShowDrillMenu] = useState(false);
-  const { setScenario } = useGameStore();
+  const [spotlightPos, setSpotlightPos] = useState({ x: 150, y: 150 });
+  const [magneticOffset, setMagneticOffset] = useState({ x: 0, y: 0 });
+  const [isExiting, setIsExiting] = useState(false);
 
+  const { setScenario } = useGameStore();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const dailyStreak = getDailyStreak();
@@ -55,13 +58,50 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
     }
   };
 
+  const handleNavigateWithExit = (page: string, scenarioId?: string) => {
+    setIsExiting(true);
+    setTimeout(() => {
+      onNavigate(page, scenarioId);
+    }, 220);
+  };
+
   const handleSelectDrill = (scenarioId: string) => {
     soundManager.playClick();
     if (!document.fullscreenElement) {
       document.documentElement.requestFullscreen().catch(() => {});
     }
     setScenario(scenarioId);
-    onNavigate('arena', scenarioId);
+    handleNavigateWithExit('arena', scenarioId);
+  };
+
+  const handlePanelMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
+      window.matchMedia('(pointer: coarse)').matches
+    ) {
+      return;
+    }
+    const rect = e.currentTarget.getBoundingClientRect();
+    setSpotlightPos({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+  };
+
+  const handleMagneticMove = (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
+      window.matchMedia('(pointer: coarse)').matches
+    ) {
+      return;
+    }
+    const rect = e.currentTarget.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    const pullX = ((e.clientX - centerX) / (rect.width / 2)) * 10;
+    const pullY = ((e.clientY - centerY) / (rect.height / 2)) * 10;
+    setMagneticOffset({ x: pullX, y: pullY });
+  };
+
+  const handleMagneticLeave = () => {
+    setMagneticOffset({ x: 0, y: 0 });
   };
 
   const menuContainerVariants = {
@@ -81,21 +121,32 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
   };
 
   return (
-    <div className="relative w-full h-[calc(100vh-73px)] max-h-[calc(100vh-73px)] bg-[#0d0d0d] text-white overflow-hidden flex flex-col justify-center items-center p-6 select-none">
+    <motion.div
+      initial={{ opacity: 1, scale: 1 }}
+      animate={{ opacity: isExiting ? 0 : 1, scale: isExiting ? 0.98 : 1 }}
+      transition={{ duration: 0.22, ease: 'easeOut' }}
+      className="relative w-full h-[calc(100vh-73px)] max-h-[calc(100vh-73px)] bg-[#0d0d0d] text-white overflow-hidden flex flex-col justify-center items-center p-6 select-none"
+    >
       {/* Background 3D Real-Time Scene */}
       <div className="absolute inset-0 z-0 opacity-75">
         <HeroScene />
       </div>
 
       {/* Radial Dark Vignette Overlay with Ambient Accent Glow */}
-      <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,transparent_30%,rgba(13,13,13,0.85)_100%)] pointer-events-none" />
+      <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,transparent_30%,rgba(13,13,13,0.92)_100%)] pointer-events-none" />
 
       {/* Dynamic Main Container */}
       <div
+        onMouseMove={handlePanelMouseMove}
+        style={{
+          backgroundImage: !showDrillMenu
+            ? `radial-gradient(400px circle at ${spotlightPos.x}px ${spotlightPos.y}px, rgba(245, 184, 201, 0.07), transparent 80%)`
+            : undefined,
+        }}
         className={`relative z-10 w-full transition-all duration-300 ${
           showDrillMenu
             ? 'max-w-7xl flex flex-col md:flex-row items-center md:items-stretch justify-between gap-8'
-            : 'max-w-lg text-center space-y-6 bg-[#0d0d0d]/50 backdrop-blur-md p-6 sm:p-8 rounded-[20px] border border-[#262626]/80 shadow-[0_0_50px_rgba(0,0,0,0.8)]'
+            : 'max-w-lg text-center space-y-6 bg-[#0d0d0d]/95 p-6 sm:p-8 rounded-[20px] border border-[#262626] shadow-[0_0_50px_rgba(0,0,0,0.9)]'
         }`}
       >
         {showDrillMenu ? (
@@ -106,7 +157,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.3 }}
-              className="bg-[#0d0d0d]/85 backdrop-blur-lg p-6 rounded-[18px] border border-[#262626] shadow-2xl space-y-5 w-full md:w-72 shrink-0 flex flex-col justify-between text-left"
+              className="bg-[#0d0d0d]/95 p-6 rounded-[18px] border border-[#262626] shadow-2xl space-y-5 w-full md:w-72 shrink-0 flex flex-col justify-between text-left"
             >
               <div className="space-y-3">
                 <h1 className="font-display font-extrabold text-3xl md:text-4xl tracking-tight leading-none text-white drop-shadow-[0_0_15px_rgba(var(--accent-color-rgb),0.3)]">
@@ -145,7 +196,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 25 }}
               transition={{ duration: 0.3 }}
-              className="flex-1 w-full max-w-full overflow-hidden bg-[#0d0d0d]/90 backdrop-blur-lg border border-[#262626] rounded-[18px] p-6 space-y-4 shadow-2xl text-left"
+              className="flex-1 w-full max-w-full overflow-hidden bg-[#0d0d0d]/95 border border-[#262626] rounded-[18px] p-6 space-y-4 shadow-2xl text-left"
             >
               <div className="flex items-center justify-between border-b border-[#262626] pb-3">
                 <span className="font-mono text-xs text-accent font-bold tracking-widest uppercase flex items-center gap-2">
@@ -264,7 +315,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
               transition={{ duration: 0.35, delay: 0.1 }}
               className="flex justify-center"
             >
-              <div className="px-4 py-1.5 rounded-[12px] bg-[#141414]/90 border border-accent/40 text-xs font-mono font-bold flex items-center justify-center gap-2 text-accent backdrop-blur-md shadow-[0_0_15px_rgba(var(--accent-color-rgb),0.15)] tracking-wider">
+              <div className="px-4 py-1.5 rounded-[12px] bg-[#141414] border border-accent/40 text-xs font-mono font-bold flex items-center justify-center gap-2 text-accent shadow-[0_0_15px_rgba(var(--accent-color-rgb),0.15)] tracking-wider">
                 <Flame className="w-4 h-4 text-accent animate-bounce" />
                 <span>
                   {dailyStreak.streakCount > 0
@@ -282,11 +333,15 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
               animate="visible"
               className="flex flex-col items-center gap-5 max-w-xs mx-auto py-2"
             >
-              {/* Option 1: START DRILL */}
+              {/* Option 1: START DRILL with Magnetic Pull Effect */}
               <motion.button
                 variants={menuItemVariants}
-                whileHover={{ scale: 1.04, x: 2 }}
-                whileTap={{ scale: 0.96 }}
+                animate={{ x: magneticOffset.x, y: magneticOffset.y }}
+                transition={{ type: 'spring', stiffness: 350, damping: 22 }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onMouseMove={handleMagneticMove}
+                onMouseLeave={handleMagneticLeave}
                 onClick={() => {
                   soundManager.playClick();
                   setShowDrillMenu(true);
@@ -309,7 +364,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
                 whileTap={{ scale: 0.96 }}
                 onClick={() => {
                   soundManager.playClick();
-                  onNavigate('library');
+                  handleNavigateWithExit('library');
                 }}
                 onMouseEnter={() => soundManager.playHover()}
                 className="group relative font-display font-bold text-lg md:text-2xl tracking-widest text-neutral-300 hover:text-accent transition-colors duration-200 py-1 flex items-center justify-center gap-2 focus:outline-none focus-visible:outline-accent"
@@ -329,7 +384,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
                 whileTap={{ scale: 0.96 }}
                 onClick={() => {
                   soundManager.playClick();
-                  onNavigate('dashboard');
+                  handleNavigateWithExit('dashboard');
                 }}
                 onMouseEnter={() => soundManager.playHover()}
                 className="group relative font-display font-bold text-lg md:text-2xl tracking-widest text-neutral-300 hover:text-accent transition-colors duration-200 py-1 flex items-center justify-center gap-2 focus:outline-none focus-visible:outline-accent"
@@ -349,7 +404,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
                 whileTap={{ scale: 0.96 }}
                 onClick={() => {
                   soundManager.playClick();
-                  onNavigate('settings');
+                  handleNavigateWithExit('settings');
                 }}
                 onMouseEnter={() => soundManager.playHover()}
                 className="group relative font-display font-bold text-lg md:text-2xl tracking-widest text-neutral-300 hover:text-accent transition-colors duration-200 py-1 flex items-center justify-center gap-2 focus:outline-none focus-visible:outline-accent"
@@ -365,6 +420,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
           </>
         )}
       </div>
-    </div>
+    </motion.div>
   );
 };
