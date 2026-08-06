@@ -3,6 +3,7 @@ import { useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { useSettingsStore } from '../../store/useSettingsStore';
+import { useGameStore } from '../../store/useGameStore';
 
 interface TargetSphereProps {
   id: string;
@@ -13,7 +14,7 @@ interface TargetSphereProps {
   vx?: number;
   vy?: number;
   targetSpeed?: number;
-  pathType?: 'linear' | 'sinusoidal' | 'erratic';
+  pathType?: 'linear' | 'sinusoidal' | 'erratic' | 'figure8';
   directionChangeIntervalMs?: number;
   speedVariance?: number;
   enableJukes?: boolean;
@@ -47,6 +48,8 @@ export const TargetSphere: React.FC<TargetSphereProps> = React.memo(({
   const [hovered, setHovered] = useState(false);
   const targetSpeedMultiplier = useSettingsStore((s) => s.targetSpeedMultiplier) || 1.0;
   const themeAccentColor = useSettingsStore((s) => s.themeAccentColor) || '#f5b8c9';
+  const streak = useGameStore((s) => s.streak);
+  const activeScenarioId = useGameStore((s) => s.activeScenario.id);
 
   const TARGET_COLORS = [
     themeAccentColor,
@@ -94,7 +97,7 @@ export const TargetSphere: React.FC<TargetSphereProps> = React.memo(({
       }
     }
 
-    // 2. Dynamic live speed evaluation (scales baseSpeed, heading velocity, & sinusoidal waves)
+    // 2. Dynamic live speed evaluation (scales baseSpeed, heading velocity, & sinusoidal/figure-8 waves)
     const liveMult = useSettingsStore.getState().targetSpeedMultiplier || 1.0;
     const liveBaseSpeed = targetSpeed * liveMult;
 
@@ -122,7 +125,11 @@ export const TargetSphere: React.FC<TargetSphereProps> = React.memo(({
       curX += curVx * delta;
       curY += curVy * delta;
 
-      if (pathType === 'sinusoidal') {
+      if (pathType === 'figure8') {
+        const elapsed = (now - spawnTime) * 0.002 * liveMult + phaseOffsetRef.current;
+        curX += Math.cos(elapsed) * 1.6 * liveMult * delta;
+        curY += Math.sin(elapsed * 2) * 1.6 * liveMult * delta;
+      } else if (pathType === 'sinusoidal') {
         curY += Math.sin((now - spawnTime) * 0.004 * liveMult + phaseOffsetRef.current) * 0.6 * liveMult * delta;
       }
 
@@ -164,7 +171,11 @@ export const TargetSphere: React.FC<TargetSphereProps> = React.memo(({
   const scaleMult = shapeConfig?.scale ?? 1.0;
   const isWireframe = shapeConfig?.wireframe ?? false;
   const glowIntensity = hovered ? 0.95 : (shapeConfig?.emissiveIntensity ?? 0.65);
-  const effRadius = radius * scaleMult;
+
+  // Progressive target size reduction for escalating-precision drill as streak builds
+  const isEscalating = activeScenarioId === 'escalating-precision';
+  const shrinkFactor = isEscalating ? Math.max(0.35, 1.0 - streak * 0.07) : 1.0;
+  const effRadius = radius * scaleMult * shrinkFactor;
 
   return (
     <group ref={groupRef} position={[x, y, z]}>

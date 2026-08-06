@@ -8,18 +8,18 @@ const AmbientParticles: React.FC = () => {
   const themeAccentColor = useSettingsStore((s) => s.themeAccentColor) || '#f5b8c9';
 
   const [positions, colors] = useMemo(() => {
-    const count = 140;
+    const count = 75;
     const pos = new Float32Array(count * 3);
     const col = new Float32Array(count * 3);
     const accentHex = new THREE.Color(themeAccentColor);
     const whiteHex = new THREE.Color('#ffffff');
 
     for (let i = 0; i < count; i++) {
-      pos[i * 3] = (Math.random() - 0.5) * 16;
-      pos[i * 3 + 1] = (Math.random() - 0.5) * 12 - 1;
-      pos[i * 3 + 2] = (Math.random() - 0.5) * 10 - 2;
+      pos[i * 3] = (Math.random() - 0.5) * 14;
+      pos[i * 3 + 1] = (Math.random() - 0.5) * 10 - 1;
+      pos[i * 3 + 2] = (Math.random() - 0.5) * 8 - 2;
 
-      const mixCol = Math.random() > 0.35 ? accentHex : whiteHex;
+      const mixCol = Math.random() > 0.4 ? accentHex : whiteHex;
       col[i * 3] = mixCol.r;
       col[i * 3 + 1] = mixCol.g;
       col[i * 3 + 2] = mixCol.b;
@@ -27,94 +27,34 @@ const AmbientParticles: React.FC = () => {
     return [pos, col];
   }, [themeAccentColor]);
 
-  useFrame(({ clock, pointer }) => {
+  useFrame(({ clock }) => {
     if (pointsRef.current) {
       const t = clock.getElapsedTime();
-      pointsRef.current.rotation.y = t * 0.02 + pointer.x * 0.05;
-      pointsRef.current.rotation.x = Math.sin(t * 0.04) * 0.02 - pointer.y * 0.05;
+      pointsRef.current.rotation.y = t * 0.03;
+      pointsRef.current.rotation.x = Math.sin(t * 0.05) * 0.02;
     }
   });
 
   return (
     <points ref={pointsRef}>
       <bufferGeometry>
-        <bufferAttribute attach="attributes-position" args={[positions, 3]} />
-        <bufferAttribute attach="attributes-color" args={[colors, 3]} />
+        <bufferAttribute
+          attach="attributes-position"
+          args={[positions, 3]}
+        />
+        <bufferAttribute
+          attach="attributes-color"
+          args={[colors, 3]}
+        />
       </bufferGeometry>
       <pointsMaterial
-        size={0.09}
+        size={0.08}
         vertexColors
         transparent
-        opacity={0.65}
+        opacity={0.6}
         sizeAttenuation
       />
     </points>
-  );
-};
-
-const ArmillaryRings: React.FC = () => {
-  const ring1Ref = useRef<THREE.Mesh>(null);
-  const ring2Ref = useRef<THREE.Mesh>(null);
-  const ring3Ref = useRef<THREE.Mesh>(null);
-  const themeAccentColor = useSettingsStore((s) => s.themeAccentColor) || '#f5b8c9';
-
-  useFrame(({ clock }) => {
-    const t = clock.getElapsedTime();
-    if (ring1Ref.current) {
-      ring1Ref.current.rotation.z = t * 0.15;
-      ring1Ref.current.rotation.y = t * 0.08;
-    }
-    if (ring2Ref.current) {
-      ring2Ref.current.rotation.x = t * 0.12;
-      ring2Ref.current.rotation.z = -t * 0.1;
-    }
-    if (ring3Ref.current) {
-      ring3Ref.current.rotation.y = -t * 0.14;
-      ring3Ref.current.rotation.x = t * 0.09;
-    }
-  });
-
-  return (
-    <group position={[0, -1.2, -0.5]}>
-      {/* Outer Ethereal Celestial Ring */}
-      <mesh ref={ring1Ref}>
-        <torusGeometry args={[2.6, 0.012, 16, 120]} />
-        <meshStandardMaterial
-          color={themeAccentColor}
-          emissive={themeAccentColor}
-          emissiveIntensity={0.6}
-          transparent
-          opacity={0.4}
-          roughness={0.1}
-        />
-      </mesh>
-
-      {/* Mid Armillary Ring */}
-      <mesh ref={ring2Ref} rotation={[Math.PI / 4, Math.PI / 6, 0]}>
-        <torusGeometry args={[2.1, 0.01, 16, 120]} />
-        <meshStandardMaterial
-          color="#ffffff"
-          emissive={themeAccentColor}
-          emissiveIntensity={0.4}
-          transparent
-          opacity={0.35}
-          roughness={0.1}
-        />
-      </mesh>
-
-      {/* Inner Delicate Ring */}
-      <mesh ref={ring3Ref} rotation={[-Math.PI / 3, 0, Math.PI / 4]}>
-        <torusGeometry args={[1.6, 0.008, 16, 120]} />
-        <meshStandardMaterial
-          color={themeAccentColor}
-          emissive={themeAccentColor}
-          emissiveIntensity={0.7}
-          transparent
-          opacity={0.45}
-          roughness={0.1}
-        />
-      </mesh>
-    </group>
   );
 };
 
@@ -129,12 +69,11 @@ const OrbCluster: React.FC = () => {
   useFrame(({ clock, pointer }) => {
     const t = clock.getElapsedTime();
     if (groupRef.current) {
-      // AAA smooth lerp camera tilt responding to pointer
-      groupRef.current.rotation.y = THREE.MathUtils.lerp(groupRef.current.rotation.y, pointer.x * 0.25, 0.05);
-      groupRef.current.rotation.x = THREE.MathUtils.lerp(groupRef.current.rotation.x, -pointer.y * 0.2, 0.05);
+      groupRef.current.rotation.y += 0.004 + pointer.x * 0.008;
+      groupRef.current.rotation.x = Math.sin(t * 0.2) * 0.1 - pointer.y * 0.1;
     }
     if (targetRef.current) {
-      // Smooth floating motion baseline y = -1.2
+      // Smooth sine floating motion baseline y = -1.2
       targetRef.current.position.x = Math.sin(t * 1.0) * 1.1;
       targetRef.current.position.y = -1.2 + Math.cos(t * 1.5) * 0.35;
       if (targetShapeConfig?.idleRotation !== false) {
@@ -143,7 +82,7 @@ const OrbCluster: React.FC = () => {
       }
     }
     if (lightRef.current) {
-      lightRef.current.intensity = 2.0 + Math.sin(t * 2.5) * 0.7;
+      lightRef.current.intensity = 1.8 + Math.sin(t * 2.5) * 0.6;
     }
   });
 
@@ -152,10 +91,7 @@ const OrbCluster: React.FC = () => {
 
   return (
     <group ref={groupRef}>
-      <pointLight ref={lightRef} position={[0, -1, 3]} intensity={2.2} color={themeAccentColor} />
-
-      {/* Armillary Orbital Rings */}
-      <ArmillaryRings />
+      <pointLight ref={lightRef} position={[0, -1, 3]} intensity={2.0} color={themeAccentColor} />
 
       {/* Central Hero Dynamic Target Geometry */}
       <mesh ref={targetRef} position={[0, -1.2, 0]}>
@@ -178,9 +114,9 @@ const OrbCluster: React.FC = () => {
           color={targetColor}
           wireframe={wireframe}
           roughness={0.15}
-          metalness={0.35}
+          metalness={0.3}
           emissive={targetColor === '#ffffff' ? themeAccentColor : targetColor}
-          emissiveIntensity={emissiveIntensity ?? 0.65}
+          emissiveIntensity={emissiveIntensity ?? 0.6}
         />
       </mesh>
 

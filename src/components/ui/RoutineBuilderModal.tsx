@@ -14,7 +14,7 @@ interface RoutineBuilderModalProps {
 export const RoutineBuilderModal: React.FC<RoutineBuilderModalProps> = ({ onClose, onSaved }) => {
   const [name, setName] = useState('MY CUSTOM WARMUP');
   const [description, setDescription] = useState('Custom multi-drill routine playlist.');
-  const [selectedDrills, setSelectedDrills] = useState<string[]>(['gridshot-classic', 'strafe-tracking']);
+  const [selectedDrills, setSelectedDrills] = useState<string[]>(['gridshot-classic', 'airstrafe-tracking']);
 
   const allScenarios = getAllScenarios();
 

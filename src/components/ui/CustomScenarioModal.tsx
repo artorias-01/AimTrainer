@@ -27,7 +27,7 @@ export const CustomScenarioModal: React.FC<CustomScenarioModalProps> = ({
   const [arenaType, setArenaType] = useState<'1-wall' | '6-wall' | 'open-arena'>(initialScenario?.arenaType || '1-wall');
   const [hasLifetimeLimit, setHasLifetimeLimit] = useState(initialScenario?.hasLifetimeLimit || false);
   const [lifetimeMs, setLifetimeMs] = useState(initialScenario?.lifetimeMs || 600);
-  const [pathType, setPathType] = useState<'linear' | 'sinusoidal' | 'erratic'>(initialScenario?.pathType || 'linear');
+  const [pathType, setPathType] = useState<'linear' | 'sinusoidal' | 'erratic' | 'figure8'>(initialScenario?.pathType || 'linear');
   const [directionChangeIntervalMs, setDirectionChangeIntervalMs] = useState(initialScenario?.directionChangeIntervalMs || 1000);
   const [enableJukes, setEnableJukes] = useState(initialScenario?.enableJukes || false);
   const [playerDistance, setPlayerDistance] = useState(initialScenario?.playerPosition?.z ?? 3.0);
@@ -253,8 +253,8 @@ export const CustomScenarioModal: React.FC<CustomScenarioModalProps> = ({
 
             <div className="space-y-2 bg-[#0d0d0d] p-3.5 rounded-[12px] border border-[#262626]">
               <label className="font-bold text-white block">PATH PATTERN & DYNAMICS</label>
-              <div className="grid grid-cols-3 gap-1.5">
-                {(['linear', 'sinusoidal', 'erratic'] as const).map((type) => (
+              <div className="grid grid-cols-4 gap-1.5">
+                {(['linear', 'sinusoidal', 'erratic', 'figure8'] as const).map((type) => (
                   <button
                     key={type}
                     type="button"
