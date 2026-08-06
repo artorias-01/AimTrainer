@@ -5,6 +5,7 @@ import { getAllScenarios } from '../utils/scenarios';
 import { getDailyStreak } from '../utils/storage';
 import { useGameStore } from '../store/useGameStore';
 import { soundManager } from '../utils/audio';
+import { triggerAutoFullscreen } from '../utils/fullscreen';
 import { Target, ArrowRight, ChevronLeft, ChevronRight, Flame, Zap } from 'lucide-react';
 import { SplitText } from '../components/ui/SplitText';
 import { SpotlightCard } from '../components/ui/SpotlightCard';
@@ -67,6 +68,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
 
   const handleSelectDrill = (scenarioId: string) => {
     soundManager.playClick();
+    triggerAutoFullscreen();
     setScenario(scenarioId);
     handleNavigateWithExit('arena', scenarioId);
   };
