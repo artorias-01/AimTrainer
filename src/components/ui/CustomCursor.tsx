@@ -3,7 +3,7 @@ import { useSettingsStore } from '../../store/useSettingsStore';
 
 export const CustomCursor: React.FC = () => {
   const cursorRef = useRef<HTMLDivElement>(null);
-  const triRef = useRef<SVGSVGElement>(null);
+  const arrowRef = useRef<SVGSVGElement>(null);
   const [isVisible, setIsVisible] = useState(false);
   const themeAccentColor = useSettingsStore((s) => s.themeAccentColor) || '#f5b8c9';
 
@@ -21,24 +21,25 @@ export const CustomCursor: React.FC = () => {
     const isReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     // Direct 1:1 DOM position update with zero React re-renders or latency
+    // Hotspot is at (2, 2) top-left tip of the arrow
     const handleMouseMove = (e: MouseEvent) => {
       if (cursorRef.current) {
-        cursorRef.current.style.transform = `translate3d(${e.clientX - 12}px, ${e.clientY - 12}px, 0)`;
+        cursorRef.current.style.transform = `translate3d(${e.clientX - 2}px, ${e.clientY - 2}px, 0)`;
       }
     };
 
     // Direct DOM click pulse animation
     const handleMouseDown = () => {
-      if (triRef.current && !isReducedMotion) {
-        triRef.current.style.transform = 'scale(0.82)';
-        triRef.current.style.filter = `drop-shadow(0 0 14px ${themeAccentColor})`;
+      if (arrowRef.current && !isReducedMotion) {
+        arrowRef.current.style.transform = 'scale(0.86)';
+        arrowRef.current.style.filter = `drop-shadow(0 2px 10px rgba(0,0,0,0.8)) drop-shadow(0 0 12px ${themeAccentColor})`;
       }
     };
 
     const handleMouseUp = () => {
-      if (triRef.current && !isReducedMotion) {
-        triRef.current.style.transform = 'scale(1)';
-        triRef.current.style.filter = `drop-shadow(0 0 6px ${themeAccentColor})`;
+      if (arrowRef.current && !isReducedMotion) {
+        arrowRef.current.style.transform = 'scale(1)';
+        arrowRef.current.style.filter = `drop-shadow(0 2px 6px rgba(0,0,0,0.6)) drop-shadow(0 0 6px ${themeAccentColor})`;
       }
     };
 
@@ -63,53 +64,41 @@ export const CustomCursor: React.FC = () => {
       style={{ willChange: 'transform' }}
     >
       <svg
-        ref={triRef}
+        ref={arrowRef}
         width="24"
         height="24"
         viewBox="0 0 24 24"
-        className="transition-transform duration-150 ease-out"
+        className="transition-transform duration-150 ease-out origin-top-left"
         style={{
-          filter: `drop-shadow(0 0 6px ${themeAccentColor})`,
+          filter: `drop-shadow(0 2px 6px rgba(0,0,0,0.6)) drop-shadow(0 0 6px ${themeAccentColor})`,
           willChange: 'transform, filter',
         }}
       >
-        {/* High-Contrast Outer Black Shadow Triangle */}
-        <polygon
-          points="12,3 21,19 3,19"
+        {/* High-Contrast Black Outline Shadow Path */}
+        <path
+          d="M 2,2 L 22,8 L 12,12 L 8,22 Z"
           fill="none"
           stroke="#000000"
           strokeWidth="3"
           strokeLinejoin="round"
-          opacity="0.6"
         />
 
-        {/* Dynamic Theme Accent Triangular Reticle Chevron */}
-        <polygon
-          points="12,3 21,19 3,19"
-          fill="rgba(var(--accent-color-rgb), 0.08)"
+        {/* Inner White/Accent Tint Stealth Chevron Arrow */}
+        <path
+          d="M 2,2 L 22,8 L 12,12 L 8,22 Z"
+          fill="#f8fafc"
           stroke={themeAccentColor}
           strokeWidth="1.5"
           strokeLinejoin="round"
         />
 
-        {/* Tactical Vertex Corner Accents */}
-        <g stroke={themeAccentColor} strokeWidth="1.5" strokeLinecap="round">
-          {/* Top Vertex Pointer Extension */}
-          <line x1="12" y1="1" x2="12" y2="4" />
-          {/* Bottom Left Corner Accent */}
-          <line x1="1.5" y1="20" x2="4" y2="18.5" />
-          {/* Bottom Right Corner Accent */}
-          <line x1="22.5" y1="20" x2="20" y2="18.5" />
-        </g>
-
-        {/* Center Target Aim Dot */}
-        <circle
-          cx="12"
-          cy="13"
-          r="1.25"
-          fill={themeAccentColor}
-          stroke="#000000"
-          strokeWidth="0.5"
+        {/* Center Spine Accent Line */}
+        <path
+          d="M 2,2 L 12,12"
+          stroke={themeAccentColor}
+          strokeWidth="1.2"
+          strokeLinecap="round"
+          opacity="0.8"
         />
       </svg>
     </div>

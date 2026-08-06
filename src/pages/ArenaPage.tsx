@@ -17,6 +17,11 @@ export const ArenaPage: React.FC<ArenaPageProps> = ({ onNavigate }) => {
   const [isTouchDevice, setIsTouchDevice] = useState(false);
   const [pointerLockDenied, setPointerLockDenied] = useState(false);
 
+  // Remove custom cursor lock class on mount so pointer lock & cursor work smoothly
+  useEffect(() => {
+    document.documentElement.classList.remove('custom-cursor-active');
+  }, []);
+
   // Check touch / coarse pointer device support
   useEffect(() => {
     const isCoarse = window.matchMedia('(pointer: coarse)').matches;
@@ -25,7 +30,7 @@ export const ArenaPage: React.FC<ArenaPageProps> = ({ onNavigate }) => {
     }
   }, []);
 
-  // Listen for native pointerlockerror events (Requirement 2)
+  // Listen for native pointerlockerror events
   useEffect(() => {
     const handlePointerLockError = () => {
       setPointerLockDenied(true);
@@ -47,23 +52,9 @@ export const ArenaPage: React.FC<ArenaPageProps> = ({ onNavigate }) => {
       if (document.pointerLockElement) {
         document.exitPointerLock();
       }
-      if (document.fullscreenElement) {
-        document.exitFullscreen().catch(() => {});
-      }
       onNavigate('results');
     }
   }, [status, onNavigate]);
-
-  // Listen for native fullscreenchange events
-  useEffect(() => {
-    const handleFullscreenChange = () => {
-      if (!document.fullscreenElement && status === 'playing') {
-        pauseSession();
-      }
-    };
-    document.addEventListener('fullscreenchange', handleFullscreenChange);
-    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
-  }, [status, pauseSession]);
 
   // Custom keybind listener
   useEffect(() => {
@@ -84,25 +75,24 @@ export const ArenaPage: React.FC<ArenaPageProps> = ({ onNavigate }) => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [status, pauseSession, resumeSession, startSession, pauseKey, restartKey]);
 
-  // Request pointer lock helper
+  // Clean Pointer Lock Request Helper without forced fullscreen collisions
   const requestPointerLock = () => {
     setPointerLockDenied(false);
     const canvasEl = document.querySelector('canvas');
 
     if (canvasEl) {
       try {
-        canvasEl.requestPointerLock();
+        const promise = canvasEl.requestPointerLock() as any;
+        if (promise && typeof promise.catch === 'function') {
+          promise.catch(() => setPointerLockDenied(true));
+        }
       } catch {
         setPointerLockDenied(true);
       }
     }
-
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen().catch(() => {});
-    }
   };
 
-  // Automatically request pointer lock on mount utilizing transient user activation from START button
+  // Automatically request pointer lock on mount using transient user activation
   useEffect(() => {
     if (isTouchDevice) return;
 

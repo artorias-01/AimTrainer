@@ -393,9 +393,6 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ onNavigate }) => {
               <button
                 onClick={() => {
                   soundManager.playClick();
-                  if (!document.fullscreenElement) {
-                    document.documentElement.requestFullscreen().catch(() => {});
-                  }
                   setScenario(nextScenario.id);
                   startSession();
                   onNavigate('arena');
@@ -412,9 +409,6 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ onNavigate }) => {
               <button
                 onClick={() => {
                   soundManager.playClick();
-                  if (!document.fullscreenElement) {
-                    document.documentElement.requestFullscreen().catch(() => {});
-                  }
                   startSession();
                   onNavigate('arena');
                 }}

@@ -67,9 +67,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
 
   const handleSelectDrill = (scenarioId: string) => {
     soundManager.playClick();
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen().catch(() => {});
-    }
     setScenario(scenarioId);
     handleNavigateWithExit('arena', scenarioId);
   };

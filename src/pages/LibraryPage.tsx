@@ -68,18 +68,12 @@ export const LibraryPage: React.FC<LibraryPageProps> = ({ onNavigate }) => {
 
   const handleStartRoutine = (routine: WarmupRoutine) => {
     soundManager.playClick();
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen().catch(() => {});
-    }
     startRoutine(routine);
     onNavigate('arena');
   };
 
   const handleStartBenchmark = () => {
     soundManager.playClick();
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen().catch(() => {});
-    }
     startBenchmark();
     onNavigate('arena');
   };
@@ -279,9 +273,6 @@ export const LibraryPage: React.FC<LibraryPageProps> = ({ onNavigate }) => {
                               onClick={(e) => {
                                 e.stopPropagation();
                                 soundManager.playClick();
-                                if (!document.fullscreenElement) {
-                                  document.documentElement.requestFullscreen().catch(() => {});
-                                }
                                 onNavigate('arena', sc.id);
                               }}
                               onMouseEnter={() => soundManager.playHover()}
@@ -466,9 +457,6 @@ export const LibraryPage: React.FC<LibraryPageProps> = ({ onNavigate }) => {
               <button
                 onClick={() => {
                   soundManager.playClick();
-                  if (!document.fullscreenElement) {
-                    document.documentElement.requestFullscreen().catch(() => {});
-                  }
                   onNavigate('arena', selectedModalScenario.id);
                   setSelectedModalScenario(null);
                 }}
