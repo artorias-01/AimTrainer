@@ -259,29 +259,33 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
             {/* Vertical Text-First Menu List */}
             <div className="flex flex-col items-center gap-6 py-2">
               {[
-                { id: 'game', label: 'GAME' },
-                { id: 'crosshair', label: 'CROSSHAIR' },
-                { id: 'audio', label: 'AUDIO' },
-                { id: 'video', label: 'VIDEO' },
-                { id: 'controls', label: 'CONTROLS' },
-              ].map((cat) => (
-                <button
-                  key={cat.id}
-                  onClick={() => {
-                    soundManager.playClick();
-                    setActiveCategory(cat.id as any);
-                  }}
-                  onMouseEnter={() => soundManager.playHover()}
-                  className="group relative font-display font-extrabold text-xl md:text-3xl tracking-widest text-neutral-300 hover:text-pink transition-colors duration-200 py-1 flex items-center justify-center gap-3 focus:outline-none"
-                >
-                  <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-pink font-mono text-base">‹</span>
-                  <span className="relative">
-                    {cat.label}
-                    <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-pink group-hover:w-full transition-all duration-250 ease-out" />
-                  </span>
-                  <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-pink font-mono text-base">›</span>
-                </button>
-              ))}
+                { id: 'game', label: 'GAME', icon: Gamepad2 },
+                { id: 'crosshair', label: 'CROSSHAIR', icon: TargetPreview3D },
+                { id: 'audio', label: 'AUDIO', icon: Volume2 },
+                { id: 'video', label: 'VIDEO', icon: Tv },
+                { id: 'controls', label: 'CONTROLS', icon: Sliders },
+              ].map((cat) => {
+                const IconComp = cat.icon === TargetPreview3D ? Sliders : cat.icon;
+                return (
+                  <button
+                    key={cat.id}
+                    onClick={() => {
+                      soundManager.playClick();
+                      setActiveCategory(cat.id as any);
+                    }}
+                    onMouseEnter={() => soundManager.playHover()}
+                    className="group relative font-display font-extrabold text-xl md:text-3xl tracking-widest text-neutral-300 hover:text-pink transition-colors duration-200 py-1 flex items-center justify-center gap-3 focus:outline-none"
+                  >
+                    <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-pink font-mono text-base">‹</span>
+                    <IconComp className="w-5 h-5 text-pink opacity-70 group-hover:opacity-100 group-hover:scale-110 transition-all duration-200" />
+                    <span className="relative">
+                      {cat.label}
+                      <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-pink group-hover:w-full transition-all duration-250 ease-out" />
+                    </span>
+                    <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-pink font-mono text-base">›</span>
+                  </button>
+                );
+              })}
 
               {/* BACK Option */}
               <div className="pt-8">

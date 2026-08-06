@@ -10,6 +10,7 @@ import { Play, Trophy, Filter, Plus, Layers, Award, Trash2 } from 'lucide-react'
 import { CustomScenarioModal } from '../components/ui/CustomScenarioModal';
 import { RoutineBuilderModal } from '../components/ui/RoutineBuilderModal';
 import { getStoredWarmupRoutines, deleteCustomScenario, deleteWarmupRoutine } from '../utils/storage';
+import { kineticStaggerContainer, kineticCascadeItem } from '../utils/motion';
 
 interface LibraryPageProps {
   onNavigate: (page: string, scenarioId?: string) => void;
@@ -207,20 +208,25 @@ export const LibraryPage: React.FC<LibraryPageProps> = ({ onNavigate }) => {
             ))}
           </div>
 
-          {/* Scenario Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {/* Scenario Grid with Staggered Kinetic Entrance */}
+          <motion.div
+            variants={kineticStaggerContainer}
+            initial="hidden"
+            animate="visible"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+          >
             {filteredScenarios.map((sc) => {
               const pb = personalBests[sc.id];
               return (
-                <Card3DTilt
-                  key={sc.id}
-                  onClick={() => {
-                    soundManager.playClick();
-                    setSelectedModalScenario(sc);
-                  }}
-                  onMouseEnter={() => soundManager.playHover()}
-                  className="bg-[#141414] border border-[#262626] rounded-[12px] p-8 flex flex-col justify-between space-y-6 hover:border-pink transition-all duration-200 group active:scale-[0.99] relative"
-                >
+                <motion.div key={sc.id} variants={kineticCascadeItem}>
+                  <Card3DTilt
+                    onClick={() => {
+                      soundManager.playClick();
+                      setSelectedModalScenario(sc);
+                    }}
+                    onMouseEnter={() => soundManager.playHover()}
+                    className="bg-[#141414] border border-[#262626] rounded-[12px] p-8 flex flex-col justify-between space-y-6 hover:border-pink transition-all duration-200 group active:scale-[0.99] relative h-full"
+                  >
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
@@ -291,11 +297,12 @@ export const LibraryPage: React.FC<LibraryPageProps> = ({ onNavigate }) => {
                     </div>
                   </div>
                 </Card3DTilt>
-              );
-            })}
-          </div>
-        </div>
-      )}
+              </motion.div>
+            );
+          })}
+        </motion.div>
+      </div>
+    )}
 
       {/* TAB 2: WARMUP ROUTINES */}
       {activeTab === 'routines' && (

@@ -27,6 +27,7 @@ import {
   TrendingUp,
 } from 'lucide-react';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip } from 'recharts';
+import { stampSealVariants } from '../utils/motion';
 
 interface ResultsPageProps {
   onNavigate: (page: string, scenarioId?: string) => void;
@@ -273,9 +274,14 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ onNavigate }) => {
               </span>
             </div>
 
-            <div className="w-24 h-24 rounded-[12px] bg-pink text-[#0d0d0d] flex items-center justify-center font-display font-extrabold text-5xl shrink-0">
+            <motion.div
+              variants={stampSealVariants}
+              initial="hidden"
+              animate="visible"
+              className="w-24 h-24 rounded-[12px] bg-pink text-[#0d0d0d] flex items-center justify-center font-display font-extrabold text-5xl shrink-0 shadow-[0_0_30px_rgba(var(--accent-color-rgb),0.5)] border-2 border-white ring-4 ring-pink/30"
+            >
               {summary.grade}
-            </div>
+            </motion.div>
           </div>
 
           {/* Detailed Metrics Table - Category Aware */}

@@ -1,8 +1,10 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import { useGameStore } from '../../store/useGameStore';
 import { useSettingsStore } from '../../store/useSettingsStore';
 import { Play, RotateCcw, Home, Sliders, Volume2, VolumeX } from 'lucide-react';
 import type { GameEngine } from '../../utils/sensitivity';
+import { springPunch } from '../../utils/motion';
 
 interface PauseModalProps {
   onNavigate: (page: string) => void;
@@ -14,8 +16,19 @@ export const PauseModal: React.FC<PauseModalProps> = ({ onNavigate, onResume }) 
   const { settings, updateSettings, masterVolume, setMasterVolume, soundEnabled, toggleSound, cm360 } = useSettingsStore();
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-6">
-      <div className="bg-[#0d0d0d] border border-[#262626] rounded-[12px] text-white p-8 max-w-xl w-full space-y-6">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-50 flex items-center justify-start bg-black/85 backdrop-blur-xl p-6 md:p-12 select-none"
+    >
+      <motion.div
+        initial={{ x: '-100%', opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        exit={{ x: '-100%', opacity: 0 }}
+        transition={springPunch}
+        className="bg-[#0d0d0d] border border-pink/40 rounded-[16px] text-white p-8 max-w-lg w-full space-y-6 shadow-[0_0_50px_rgba(0,0,0,0.9)] ring-1 ring-pink/20"
+      >
         {/* Header */}
         <div className="flex items-center justify-between border-b border-[#262626] pb-4">
           <div>
@@ -159,7 +172,7 @@ export const PauseModal: React.FC<PauseModalProps> = ({ onNavigate, onResume }) 
             EXIT DRILL (QUIT TO MAIN MENU)
           </button>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };
