@@ -65,8 +65,8 @@ export function App() {
           return;
         }
 
-        // Do not interfere with Arena in-game pause or Landing drill-menu listeners
-        if (activePage === 'arena' || activePage === 'landing') return;
+        // Do not interfere with Arena in-game pause listener
+        if (activePage === 'arena') return;
 
         // Navigate back to Landing page from top-level views (library, dashboard, results, settings)
         e.preventDefault();
