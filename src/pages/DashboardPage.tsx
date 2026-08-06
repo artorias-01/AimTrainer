@@ -172,7 +172,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
 
       {/* High Level Stats Row */}
       <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-[#141414] border border-[#262626] rounded-[12px] p-6 space-y-2">
+        <div className="bg-[#141414] border border-[#262626] rounded-[12px] p-6 space-y-2 hover-lift">
           <span className="text-neutral-400 font-mono text-xs flex items-center gap-1.5">
             <Activity className="w-3.5 h-3.5 text-pink" /> TOTAL SESSIONS
           </span>
@@ -181,7 +181,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
           </div>
         </div>
 
-        <div className="bg-[#141414] border border-[#262626] rounded-[12px] p-6 space-y-2">
+        <div className="bg-[#141414] border border-[#262626] rounded-[12px] p-6 space-y-2 hover-lift">
           <span className="text-neutral-400 font-mono text-xs flex items-center gap-1.5">
             <Trophy className="w-3.5 h-3.5 text-pink" /> ALL-TIME HIGH SCORE
           </span>
@@ -190,7 +190,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
           </div>
         </div>
 
-        <div className="bg-[#141414] border border-[#262626] rounded-[12px] p-6 space-y-2">
+        <div className="bg-[#141414] border border-[#262626] rounded-[12px] p-6 space-y-2 hover-lift">
           <span className="text-neutral-400 font-mono text-xs flex items-center gap-1.5">
             <Target className="w-3.5 h-3.5 text-pink" /> AVG ACCURACY
           </span>
@@ -199,7 +199,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
           </div>
         </div>
 
-        <div className="bg-[#141414] border border-[#262626] rounded-[12px] p-6 space-y-2">
+        <div className="bg-[#141414] border border-[#262626] rounded-[12px] p-6 space-y-2 hover-lift">
           <span className="text-neutral-400 font-mono text-xs flex items-center gap-1.5">
             <Calendar className="w-3.5 h-3.5 text-pink" /> DAILY STREAK
           </span>

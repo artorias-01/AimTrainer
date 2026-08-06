@@ -7,6 +7,7 @@ import { SCENARIOS, getScenarioById } from '../utils/scenarios';
 import { HeatmapChart } from '../components/ui/HeatmapChart';
 import { ReactionTimeHistogram } from '../components/ui/ReactionTimeHistogram';
 import { AnimatedCountUp } from '../components/ui/AnimatedCountUp';
+import { DigitScramble } from '../components/ui/DigitScramble';
 import confetti from 'canvas-confetti';
 import { soundManager } from '../utils/audio';
 import {
@@ -284,7 +285,7 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ onNavigate }) => {
             <div className="space-y-2">
               <span className="text-xs font-mono text-neutral-400">PERFORMANCE RATING</span>
               <div className="font-display font-extrabold text-6xl md:text-7xl text-white">
-                <AnimatedCountUp value={summary.score} />
+                <DigitScramble value={summary.score} durationMs={650} />
               </div>
               <span className="text-xs font-mono text-neutral-400 block">
                 {isTrackingMode

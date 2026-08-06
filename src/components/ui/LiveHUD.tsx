@@ -175,11 +175,17 @@ export const LiveHUD: React.FC = () => {
             </div>
           </div>
 
-          {/* Streak Combo */}
+          {/* Streak Combo with Scale Punch Animation */}
           {streak > 2 && (
-            <div className="flex items-center justify-center bg-pink text-[#0d0d0d] px-3.5 py-2.5 rounded-[12px] font-mono font-extrabold text-xs tracking-wider animate-bounce">
+            <motion.div
+              key={`streak-${streak}`}
+              initial={{ scale: 1.35 }}
+              animate={{ scale: 1 }}
+              transition={{ duration: 0.2, ease: 'easeOut' }}
+              className="flex items-center justify-center bg-pink text-[#0d0d0d] px-3.5 py-2.5 rounded-[12px] font-mono font-extrabold text-xs tracking-wider shadow-lg"
+            >
               <span>{streak}X STREAK</span>
-            </div>
+            </motion.div>
           )}
 
           {/* Pause Button */}

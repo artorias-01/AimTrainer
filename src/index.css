@@ -286,13 +286,43 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   border-color: #ffffff;
 }
 
-.btn-editorial-pink:active {
-  transform: scale(0.97);
+@keyframes btnClickFlash {
+  0% { box-shadow: 0 0 0 0 rgba(var(--accent-color-rgb), 0.8); }
+  50% { box-shadow: 0 0 0 6px rgba(var(--accent-color-rgb), 0.5); }
+  100% { box-shadow: 0 0 0 0 rgba(var(--accent-color-rgb), 0); }
+}
+
+.btn-editorial-pink:active,
+.btn-editorial-primary:active,
+.btn-editorial-secondary:active {
+  transform: scale(0.96);
+  animation: btnClickFlash 0.18s ease-out;
 }
 
 .btn-editorial-pink:focus-visible {
   outline: none;
   box-shadow: 0 0 0 2px #ffffff !important;
+}
+
+/* Card Hover Lift Utility */
+.hover-lift {
+  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out, border-color 0.2s ease-out;
+}
+.hover-lift:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.6), 0 0 18px rgba(var(--accent-color-rgb), 0.15);
+}
+
+/* Fast Tooltip Entrance Animation */
+@keyframes tooltipEntrance {
+  0% { opacity: 0; transform: scale(0.9) translateY(4px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+[aria-label][role="tooltip"],
+[data-tooltip],
+.tooltip-entrance {
+  animation: tooltipEntrance 0.12s ease-out forwards;
 }
 
 /* Custom Scrollbar */

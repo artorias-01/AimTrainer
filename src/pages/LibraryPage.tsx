@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { getAllScenarios, PRESET_ROUTINES } from '../utils/scenarios';
 import type { ScenarioDef, WarmupRoutine } from '../utils/scenarios';
 import { SpotlightCard } from '../components/ui/SpotlightCard';
+import { Card3DTilt } from '../components/3d/Card3DTilt';
 import { useStatsStore } from '../store/useStatsStore';
 import { useGameStore } from '../store/useGameStore';
 import { soundManager } from '../utils/audio';
@@ -209,92 +210,104 @@ export const LibraryPage: React.FC<LibraryPageProps> = ({ onNavigate }) => {
             ))}
           </div>
 
-          {/* Scenario Grid */}
+          {/* Scenario Grid with AnimatePresence Filter Transitions & Card3DTilt */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredScenarios.map((sc) => {
-              const pb = personalBests[sc.id];
-              return (
-                <SpotlightCard
-                  key={sc.id}
-                  onClick={() => {
-                    soundManager.playClick();
-                    setSelectedModalScenario(sc);
-                  }}
-                  onMouseEnter={() => soundManager.playHover()}
-                  className="cursor-pointer h-full flex flex-col justify-between"
-                >
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-mono font-bold text-[#0d0d0d] bg-pink px-2.5 py-1 rounded-[6px]">
-                          {sc.category.toUpperCase()}
-                        </span>
-                        {sc.isCustom && (
-                          <span className="text-[10px] font-mono font-bold text-white bg-pink-600 px-2 py-0.5 rounded-[6px]">
-                            CUSTOM
-                          </span>
-                        )}
-                      </div>
-                      <span className="text-xs font-mono text-neutral-400 bg-[#0d0d0d] px-2.5 py-1 rounded-[12px] border border-[#262626]">
-                        {sc.difficulty}
-                      </span>
-                    </div>
+            <AnimatePresence mode="popLayout">
+              {filteredScenarios.map((sc) => {
+                const pb = personalBests[sc.id];
+                return (
+                  <motion.div
+                    key={sc.id}
+                    layout
+                    initial={{ opacity: 0, scale: 0.92 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.92 }}
+                    transition={{ duration: 0.22 }}
+                  >
+                    <SpotlightCard
+                      onClick={() => {
+                        soundManager.playClick();
+                        setSelectedModalScenario(sc);
+                      }}
+                      onMouseEnter={() => soundManager.playHover()}
+                      className="cursor-pointer h-full flex flex-col justify-between"
+                    >
+                      <Card3DTilt className="h-full flex flex-col justify-between space-y-6">
+                        <div className="space-y-4">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <span className="text-[10px] font-mono font-bold text-[#0d0d0d] bg-pink px-2.5 py-1 rounded-[6px]">
+                                {sc.category.toUpperCase()}
+                              </span>
+                              {sc.isCustom && (
+                                <span className="text-[10px] font-mono font-bold text-white bg-pink-600 px-2 py-0.5 rounded-[6px]">
+                                  CUSTOM
+                                </span>
+                              )}
+                            </div>
+                            <span className="text-xs font-mono text-neutral-400 bg-[#0d0d0d] px-2.5 py-1 rounded-[12px] border border-[#262626]">
+                              {sc.difficulty}
+                            </span>
+                          </div>
 
-                    <div className="space-y-2">
-                      <h3 className="font-display font-bold text-2xl text-white group-hover:text-pink transition-colors">
-                        {sc.name}
-                      </h3>
-                      <p className="font-sans-ui text-sm text-neutral-400 leading-relaxed">
-                        {sc.description}
-                      </p>
-                    </div>
-                  </div>
+                          <div className="space-y-2">
+                            <h3 className="font-display font-bold text-2xl text-white group-hover:text-pink transition-colors">
+                              {sc.name}
+                            </h3>
+                            <p className="font-sans-ui text-sm text-neutral-400 leading-relaxed">
+                              {sc.description}
+                            </p>
+                          </div>
+                        </div>
 
-                  <div className="space-y-4 pt-4 border-t border-[#262626]">
-                    {pb ? (
-                      <div className="flex items-center justify-between text-xs font-mono text-neutral-300 bg-[#0d0d0d] p-3 rounded-[12px] border border-[#262626]">
-                        <span className="flex items-center gap-1.5 text-pink font-bold">
-                          <Trophy className="w-3.5 h-3.5" /> PB: {pb.highScore.toLocaleString()}
-                        </span>
-                        <span className="text-neutral-400">{pb.bestAccuracy}% ACC</span>
-                      </div>
-                    ) : (
-                      <div className="text-[11px] font-mono text-neutral-500 bg-[#0d0d0d] p-3 rounded-[12px] border border-[#262626]">
-                        NO COMPLETED SESSIONS YET
-                      </div>
-                    )}
+                        <div className="space-y-4 pt-4 border-t border-[#262626]">
+                          {pb ? (
+                            <div className="flex items-center justify-between text-xs font-mono text-neutral-300 bg-[#0d0d0d] p-3 rounded-[12px] border border-[#262626]">
+                              <span className="flex items-center gap-1.5 text-pink font-bold">
+                                <Trophy className="w-3.5 h-3.5" /> PB: {pb.highScore.toLocaleString()}
+                              </span>
+                              <span className="text-neutral-400">{pb.bestAccuracy}% ACC</span>
+                            </div>
+                          ) : (
+                            <div className="text-[11px] font-mono text-neutral-500 bg-[#0d0d0d] p-3 rounded-[12px] border border-[#262626]">
+                              NO COMPLETED SESSIONS YET
+                            </div>
+                          )}
 
-                    <div className="flex gap-2">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          soundManager.playClick();
-                          if (!document.fullscreenElement) {
-                            document.documentElement.requestFullscreen().catch(() => {});
-                          }
-                          onNavigate('arena', sc.id);
-                        }}
-                        onMouseEnter={() => soundManager.playHover()}
-                        className="btn-editorial-pink flex-1 py-3 flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-wider active:scale-95"
-                      >
-                        <Play className="w-4 h-4 fill-[#0d0d0d]" />
-                        LAUNCH DRILL ({sc.durationSeconds}S)
-                      </button>
+                          <div className="flex gap-2">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                soundManager.playClick();
+                                if (!document.fullscreenElement) {
+                                  document.documentElement.requestFullscreen().catch(() => {});
+                                }
+                                onNavigate('arena', sc.id);
+                              }}
+                              onMouseEnter={() => soundManager.playHover()}
+                              className="btn-editorial-pink flex-1 py-3 flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-wider active:scale-95"
+                            >
+                              <Play className="w-4 h-4 fill-[#0d0d0d]" />
+                              LAUNCH DRILL ({sc.durationSeconds}S)
+                            </button>
 
-                      {sc.isCustom && (
-                        <button
-                          onClick={(e) => handleDeleteCustom(e, sc.id)}
-                          className="px-3 bg-[#0d0d0d] hover:bg-red-950/60 text-neutral-400 hover:text-red-400 border border-[#262626] hover:border-red-900/50 rounded-[12px] flex items-center justify-center transition-colors"
-                          title="Delete Custom Drill"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                </SpotlightCard>
-              );
-            })}
+                            {sc.isCustom && (
+                              <button
+                                onClick={(e) => handleDeleteCustom(e, sc.id)}
+                                className="px-3 bg-[#0d0d0d] hover:bg-red-950/60 text-neutral-400 hover:text-red-400 border border-[#262626] hover:border-red-900/50 rounded-[12px] flex items-center justify-center transition-colors"
+                                title="Delete Custom Drill"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </Card3DTilt>
+                    </SpotlightCard>
+                  </motion.div>
+                );
+              })}
+            </AnimatePresence>
           </div>
         </div>
       )}

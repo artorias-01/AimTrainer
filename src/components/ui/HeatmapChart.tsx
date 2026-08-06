@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import { useSettingsStore } from '../../store/useSettingsStore';
 
 interface HeatmapChartProps {
@@ -34,20 +35,22 @@ export const HeatmapChart: React.FC<HeatmapChartProps> = ({
         />
       </div>
 
-      {/* Render Hit Points */}
+      {/* Render Hit Points with Staggered Entrance */}
       <svg width={width} height={height} className="relative z-10">
         {hitLocations.map((loc, idx) => {
           const px = ((loc.x + 4) / 8) * (width - 32) + 16;
           const py = height - (((loc.y - 1) / 4) * (height - 32) + 16);
 
           return (
-            <circle
+            <motion.circle
               key={idx}
               cx={px}
               cy={py}
               r={3.5}
               fill={themeAccentColor}
-              opacity={0.75}
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 0.85 }}
+              transition={{ duration: 0.25, delay: Math.min(0.5, idx * 0.015) }}
               className="transition-all hover:scale-150"
             />
           );
