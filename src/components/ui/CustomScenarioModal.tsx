@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
 import { X, Save, Target } from 'lucide-react';
 import type { ScenarioDef, ScenarioCategory } from '../../utils/scenarios';
 import { saveCustomScenario } from '../../utils/storage';
 import { soundManager } from '../../utils/audio';
+import { MotionModal } from './MotionModal';
 
 interface CustomScenarioModalProps {
   initialScenario?: ScenarioDef | null;
@@ -61,7 +61,7 @@ export const CustomScenarioModal: React.FC<CustomScenarioModalProps> = ({
       directionChangeIntervalMs: targetSpeed > 0 ? directionChangeIntervalMs : undefined,
       speedVariance: targetSpeed > 0 ? speedVariance : undefined,
       enableJukes: targetSpeed > 0 ? enableJukes : undefined,
-      tags: ['CUSTOM', category.toUpperCase(), arenaType.toUpperCase()],
+      tags: ['CUSTOM', category.toUpperCase()],
       recommendedCm360: '25-45 cm',
       iconName: 'Target',
       isCustom: true,
@@ -73,13 +73,8 @@ export const CustomScenarioModal: React.FC<CustomScenarioModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.95 }}
-        className="bg-[#141414] border border-pink/50 rounded-[12px] p-6 max-w-2xl w-full space-y-6 shadow-2xl my-8 text-left"
-      >
+    <MotionModal isOpen={true} onClose={onClose} maxWidthClass="max-w-2xl">
+      <div className="p-6 space-y-6 text-left">
         <div className="flex items-center justify-between border-b border-[#262626] pb-4">
           <div className="flex items-center gap-2">
             <Target className="w-5 h-5 text-pink" />
@@ -113,12 +108,12 @@ export const CustomScenarioModal: React.FC<CustomScenarioModalProps> = ({
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value as ScenarioCategory)}
-                className="w-full bg-[#0d0d0d] border border-[#262626] rounded-[12px] p-3 text-sm text-white focus:outline-none focus:border-pink"
+                className="w-full bg-[#0d0d0d] border border-[#262626] rounded-[12px] p-3 text-xs text-white font-bold focus:outline-none focus:border-pink"
               >
-                <option value="clicking">CLICKING / FLICKING</option>
-                <option value="tracking">TRACKING / SMOOTHNESS</option>
-                <option value="switching">SWITCHING / REFLEX</option>
-                <option value="precision">PRECISION / MICRO</option>
+                <option value="clicking">CLICKING</option>
+                <option value="tracking">TRACKING</option>
+                <option value="switching">SWITCHING</option>
+                <option value="precision">PRECISION</option>
               </select>
             </div>
           </div>
@@ -376,7 +371,7 @@ export const CustomScenarioModal: React.FC<CustomScenarioModalProps> = ({
             </button>
           </div>
         </form>
-      </motion.div>
-    </div>
+      </div>
+    </MotionModal>
   );
 };

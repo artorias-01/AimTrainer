@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { getAllScenarios, PRESET_ROUTINES } from '../utils/scenarios';
 import type { ScenarioDef, WarmupRoutine } from '../utils/scenarios';
-import { Card3DTilt } from '../components/3d/Card3DTilt';
+import { SpotlightCard } from '../components/ui/SpotlightCard';
 import { useStatsStore } from '../store/useStatsStore';
 import { useGameStore } from '../store/useGameStore';
 import { soundManager } from '../utils/audio';
@@ -10,7 +10,6 @@ import { Play, Trophy, Filter, Plus, Layers, Award, Trash2 } from 'lucide-react'
 import { CustomScenarioModal } from '../components/ui/CustomScenarioModal';
 import { RoutineBuilderModal } from '../components/ui/RoutineBuilderModal';
 import { getStoredWarmupRoutines, deleteCustomScenario, deleteWarmupRoutine } from '../utils/storage';
-import { kineticStaggerContainer, kineticCascadeItem } from '../utils/motion';
 
 interface LibraryPageProps {
   onNavigate: (page: string, scenarioId?: string) => void;
@@ -113,7 +112,7 @@ export const LibraryPage: React.FC<LibraryPageProps> = ({ onNavigate }) => {
       {/* Header */}
       <div className="max-w-7xl mx-auto space-y-4 border-b border-[#262626] pb-8 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
         <div className="space-y-3">
-          <div className="flex items-center gap-2 font-mono text-xs text-pink uppercase tracking-widest">
+          <div className="flex items-center gap-2 font-mono text-xs text-pink uppercase tracking-widest font-bold">
             <Filter className="w-3.5 h-3.5" />
             DRILL CATALOG // {allScenarios.length} DRILLS AVAILABLE
           </div>
@@ -150,37 +149,32 @@ export const LibraryPage: React.FC<LibraryPageProps> = ({ onNavigate }) => {
 
       {/* Primary Section Mode Tabs */}
       <div className="max-w-7xl mx-auto flex items-center justify-between border-b border-[#262626] pb-4">
-        <div className="flex gap-4 font-mono text-xs">
-          <button
-            onClick={() => setActiveTab('drills')}
-            className={`pb-2 font-bold uppercase tracking-widest transition-all ${
-              activeTab === 'drills'
-                ? 'text-pink border-b-2 border-pink'
-                : 'text-neutral-400 hover:text-white'
-            }`}
-          >
-            INDIVIDUAL DRILLS ({allScenarios.length})
-          </button>
-          <button
-            onClick={() => setActiveTab('routines')}
-            className={`pb-2 font-bold uppercase tracking-widest transition-all ${
-              activeTab === 'routines'
-                ? 'text-pink border-b-2 border-pink'
-                : 'text-neutral-400 hover:text-white'
-            }`}
-          >
-            WARMUP ROUTINES ({routinesList.length})
-          </button>
-          <button
-            onClick={() => setActiveTab('benchmark')}
-            className={`pb-2 font-bold uppercase tracking-widest transition-all ${
-              activeTab === 'benchmark'
-                ? 'text-pink border-b-2 border-pink'
-                : 'text-neutral-400 hover:text-white'
-            }`}
-          >
-            BENCHMARK TEST
-          </button>
+        <div className="flex gap-4 font-mono text-xs relative">
+          {[
+            { id: 'drills', label: `INDIVIDUAL DRILLS (${allScenarios.length})` },
+            { id: 'routines', label: `WARMUP ROUTINES (${routinesList.length})` },
+            { id: 'benchmark', label: 'BENCHMARK TEST' },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => {
+                soundManager.playClick();
+                setActiveTab(tab.id as any);
+              }}
+              className={`relative pb-2 font-bold uppercase tracking-widest transition-colors ${
+                activeTab === tab.id ? 'text-pink' : 'text-neutral-400 hover:text-white'
+              }`}
+            >
+              {tab.label}
+              {activeTab === tab.id && (
+                <motion.div
+                  layoutId="librarySectionTabPill"
+                  className="absolute bottom-0 left-0 right-0 h-0.5 bg-pink rounded-full shadow-[0_0_8px_var(--accent-color)]"
+                  transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                />
+              )}
+            </button>
+          ))}
         </div>
       </div>
 
@@ -197,49 +191,51 @@ export const LibraryPage: React.FC<LibraryPageProps> = ({ onNavigate }) => {
                   setActiveCategory(cat.id);
                 }}
                 onMouseEnter={() => soundManager.playHover()}
-                className={`px-5 py-2.5 clip-corner-tr text-xs font-mono font-bold tracking-wider transition-all duration-150 active:scale-95 border focus-visible:ring-2 focus-visible:ring-pink ${
+                className={`relative px-5 py-2.5 rounded-[12px] text-xs font-mono font-bold tracking-wider transition-all duration-150 active:scale-95 border focus-visible:ring-2 focus-visible:ring-pink ${
                   activeCategory === cat.id
-                    ? 'bg-pink text-[#0d0d0d] border-pink'
+                    ? 'text-[#0d0d0d] border-pink'
                     : 'bg-[#141414] text-neutral-400 border-[#262626] hover:text-white hover:border-pink/50'
                 }`}
               >
-                {cat.label}
+                {activeCategory === cat.id && (
+                  <motion.div
+                    layoutId="libraryCategoryTabPill"
+                    className="absolute inset-0 bg-pink rounded-[12px]"
+                    transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                  />
+                )}
+                <span className="relative z-10">{cat.label}</span>
               </button>
             ))}
           </div>
 
-          {/* Scenario Grid with Staggered Kinetic Entrance */}
-          <motion.div
-            variants={kineticStaggerContainer}
-            initial="hidden"
-            animate="visible"
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-          >
+          {/* Scenario Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredScenarios.map((sc) => {
               const pb = personalBests[sc.id];
               return (
-                <motion.div key={sc.id} variants={kineticCascadeItem}>
-                  <Card3DTilt
-                    onClick={() => {
-                      soundManager.playClick();
-                      setSelectedModalScenario(sc);
-                    }}
-                    onMouseEnter={() => soundManager.playHover()}
-                    className="bg-[#141414] border border-[#262626] clip-corner-diagonal p-8 flex flex-col justify-between space-y-6 hover:border-pink transition-all duration-200 group active:scale-[0.99] relative h-full"
-                  >
+                <SpotlightCard
+                  key={sc.id}
+                  onClick={() => {
+                    soundManager.playClick();
+                    setSelectedModalScenario(sc);
+                  }}
+                  onMouseEnter={() => soundManager.playHover()}
+                  className="cursor-pointer h-full flex flex-col justify-between"
+                >
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-mono font-extrabold text-[#0d0d0d] bg-pink px-3 py-1 clip-tag-ribbon uppercase">
+                        <span className="text-[10px] font-mono font-bold text-[#0d0d0d] bg-pink px-2.5 py-1 rounded-[6px]">
                           {sc.category.toUpperCase()}
                         </span>
                         {sc.isCustom && (
-                          <span className="text-[10px] font-mono font-extrabold text-white bg-accent/30 border border-accent/60 px-2 py-0.5 clip-corner-tr">
+                          <span className="text-[10px] font-mono font-bold text-white bg-pink-600 px-2 py-0.5 rounded-[6px]">
                             CUSTOM
                           </span>
                         )}
                       </div>
-                      <span className="text-xs font-mono text-neutral-400 bg-[#0d0d0d] px-2.5 py-1 clip-corner-tr border border-[#262626] font-bold uppercase">
+                      <span className="text-xs font-mono text-neutral-400 bg-[#0d0d0d] px-2.5 py-1 rounded-[12px] border border-[#262626]">
                         {sc.difficulty}
                       </span>
                     </div>
@@ -256,7 +252,7 @@ export const LibraryPage: React.FC<LibraryPageProps> = ({ onNavigate }) => {
 
                   <div className="space-y-4 pt-4 border-t border-[#262626]">
                     {pb ? (
-                      <div className="flex items-center justify-between text-xs font-mono text-neutral-300 bg-[#0d0d0d] p-3 clip-corner-tr border border-[#262626]">
+                      <div className="flex items-center justify-between text-xs font-mono text-neutral-300 bg-[#0d0d0d] p-3 rounded-[12px] border border-[#262626]">
                         <span className="flex items-center gap-1.5 text-pink font-bold">
                           <Trophy className="w-3.5 h-3.5" /> PB: {pb.highScore.toLocaleString()}
                         </span>
@@ -296,13 +292,12 @@ export const LibraryPage: React.FC<LibraryPageProps> = ({ onNavigate }) => {
                       )}
                     </div>
                   </div>
-                </Card3DTilt>
-              </motion.div>
-            );
-          })}
-        </motion.div>
-      </div>
-    )}
+                </SpotlightCard>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* TAB 2: WARMUP ROUTINES */}
       {activeTab === 'routines' && (

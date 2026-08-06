@@ -1,407 +1,370 @@
-import React, { useState, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useRef, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { HeroScene } from '../components/3d/HeroScene';
-import { Card3DTilt } from '../components/3d/Card3DTilt';
-import { ScreenWipe } from '../components/ui/ScreenWipe';
+import { getAllScenarios } from '../utils/scenarios';
 import { getDailyStreak } from '../utils/storage';
 import { useGameStore } from '../store/useGameStore';
 import { soundManager } from '../utils/audio';
-import {
-  Flame,
-  ChevronLeft,
-  ChevronRight,
-  Settings as SettingsIcon,
-  Play,
-  Layers,
-  BarChart3,
-} from 'lucide-react';
-import { getAllScenarios } from '../utils/scenarios';
-import type { ScenarioCategory } from '../utils/scenarios';
-import {
-  springPunch,
-  kineticStaggerContainer,
-  kineticCascadeItem,
-} from '../utils/motion';
+import { Target, ArrowRight, ChevronLeft, ChevronRight, Flame, Zap } from 'lucide-react';
+import { SplitText } from '../components/ui/SplitText';
+import { SpotlightCard } from '../components/ui/SpotlightCard';
 
 interface LandingPageProps {
   onNavigate: (page: string, scenarioId?: string) => void;
 }
 
 export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
-  const [pageMode, setPageMode] = useState<'main-menu' | 'drill-select'>('main-menu');
-  const [activeCategory, setActiveCategory] = useState<ScenarioCategory | 'all'>('all');
-  const [activeWipe, setActiveWipe] = useState<'iris' | 'card' | 'scanline' | 'diagonal' | null>(null);
-  const [pendingNavigation, setPendingNavigation] = useState<{ page: string; scenarioId?: string } | null>(null);
-
-  // Hover states for the 4 bespoke menu choices
-  const [hoveredChoice, setHoveredChoice] = useState<string | null>(null);
-
+  const [showDrillMenu, setShowDrillMenu] = useState(false);
   const { setScenario } = useGameStore();
-  const dailyStreak = getDailyStreak();
 
-  // Load ALL scenarios (built-in + custom)
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  const dailyStreak = getDailyStreak();
   const allScenarios = getAllScenarios();
 
-  const filteredScenarios = allScenarios.filter(
-    (sc) => activeCategory === 'all' || sc.category === activeCategory
-  );
+  useEffect(() => {
+    if (!showDrillMenu) return;
 
-  const categories: { id: ScenarioCategory | 'all'; label: string }[] = [
-    { id: 'all', label: 'ALL DRILLS' },
-    { id: 'clicking', label: 'CLICKING' },
-    { id: 'tracking', label: 'TRACKING' },
-    { id: 'switching', label: 'SWITCHING' },
-    { id: 'precision', label: 'PRECISION' },
-  ];
-
-  const handleSelectMenuKey = useCallback(
-    (key: string) => {
-      soundManager.playClick();
-      if (key === 'drill-select') {
-        setActiveWipe('iris');
-        setTimeout(() => {
-          setPageMode('drill-select');
-        }, 120);
-      } else if (key === 'library') {
-        setActiveWipe('card');
-        setPendingNavigation({ page: 'library' });
-      } else if (key === 'dashboard') {
-        setActiveWipe('scanline');
-        setPendingNavigation({ page: 'dashboard' });
-      } else if (key === 'settings') {
-        setActiveWipe('diagonal');
-        setPendingNavigation({ page: 'settings' });
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        soundManager.playClick();
+        setShowDrillMenu(false);
       }
-    },
-    []
-  );
+    };
 
-  const handleWipeComplete = useCallback(() => {
-    setActiveWipe(null);
-    if (pendingNavigation) {
-      onNavigate(pendingNavigation.page, pendingNavigation.scenarioId);
-      setPendingNavigation(null);
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showDrillMenu]);
+
+  const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
+    if (scrollContainerRef.current) {
+      if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+        scrollContainerRef.current.scrollLeft += e.deltaY;
+      }
     }
-  }, [pendingNavigation, onNavigate]);
+  };
 
-  const handleSelectScenarioId = useCallback(
-    (scenarioId: string) => {
-      soundManager.playClick();
-      if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen().catch(() => {});
-      }
-      setScenario(scenarioId);
-      onNavigate('arena', scenarioId);
+  const scrollTrack = (direction: 'left' | 'right') => {
+    if (scrollContainerRef.current) {
+      const scrollAmount = 320;
+      scrollContainerRef.current.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth',
+      });
+    }
+  };
+
+  const handleSelectDrill = (scenarioId: string) => {
+    soundManager.playClick();
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(() => {});
+    }
+    setScenario(scenarioId);
+    onNavigate('arena', scenarioId);
+  };
+
+  const menuContainerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.08,
+        delayChildren: 0.05,
+      },
     },
-    [onNavigate, setScenario]
-  );
+  };
+
+  const menuItemVariants = {
+    hidden: { opacity: 0, y: 14 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.25, ease: 'easeOut' as const } },
+  };
 
   return (
-    <div className="relative w-full h-[calc(100vh-73px)] max-h-[calc(100vh-73px)] bg-[#0d0d0d] text-white overflow-hidden select-none">
-      {/* 3D Atmospheric Background Scene */}
-      <div className="absolute inset-0 z-0 pointer-events-none">
+    <div className="relative w-full h-[calc(100vh-73px)] max-h-[calc(100vh-73px)] bg-[#0d0d0d] text-white overflow-hidden flex flex-col justify-center items-center p-6 select-none">
+      {/* Background 3D Real-Time Scene */}
+      <div className="absolute inset-0 z-0 opacity-75">
         <HeroScene />
       </div>
 
-      {/* Dark Vignette Overlay */}
-      <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,transparent_30%,rgba(13,13,13,0.92)_100%)] pointer-events-none" />
+      {/* Radial Dark Vignette Overlay with Ambient Accent Glow */}
+      <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,transparent_30%,rgba(13,13,13,0.85)_100%)] pointer-events-none" />
 
-      {/* Screen Transition Wipe Overlay (Self-Cleaning, Dark Tactical Aesthetics) */}
-      <ScreenWipe activeWipe={activeWipe} onComplete={handleWipeComplete} />
-
-      {/* Top Right Streak Badge */}
-      <div className="absolute top-6 right-6 z-20 pointer-events-auto flex items-center gap-3">
-        <div className="px-3.5 py-1.5 clip-corner-tr bg-[#0d0d0d]/90 border border-accent/40 text-xs font-mono font-bold flex items-center justify-center gap-2 text-accent backdrop-blur-md shadow-[0_0_15px_rgba(var(--accent-color-rgb),0.15)] tracking-wider">
-          <Flame className="w-3.5 h-3.5 text-accent animate-bounce" />
-          <span>
-            {dailyStreak.streakCount > 0 ? `${dailyStreak.streakCount} DAY STREAK` : 'NO STREAK'}
-          </span>
-        </div>
-      </div>
-
-      {/* MAIN CONTENT AREA */}
-      <AnimatePresence mode="wait">
-        {pageMode === 'main-menu' ? (
-          /* ================= LEVEL 1: MAIN MENU (COMPACT 4 BESPOKE OPTIONS) ================= */
-          <motion.div
-            key="main-menu-overlay"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="relative z-10 w-full h-full flex flex-col items-center justify-center p-6"
-          >
-            {/* Center Main Header Branding with Signature Diagonal Pink Accent Slash Bar */}
-            <div className="relative text-center space-y-1.5 mb-8">
-              {/* Skewed Accent Bar Motif */}
-              <div className="absolute -inset-x-6 top-1/2 -translate-y-1/2 h-14 bg-accent/10 border-y border-accent/30 -skew-x-12 pointer-events-none -z-10" />
-
-              <motion.h1
-                initial={{ opacity: 0, y: -20, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                transition={springPunch}
-                className="font-display font-black text-5xl md:text-7xl tracking-tighter text-white drop-shadow-[0_0_35px_rgba(var(--accent-color-rgb),0.4)]"
-              >
-                AIM <span className="text-accent">//</span> TT
-              </motion.h1>
-              <p className="font-mono text-[10px] text-accent uppercase tracking-[0.35em] font-extrabold">
-                TACTICAL 3D EDITORIAL TRAINER
-              </p>
-            </div>
-
-            {/* 4 BESPOKE MAIN MENU OPTIONS (PROPORTIONATE SCALE & KINETIC CUT CORNERS) */}
+      {/* Dynamic Main Container */}
+      <div
+        className={`relative z-10 w-full transition-all duration-300 ${
+          showDrillMenu
+            ? 'max-w-7xl flex flex-col md:flex-row items-center md:items-stretch justify-between gap-8'
+            : 'max-w-lg text-center space-y-6 bg-[#0d0d0d]/50 backdrop-blur-md p-6 sm:p-8 rounded-[20px] border border-[#262626]/80 shadow-[0_0_50px_rgba(0,0,0,0.8)]'
+        }`}
+      >
+        {showDrillMenu ? (
+          /* DRILL SELECTOR HORIZONTAL LAYOUT */
+          <>
+            {/* Left Column: Title & Back Button */}
             <motion.div
-              variants={kineticStaggerContainer}
-              initial="hidden"
-              animate="visible"
-              className="flex flex-col items-center gap-3.5 w-full max-w-sm"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.3 }}
+              className="bg-[#0d0d0d]/85 backdrop-blur-lg p-6 rounded-[18px] border border-[#262626] shadow-2xl space-y-5 w-full md:w-72 shrink-0 flex flex-col justify-between text-left"
             >
-              {/* CHOICE 1: SELECT MODE (Reticle Corner Snap Hover) */}
-              <motion.button
-                variants={kineticCascadeItem}
-                onClick={() => handleSelectMenuKey('drill-select')}
-                onMouseEnter={() => {
-                  soundManager.playHover();
-                  setHoveredChoice('select-mode');
-                }}
-                onMouseLeave={() => setHoveredChoice(null)}
-                className="kinetic-btn group relative w-full py-2.5 px-4 bg-[#141414]/90 hover:bg-accent hover:text-[#0d0d0d] border border-[#262626] hover:border-accent font-display font-extrabold text-base tracking-wider uppercase shadow-lg flex items-center justify-between overflow-hidden cursor-pointer"
-              >
-                <div className="flex items-center gap-2.5">
-                  <Play className="w-4 h-4 text-accent group-hover:text-[#0d0d0d] transition-colors" />
-                  <span>SELECT MODE</span>
+              <div className="space-y-3">
+                <h1 className="font-display font-extrabold text-3xl md:text-4xl tracking-tight leading-none text-white drop-shadow-[0_0_15px_rgba(var(--accent-color-rgb),0.3)]">
+                  AIM <span className="text-accent">//</span> TT
+                </h1>
+                <div className="flex items-center gap-2 w-28 opacity-80">
+                  <div className="h-px bg-gradient-to-r from-accent to-transparent flex-1" />
+                  <span className="text-accent text-[10px] font-mono animate-pulse">◆</span>
                 </div>
-
-                {/* Reticle Corner Brackets Hover Micro-Interaction */}
-                {hoveredChoice === 'select-mode' && (
-                  <>
-                    <motion.div
-                      initial={{ opacity: 0, x: -4, y: -4 }}
-                      animate={{ opacity: 1, x: 0, y: 0 }}
-                      className="absolute top-1 left-1 w-2.5 h-2.5 border-t-2 border-l-2 border-[#0d0d0d]"
-                    />
-                    <motion.div
-                      initial={{ opacity: 0, x: 4, y: -4 }}
-                      animate={{ opacity: 1, x: 0, y: 0 }}
-                      className="absolute top-1 right-1 w-2.5 h-2.5 border-t-2 border-r-2 border-[#0d0d0d]"
-                    />
-                    <motion.div
-                      initial={{ opacity: 0, x: -4, y: 4 }}
-                      animate={{ opacity: 1, x: 0, y: 0 }}
-                      className="absolute bottom-1 left-1 w-2.5 h-2.5 border-b-2 border-l-2 border-[#0d0d0d]"
-                    />
-                    <motion.div
-                      initial={{ opacity: 0, x: 4, y: 4 }}
-                      animate={{ opacity: 1, x: 0, y: 0 }}
-                      className="absolute bottom-1 right-1 w-2.5 h-2.5 border-b-2 border-r-2 border-[#0d0d0d]"
-                    />
-                  </>
-                )}
-
-                <span className="font-mono text-[10px] text-neutral-500 group-hover:text-[#0d0d0d] font-bold">
-                  START ➔
+                <span className="font-mono text-[10px] text-neutral-400 tracking-widest uppercase block font-bold">
+                  DRILL SELECTOR [ESC]
                 </span>
-              </motion.button>
+                <p className="font-sans-ui text-xs text-neutral-400 leading-relaxed">
+                  Choose from {allScenarios.length} competitive aim scenarios across clicking, precision, tracking, and switching categories.
+                </p>
+              </div>
 
-              {/* CHOICE 2: DRILL LIBRARY (Card Stack Parallax Tilt Hover) */}
               <motion.button
-                variants={kineticCascadeItem}
-                onClick={() => handleSelectMenuKey('library')}
-                onMouseEnter={() => {
-                  soundManager.playHover();
-                  setHoveredChoice('library');
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => {
+                  soundManager.playClick();
+                  setShowDrillMenu(false);
                 }}
-                onMouseLeave={() => setHoveredChoice(null)}
-                className="kinetic-btn group relative w-full py-2.5 px-4 bg-[#141414]/90 hover:bg-white hover:text-[#0d0d0d] border border-[#262626] hover:border-white font-display font-extrabold text-base tracking-wider uppercase shadow-lg flex items-center justify-between overflow-hidden cursor-pointer"
+                onMouseEnter={() => soundManager.playHover()}
+                className="btn-editorial-secondary py-3 text-xs font-bold uppercase flex items-center justify-center gap-2 text-white border-[#262626] hover:border-accent transition-all focus:outline-none focus-visible:outline-accent"
               >
-                <div className="flex items-center gap-2.5">
-                  <Layers className="w-4 h-4 text-accent group-hover:text-[#0d0d0d] transition-colors" />
-                  <span>DRILL LIBRARY</span>
-                </div>
-
-                {/* Card Stack Parallax Silhouette Micro-Interaction */}
-                {hoveredChoice === 'library' && (
-                  <div className="absolute right-12 flex items-center gap-1 opacity-40 pointer-events-none">
-                    <motion.div
-                      initial={{ rotate: 0, x: 0 }}
-                      animate={{ rotate: -12, x: -3 }}
-                      className="w-3 h-5 bg-[#0d0d0d] border border-white"
-                    />
-                    <motion.div
-                      initial={{ rotate: 0, x: 0 }}
-                      animate={{ rotate: 0, y: -2 }}
-                      className="w-3 h-5 bg-[#0d0d0d] border border-white"
-                    />
-                    <motion.div
-                      initial={{ rotate: 0, x: 0 }}
-                      animate={{ rotate: 12, x: 3 }}
-                      className="w-3 h-5 bg-[#0d0d0d] border border-white"
-                    />
-                  </div>
-                )}
-
-                <span className="font-mono text-[10px] text-neutral-500 group-hover:text-[#0d0d0d] font-bold">
-                  ALL DRILLS ➔
-                </span>
-              </motion.button>
-
-              {/* CHOICE 3: ANALYTICS (Live Mini Sparkline Hover) */}
-              <motion.button
-                variants={kineticCascadeItem}
-                onClick={() => handleSelectMenuKey('dashboard')}
-                onMouseEnter={() => {
-                  soundManager.playHover();
-                  setHoveredChoice('analytics');
-                }}
-                onMouseLeave={() => setHoveredChoice(null)}
-                className="kinetic-btn group relative w-full py-2.5 px-4 bg-[#141414]/90 hover:bg-accent hover:text-[#0d0d0d] border border-[#262626] hover:border-accent font-display font-extrabold text-base tracking-wider uppercase shadow-lg flex items-center justify-between overflow-hidden cursor-pointer"
-              >
-                <div className="flex items-center gap-2.5">
-                  <BarChart3 className="w-4 h-4 text-accent group-hover:text-[#0d0d0d] transition-colors" />
-                  <span>ANALYTICS</span>
-                </div>
-
-                {/* Animated Mini Sparkline SVG Graph Hover */}
-                {hoveredChoice === 'analytics' ? (
-                  <motion.svg
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="w-14 h-5 stroke-[#0d0d0d] fill-none stroke-[2.5]"
-                    viewBox="0 0 60 20"
-                  >
-                    <motion.polyline
-                      initial={{ pathLength: 0 }}
-                      animate={{ pathLength: 1 }}
-                      transition={{ duration: 0.35 }}
-                      points="2,16 12,12 24,17 36,6 48,11 58,3"
-                    />
-                  </motion.svg>
-                ) : (
-                  <span className="font-mono text-[10px] text-neutral-500 font-bold">STATS ➔</span>
-                )}
-              </motion.button>
-
-              {/* CHOICE 4: OPTIONS (Rotating Mechanical Gear Hover) */}
-              <motion.button
-                variants={kineticCascadeItem}
-                onClick={() => handleSelectMenuKey('settings')}
-                onMouseEnter={() => {
-                  soundManager.playHover();
-                  setHoveredChoice('options');
-                }}
-                onMouseLeave={() => setHoveredChoice(null)}
-                className="kinetic-btn group relative w-full py-2.5 px-4 bg-[#141414]/90 hover:bg-white hover:text-[#0d0d0d] border border-[#262626] hover:border-white font-display font-extrabold text-base tracking-wider uppercase shadow-lg flex items-center justify-between overflow-hidden cursor-pointer"
-              >
-                <div className="flex items-center gap-2.5">
-                  <motion.div
-                    animate={{ rotate: hoveredChoice === 'options' ? 90 : 0 }}
-                    transition={springPunch}
-                  >
-                    <SettingsIcon className="w-4 h-4 text-accent group-hover:text-[#0d0d0d] transition-colors" />
-                  </motion.div>
-                  <span>OPTIONS</span>
-                </div>
-
-                <span className="font-mono text-[10px] text-neutral-500 group-hover:text-[#0d0d0d] font-bold">
-                  SETTINGS ➔
-                </span>
+                <ChevronLeft className="w-4 h-4 text-accent" /> BACK TO MAIN MENU
               </motion.button>
             </motion.div>
-          </motion.div>
-        ) : (
-          /* ================= LEVEL 2: DRILL SELECTOR (ALL DRILLS + 3D TILT CARDS) ================= */
-          <motion.div
-            key="drill-selector-overlay"
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -15 }}
-            transition={springPunch}
-            className="relative z-10 w-full h-full flex flex-col justify-between p-6 md:p-10 max-w-7xl mx-auto"
-          >
-            {/* Header Breadcrumb */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => {
-                    soundManager.playClick();
-                    setPageMode('main-menu');
-                  }}
-                  className="px-3 py-1.5 rounded-[10px] bg-[#141414] hover:bg-[#262626] text-neutral-300 hover:text-white border border-[#262626] font-mono text-xs font-bold flex items-center gap-1.5 transition-all"
-                >
-                  <ChevronLeft className="w-4 h-4 text-accent" /> MAIN MENU
-                </button>
-                <span className="font-mono text-xs text-neutral-500">/</span>
-                <span className="font-mono text-xs text-accent font-bold uppercase tracking-widest">
-                  SELECT DRILL ({filteredScenarios.length} SCENARIOS)
-                </span>
-              </div>
-            </div>
 
-            {/* 3D Tilt Standard 2D Scenario Cards Grid showing ALL Scenarios */}
+            {/* Right Column: Horizontal Cards Scrollable Track */}
             <motion.div
-              variants={kineticStaggerContainer}
-              initial="hidden"
-              animate="visible"
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 my-auto overflow-y-auto max-h-[calc(100vh-220px)] p-1 pr-2"
+              key="drill-horizontal-track"
+              initial={{ opacity: 0, x: 25 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 25 }}
+              transition={{ duration: 0.3 }}
+              className="flex-1 w-full max-w-full overflow-hidden bg-[#0d0d0d]/90 backdrop-blur-lg border border-[#262626] rounded-[18px] p-6 space-y-4 shadow-2xl text-left"
             >
-              {filteredScenarios.map((sc) => (
-                <motion.div key={sc.id} variants={kineticCascadeItem}>
-                  <Card3DTilt
-                    onClick={() => handleSelectScenarioId(sc.id)}
+              <div className="flex items-center justify-between border-b border-[#262626] pb-3">
+                <span className="font-mono text-xs text-accent font-bold tracking-widest uppercase flex items-center gap-2">
+                  <Zap className="w-3.5 h-3.5 text-accent animate-pulse" /> SELECT TRAINING DRILL
+                </span>
+
+                <div className="flex items-center gap-3">
+                  <span className="font-mono text-xs text-neutral-400 bg-[#141414] px-3 py-1 rounded-[8px] border border-[#262626] font-bold">
+                    {allScenarios.length} DRILLS AVAILABLE
+                  </span>
+
+                  {/* Manual Horizontal Scroll Arrow Buttons */}
+                  <div className="flex items-center gap-1.5">
+                    <motion.button
+                      whileHover={{ scale: 1.08 }}
+                      whileTap={{ scale: 0.92 }}
+                      onClick={() => scrollTrack('left')}
+                      onMouseEnter={() => soundManager.playHover()}
+                      title="Scroll Left"
+                      className="p-1.5 rounded-[8px] bg-[#141414] hover:bg-accent/20 border border-[#262626] hover:border-accent text-neutral-300 hover:text-accent transition-all focus:outline-none focus-visible:outline-accent"
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                    </motion.button>
+                    <motion.button
+                      whileHover={{ scale: 1.08 }}
+                      whileTap={{ scale: 0.92 }}
+                      onClick={() => scrollTrack('right')}
+                      onMouseEnter={() => soundManager.playHover()}
+                      title="Scroll Right"
+                      className="p-1.5 rounded-[8px] bg-[#141414] hover:bg-accent/20 border border-[#262626] hover:border-accent text-neutral-300 hover:text-accent transition-all focus:outline-none focus-visible:outline-accent"
+                    >
+                      <ChevronRight className="w-4 h-4" />
+                    </motion.button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Horizontally Scrollable Cards Container */}
+              <div
+                ref={scrollContainerRef}
+                onWheel={handleWheel}
+                className="flex flex-row gap-4 overflow-x-auto py-2 pr-2 scroll-smooth thin-pink-scrollbar"
+              >
+                {allScenarios.map((sc) => (
+                  <SpotlightCard
+                    key={sc.id}
+                    onClick={() => handleSelectDrill(sc.id)}
                     onMouseEnter={() => soundManager.playHover()}
-                    className="group relative bg-[#141414]/90 hover:bg-[#1a1a1a] border border-[#262626] hover:border-accent rounded-[14px] p-5 cursor-pointer flex flex-col justify-between space-y-4 shadow-xl backdrop-blur-md transition-all duration-200 hover:shadow-[0_0_25px_rgba(var(--accent-color-rgb),0.2)] active:scale-[0.98] h-full"
+                    className="w-64 h-52 shrink-0 cursor-pointer flex flex-col justify-between"
                   >
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-mono font-bold uppercase text-accent bg-accent/10 px-2 py-0.5 rounded border border-accent/20">
+                        <span className="text-[10px] font-mono font-bold text-accent uppercase tracking-wider bg-accent/10 px-2 py-0.5 rounded-[6px] border border-accent/20">
                           {sc.category}
                         </span>
-                        <span className="text-[10px] font-mono text-neutral-400 font-bold uppercase">
-                          {sc.difficulty}
-                        </span>
+                        {sc.isCustom ? (
+                          <span className="text-[9px] font-mono font-bold text-[#0d0d0d] bg-accent px-1.5 py-0.5 rounded-[4px]">
+                            CUSTOM
+                          </span>
+                        ) : (
+                          <span className="text-[10px] font-mono text-neutral-400 font-bold">
+                            {sc.durationSeconds}S
+                          </span>
+                        )}
                       </div>
 
-                      <h3 className="font-display font-extrabold text-lg text-white group-hover:text-accent transition-colors leading-tight">
+                      <h3 className="font-display font-extrabold text-base text-white group-hover:text-accent transition-colors leading-tight">
                         {sc.name}
                       </h3>
 
-                      <p className="font-mono text-[10px] text-neutral-400 line-clamp-2 leading-relaxed">
+                      <p className="font-sans-ui text-[11px] text-neutral-400 line-clamp-2 leading-snug">
                         {sc.description}
                       </p>
                     </div>
 
-                    <div className="pt-3 border-t border-[#262626] flex items-center justify-between text-xs font-mono">
-                      <span className="text-neutral-500 font-bold">{sc.durationSeconds}S</span>
-                      <span className="text-accent font-bold group-hover:translate-x-1 transition-transform flex items-center gap-1">
-                        START <ChevronRight className="w-3.5 h-3.5" />
+                    <div className="flex items-center justify-between border-t border-[#262626] pt-2.5 mt-2">
+                      <span className="text-[10px] font-mono text-neutral-400 group-hover:text-neutral-200 flex items-center gap-1 font-bold">
+                        <Target className="w-3.5 h-3.5 text-accent" /> {sc.difficulty}
+                      </span>
+                      <span className="text-[10px] font-mono text-accent font-bold group-hover:translate-x-1 transition-transform flex items-center gap-1">
+                        START DRILL <ArrowRight className="w-3.5 h-3.5" />
                       </span>
                     </div>
-                  </Card3DTilt>
-                </motion.div>
-              ))}
+                  </SpotlightCard>
+                ))}
+              </div>
+            </motion.div>
+          </>
+        ) : (
+          /* MAIN MENU MODE */
+          <>
+            {/* Title Section */}
+            <motion.div
+              initial={{ opacity: 0, y: -15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.35, ease: 'easeOut' }}
+              className="space-y-3"
+            >
+              <h1 className="font-display font-extrabold text-4xl md:text-6xl tracking-tight leading-none text-white drop-shadow-[0_0_25px_rgba(var(--accent-color-rgb),0.35)]">
+                <SplitText text="AIM // TT" highlightText="//" highlightClassName="text-accent" />
+              </h1>
+              <div className="flex items-center justify-center gap-3 w-44 mx-auto opacity-80">
+                <div className="h-px bg-gradient-to-r from-transparent via-accent to-transparent flex-1" />
+                <span className="text-accent text-xs font-mono animate-pulse">◆</span>
+                <div className="h-px bg-gradient-to-l from-transparent via-accent to-transparent flex-1" />
+              </div>
+              <p className="font-mono text-[10px] md:text-xs text-neutral-400 tracking-widest uppercase font-bold">
+                3D ONLINE AIM ENGINE
+              </p>
             </motion.div>
 
-            {/* Bottom Category Filter Pills */}
-            <div className="flex items-center justify-center gap-2 pt-4">
-              {categories.map((cat) => (
-                <button
-                  key={cat.id}
-                  onClick={() => {
-                    soundManager.playClick();
-                    setActiveCategory(cat.id);
-                  }}
-                  className={`px-3.5 py-1.5 rounded-[10px] text-xs font-mono font-bold transition-all border ${
-                    activeCategory === cat.id
-                      ? 'bg-accent text-[#0d0d0d] border-accent shadow-[0_0_12px_var(--accent-color)] font-extrabold'
-                      : 'bg-[#141414] text-neutral-400 hover:text-white border-[#262626]'
-                  }`}
-                >
-                  {cat.label}
-                </button>
-              ))}
-            </div>
-          </motion.div>
+            {/* Daily Streak Indicator Badge */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.35, delay: 0.1 }}
+              className="flex justify-center"
+            >
+              <div className="px-4 py-1.5 rounded-[12px] bg-[#141414]/90 border border-accent/40 text-xs font-mono font-bold flex items-center justify-center gap-2 text-accent backdrop-blur-md shadow-[0_0_15px_rgba(var(--accent-color-rgb),0.15)] tracking-wider">
+                <Flame className="w-4 h-4 text-accent animate-bounce" />
+                <span>
+                  {dailyStreak.streakCount > 0
+                    ? `${dailyStreak.streakCount} DAY STREAK ACTIVE`
+                    : 'NO ACTIVE STREAK • COMPLETE A DRILL TODAY'}
+                </span>
+              </div>
+            </motion.div>
+
+            {/* Main Menu Buttons */}
+            <motion.div
+              key="main-menu"
+              variants={menuContainerVariants}
+              initial="hidden"
+              animate="visible"
+              className="flex flex-col items-center gap-5 max-w-xs mx-auto py-2"
+            >
+              {/* Option 1: START DRILL */}
+              <motion.button
+                variants={menuItemVariants}
+                whileHover={{ scale: 1.04, x: 2 }}
+                whileTap={{ scale: 0.96 }}
+                onClick={() => {
+                  soundManager.playClick();
+                  setShowDrillMenu(true);
+                }}
+                onMouseEnter={() => soundManager.playHover()}
+                className="group relative font-display font-extrabold text-2xl md:text-3xl tracking-widest text-white hover:text-accent transition-colors duration-200 py-1 flex items-center justify-center gap-2 focus:outline-none focus-visible:outline-accent"
+              >
+                <span className="text-accent font-mono text-base transition-transform group-hover:-translate-x-1.5">‹</span>
+                <span className="relative">
+                  START DRILL
+                  <span className="absolute bottom-0 left-0 w-0 h-[2.5px] bg-accent group-hover:w-full transition-all duration-250 ease-out shadow-[0_0_8px_var(--accent-color)]" />
+                </span>
+                <span className="text-accent font-mono text-base transition-transform group-hover:translate-x-1.5">›</span>
+              </motion.button>
+
+              {/* Option 2: DRILL LIBRARY */}
+              <motion.button
+                variants={menuItemVariants}
+                whileHover={{ scale: 1.04, x: 2 }}
+                whileTap={{ scale: 0.96 }}
+                onClick={() => {
+                  soundManager.playClick();
+                  onNavigate('library');
+                }}
+                onMouseEnter={() => soundManager.playHover()}
+                className="group relative font-display font-bold text-lg md:text-2xl tracking-widest text-neutral-300 hover:text-accent transition-colors duration-200 py-1 flex items-center justify-center gap-2 focus:outline-none focus-visible:outline-accent"
+              >
+                <span className="opacity-0 group-hover:opacity-100 transition-all duration-200 text-accent font-mono text-sm -translate-x-1 group-hover:translate-x-0">‹</span>
+                <span className="relative">
+                  DRILL LIBRARY
+                  <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-accent group-hover:w-full transition-all duration-250 ease-out shadow-[0_0_8px_var(--accent-color)]" />
+                </span>
+                <span className="opacity-0 group-hover:opacity-100 transition-all duration-200 text-accent font-mono text-sm translate-x-1 group-hover:translate-x-0">›</span>
+              </motion.button>
+
+              {/* Option 3: ANALYTICS */}
+              <motion.button
+                variants={menuItemVariants}
+                whileHover={{ scale: 1.04, x: 2 }}
+                whileTap={{ scale: 0.96 }}
+                onClick={() => {
+                  soundManager.playClick();
+                  onNavigate('dashboard');
+                }}
+                onMouseEnter={() => soundManager.playHover()}
+                className="group relative font-display font-bold text-lg md:text-2xl tracking-widest text-neutral-300 hover:text-accent transition-colors duration-200 py-1 flex items-center justify-center gap-2 focus:outline-none focus-visible:outline-accent"
+              >
+                <span className="opacity-0 group-hover:opacity-100 transition-all duration-200 text-accent font-mono text-sm -translate-x-1 group-hover:translate-x-0">‹</span>
+                <span className="relative">
+                  ANALYTICS
+                  <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-accent group-hover:w-full transition-all duration-250 ease-out shadow-[0_0_8px_var(--accent-color)]" />
+                </span>
+                <span className="opacity-0 group-hover:opacity-100 transition-all duration-200 text-accent font-mono text-sm translate-x-1 group-hover:translate-x-0">›</span>
+              </motion.button>
+
+              {/* Option 4: OPTIONS */}
+              <motion.button
+                variants={menuItemVariants}
+                whileHover={{ scale: 1.04, x: 2 }}
+                whileTap={{ scale: 0.96 }}
+                onClick={() => {
+                  soundManager.playClick();
+                  onNavigate('settings');
+                }}
+                onMouseEnter={() => soundManager.playHover()}
+                className="group relative font-display font-bold text-lg md:text-2xl tracking-widest text-neutral-300 hover:text-accent transition-colors duration-200 py-1 flex items-center justify-center gap-2 focus:outline-none focus-visible:outline-accent"
+              >
+                <span className="opacity-0 group-hover:opacity-100 transition-all duration-200 text-accent font-mono text-sm -translate-x-1 group-hover:translate-x-0">‹</span>
+                <span className="relative">
+                  OPTIONS
+                  <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-accent group-hover:w-full transition-all duration-250 ease-out shadow-[0_0_8px_var(--accent-color)]" />
+                </span>
+                <span className="opacity-0 group-hover:opacity-100 transition-all duration-200 text-accent font-mono text-sm translate-x-1 group-hover:translate-x-0">›</span>
+              </motion.button>
+            </motion.div>
+          </>
         )}
-      </AnimatePresence>
+      </div>
     </div>
   );
 };

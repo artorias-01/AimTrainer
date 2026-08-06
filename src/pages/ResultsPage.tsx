@@ -6,6 +6,7 @@ import { useSettingsStore } from '../store/useSettingsStore';
 import { SCENARIOS, getScenarioById } from '../utils/scenarios';
 import { HeatmapChart } from '../components/ui/HeatmapChart';
 import { ReactionTimeHistogram } from '../components/ui/ReactionTimeHistogram';
+import { AnimatedCountUp } from '../components/ui/AnimatedCountUp';
 import confetti from 'canvas-confetti';
 import { soundManager } from '../utils/audio';
 import {
@@ -27,7 +28,6 @@ import {
   TrendingUp,
 } from 'lucide-react';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip } from 'recharts';
-import { stampSealVariants } from '../utils/motion';
 
 interface ResultsPageProps {
   onNavigate: (page: string, scenarioId?: string) => void;
@@ -170,34 +170,53 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ onNavigate }) => {
     <motion.div
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-      className="w-full bg-[#0d0d0d] text-white min-h-screen py-12 px-6 md:px-16 space-y-12 select-none text-left"
+      exit={{ opacity: 0, y: -15 }}
+      className="p-6 md:p-12 space-y-10 max-w-7xl mx-auto select-none text-left"
     >
-      {/* Benchmark Rank Summary Overlay Card */}
+      {/* Benchmark Summary Overlay Banner */}
       {isBenchmarkMode && lastBenchmarkSummary && (
-        <div className="max-w-7xl mx-auto bg-[#141414] border border-pink rounded-[12px] p-8 space-y-6 text-center">
-          <div className="flex justify-center items-center gap-3 text-pink font-mono text-xs uppercase tracking-widest font-bold">
-            <Award className="w-5 h-5 text-pink" /> BENCHMARK TEST COMPLETED
-          </div>
-          <div className="flex items-center justify-center gap-6">
-            <div className="text-left">
-              <span className="text-xs font-mono text-neutral-400 block uppercase">COMPOSITE AIM RATING</span>
-              <span className="font-display font-extrabold text-6xl text-white">
-                {lastBenchmarkSummary.compositeScore}
+        <div className="max-w-7xl mx-auto bg-[#141414] border border-pink rounded-[16px] p-8 space-y-4 shadow-2xl">
+          <div className="flex items-center justify-between border-b border-[#262626] pb-4">
+            <div className="flex items-center gap-3">
+              <Award className="w-6 h-6 text-pink" />
+              <div>
+                <h3 className="font-display font-extrabold text-xl text-white">
+                  BENCHMARK RANK COMPLETED
+                </h3>
+                <span className="font-mono text-xs text-neutral-400">
+                  COMPOSITE EVALUATION ACROSS ALL CATEGORIES
+                </span>
+              </div>
+            </div>
+            <div className="text-right">
+              <span className="font-mono text-xs text-neutral-400 block">TIER RATING</span>
+              <span className="font-display font-black text-3xl text-pink">
+                {lastBenchmarkSummary.grade}
               </span>
             </div>
-            <div className="w-20 h-20 bg-pink text-[#0d0d0d] rounded-[12px] flex items-center justify-center font-display font-extrabold text-4xl">
-              {lastBenchmarkSummary.grade}
-            </div>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs font-mono bg-[#0d0d0d] p-4 rounded-[12px] border border-[#262626]">
-            {lastBenchmarkSummary.drillScores.map((ds, idx) => (
-              <div key={idx} className="space-y-1 text-left">
-                <span className="text-neutral-500 text-[10px] block">{ds.scenarioName}</span>
-                <span className="font-bold text-white block">{ds.score.toLocaleString()} SCORE</span>
-                <span className="text-pink block">{ds.accuracy}% ACC</span>
-              </div>
-            ))}
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 font-mono text-xs">
+            <div className="bg-[#0d0d0d] p-4 rounded-[12px] border border-[#262626] space-y-1">
+              <span className="text-neutral-400 block">COMPOSITE SCORE</span>
+              <span className="font-bold text-xl text-white">
+                <AnimatedCountUp value={lastBenchmarkSummary.compositeScore} />
+              </span>
+            </div>
+            <div className="bg-[#0d0d0d] p-4 rounded-[12px] border border-[#262626] space-y-1">
+              <span className="text-neutral-400 block">GRADE</span>
+              <span className="font-bold text-xl text-pink">{lastBenchmarkSummary.grade}</span>
+            </div>
+            <div className="bg-[#0d0d0d] p-4 rounded-[12px] border border-[#262626] space-y-1">
+              <span className="text-neutral-400 block">TIMESTAMP</span>
+              <span className="font-bold text-white">
+                {new Date(lastBenchmarkSummary.timestamp).toLocaleDateString()}
+              </span>
+            </div>
+            <div className="bg-[#0d0d0d] p-4 rounded-[12px] border border-[#262626] space-y-1">
+              <span className="text-neutral-400 block">STATUS</span>
+              <span className="font-bold text-emerald-400">OFFICIAL RANK</span>
+            </div>
           </div>
         </div>
       )}
@@ -260,28 +279,23 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ onNavigate }) => {
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Left Column: Grade Card & Score Breakdown (5 Cols) */}
         <div className="lg:col-span-5 space-y-6">
-          {/* Grade Card with Angled Cut Corner */}
-          <div className="bg-[#141414] border border-[#262626] clip-corner-diagonal p-8 flex items-center justify-between shadow-lg">
+          {/* Grade Card */}
+          <div className="bg-[#141414] border border-[#262626] rounded-[12px] p-8 flex items-center justify-between">
             <div className="space-y-2">
-              <span className="text-xs font-mono text-neutral-400 font-bold uppercase tracking-wider">PERFORMANCE RATING</span>
-              <div className="font-mono font-extrabold text-5xl md:text-6xl text-white tracking-tight">
-                {summary.score.toLocaleString()}
+              <span className="text-xs font-mono text-neutral-400">PERFORMANCE RATING</span>
+              <div className="font-display font-extrabold text-6xl md:text-7xl text-white">
+                <AnimatedCountUp value={summary.score} />
               </div>
-              <span className="text-xs font-mono text-neutral-400 block font-bold">
+              <span className="text-xs font-mono text-neutral-400 block">
                 {isTrackingMode
                   ? `TIME ON TARGET: ${summary.accuracy}%`
                   : `${summary.hits} HITS // ${summary.misses} MISSES`}
               </span>
             </div>
 
-            <motion.div
-              variants={stampSealVariants}
-              initial="hidden"
-              animate="visible"
-              className="w-24 h-24 clip-corner-tr bg-pink text-[#0d0d0d] flex items-center justify-center font-display font-extrabold text-5xl shrink-0 shadow-[0_0_30px_rgba(var(--accent-color-rgb),0.5)] border-2 border-white"
-            >
+            <div className="w-24 h-24 rounded-[12px] bg-pink text-[#0d0d0d] flex items-center justify-center font-display font-extrabold text-5xl shrink-0">
               {summary.grade}
-            </motion.div>
+            </div>
           </div>
 
           {/* Detailed Metrics Table - Category Aware */}

@@ -9,25 +9,25 @@ interface NavbarProps {
 
 export const Navbar: React.FC<NavbarProps> = ({ onNavigate }) => {
   return (
-    <nav className="w-full bg-[#0d0d0d] text-white sticky top-0 z-40 px-6 md:px-16 py-4 flex items-center justify-between select-none border-b border-[#262626]">
-      {/* Brand Logo - Dynamic Theme Accent with Cut Corner */}
+    <nav className="w-full bg-[#0d0d0d] text-white sticky top-0 z-40 px-6 md:px-16 py-4 flex items-center justify-between select-none">
+      {/* Brand Logo - Dynamic Theme Accent */}
       <div
         onClick={() => {
           soundManager.playClick();
           onNavigate('landing');
         }}
         onMouseEnter={() => soundManager.playHover()}
-        className="cursor-pointer flex items-center gap-3.5 group pointer-events-auto z-50 nav-slash-link"
+        className="cursor-pointer flex items-center gap-3.5 group"
       >
-        <div className="w-10 h-10 clip-corner-tr bg-[#141414] border border-accent/40 text-accent flex items-center justify-center font-mono font-bold text-lg group-hover:bg-accent group-hover:text-[#0d0d0d] group-hover:border-accent transition-all duration-200">
+        <div className="w-10 h-10 rounded-[12px] bg-[#141414] border border-pink/40 text-pink flex items-center justify-center font-mono font-bold text-lg group-hover:bg-pink group-hover:text-[#0d0d0d] group-hover:border-pink transition-all duration-300">
           <Crosshair className="w-5 h-5 stroke-[2.5]" />
         </div>
         <div className="flex flex-col">
-          <span className="font-display font-extrabold text-2xl tracking-tighter text-white leading-none group-hover:text-accent transition-colors">
-            AIM<span className="text-accent">//</span>TT
+          <span className="font-display font-extrabold text-2xl tracking-tight text-white leading-none group-hover:text-pink transition-colors">
+            AIM<span className="text-pink">//</span>TT
           </span>
-          <span className="text-[10px] font-mono tracking-[0.2em] text-neutral-400 group-hover:text-white transition-colors uppercase font-bold">
-            3D TACTICAL TRAINER
+          <span className="text-[10px] font-mono tracking-widest text-neutral-400 group-hover:text-white transition-colors">
+            3D EDITORIAL TRAINER
           </span>
         </div>
       </div>

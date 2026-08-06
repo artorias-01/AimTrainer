@@ -1,10 +1,9 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 import { useGameStore } from '../../store/useGameStore';
 import { useSettingsStore } from '../../store/useSettingsStore';
 import { Play, RotateCcw, Home, Sliders, Volume2, VolumeX } from 'lucide-react';
 import type { GameEngine } from '../../utils/sensitivity';
-import { springPunch } from '../../utils/motion';
+import { MotionModal } from './MotionModal';
 
 interface PauseModalProps {
   onNavigate: (page: string) => void;
@@ -16,36 +15,25 @@ export const PauseModal: React.FC<PauseModalProps> = ({ onNavigate, onResume }) 
   const { settings, updateSettings, masterVolume, setMasterVolume, soundEnabled, toggleSound, cm360 } = useSettingsStore();
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-center justify-start bg-black/85 backdrop-blur-xl p-6 md:p-12 select-none"
-    >
-      <motion.div
-        initial={{ x: '-100%', opacity: 0 }}
-        animate={{ x: 0, opacity: 1 }}
-        exit={{ x: '-100%', opacity: 0 }}
-        transition={springPunch}
-        className="bg-[#0d0d0d] border border-pink/40 rounded-[16px] text-white p-8 max-w-lg w-full space-y-6 shadow-[0_0_50px_rgba(0,0,0,0.9)] ring-1 ring-pink/20"
-      >
+    <MotionModal isOpen={true} onClose={onResume} maxWidthClass="max-w-xl">
+      <div className="p-8 space-y-6 text-left">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-[#262626] pb-4">
           <div>
-            <span className="text-[10px] font-mono text-pink tracking-widest uppercase">
+            <span className="text-[10px] font-mono text-pink tracking-widest uppercase font-bold">
               SESSION PAUSED
             </span>
             <h2 className="font-display font-extrabold text-2xl text-white">
               {activeScenario.name}
             </h2>
           </div>
-          <span className="text-xs font-mono bg-[#1a1a1a] px-3 py-1.5 rounded-[12px] text-neutral-400 border border-[#2d2d2d]">
+          <span className="text-xs font-mono bg-[#1a1a1a] px-3 py-1.5 rounded-[12px] text-neutral-400 border border-[#2d2d2d] font-bold">
             ESC TO RESUME
           </span>
         </div>
 
         {/* Quick Settings Adjustment */}
-        <div className="space-y-4 bg-[#141414] p-5 rounded-[12px] border border-[#262626]">
+        <div className="space-y-4 bg-[#0d0d0d] p-5 rounded-[12px] border border-[#262626]">
           <div className="flex items-center justify-between">
             <span className="text-xs font-mono text-neutral-300 font-bold flex items-center gap-2">
               <Sliders className="w-3.5 h-3.5 text-pink" /> LIVE SENSITIVITY PRESET
@@ -58,7 +46,7 @@ export const PauseModal: React.FC<PauseModalProps> = ({ onNavigate, onResume }) 
           <div className="grid grid-cols-2 gap-4">
             {/* Sensitivity Slider */}
             <div className="space-y-1">
-              <label className="text-[10px] font-mono text-neutral-400">SENSITIVITY</label>
+              <label className="text-[10px] font-mono text-neutral-400 font-bold">SENSITIVITY</label>
               <input
                 type="range"
                 min="0.05"
@@ -77,11 +65,11 @@ export const PauseModal: React.FC<PauseModalProps> = ({ onNavigate, onResume }) 
 
             {/* DPI */}
             <div className="space-y-1">
-              <label className="text-[10px] font-mono text-neutral-400">DPI</label>
+              <label className="text-[10px] font-mono text-neutral-400 font-bold">DPI</label>
               <select
                 value={settings.dpi}
                 onChange={(e) => updateSettings({ dpi: parseInt(e.target.value) })}
-                className="w-full bg-[#0d0d0d] border border-[#262626] rounded-[12px] p-2 text-xs font-mono text-white focus:outline-none focus:border-pink"
+                className="w-full bg-[#141414] border border-[#262626] rounded-[12px] p-2 text-xs font-mono text-white focus:outline-none focus:border-pink"
               >
                 <option value={400}>400 DPI</option>
                 <option value={800}>800 DPI</option>
@@ -94,7 +82,7 @@ export const PauseModal: React.FC<PauseModalProps> = ({ onNavigate, onResume }) 
 
           {/* Engine Selector */}
           <div className="space-y-1 pt-2">
-            <label className="text-[10px] font-mono text-neutral-400">GAME ENGINE SENS PRESET</label>
+            <label className="text-[10px] font-mono text-neutral-400 font-bold">GAME ENGINE SENS PRESET</label>
             <div className="grid grid-cols-4 gap-2">
               {(['valorant', 'cs2', 'overwatch', 'apex'] as GameEngine[]).map((eng) => (
                 <button
@@ -103,7 +91,7 @@ export const PauseModal: React.FC<PauseModalProps> = ({ onNavigate, onResume }) 
                   className={`py-1.5 rounded-[12px] text-[10px] font-mono uppercase font-bold transition-all border ${
                     settings.engine === eng
                       ? 'bg-pink text-[#0d0d0d] border-pink'
-                      : 'bg-[#0d0d0d] text-neutral-400 border-[#262626] hover:text-white'
+                      : 'bg-[#141414] text-neutral-400 border-[#262626] hover:text-white'
                   }`}
                 >
                   {eng}
@@ -116,7 +104,7 @@ export const PauseModal: React.FC<PauseModalProps> = ({ onNavigate, onResume }) 
           <div className="flex items-center justify-between pt-2">
             <button
               onClick={toggleSound}
-              className="flex items-center gap-2 text-xs font-mono text-neutral-300 hover:text-white"
+              className="flex items-center gap-2 text-xs font-mono text-neutral-300 hover:text-white font-bold"
             >
               {soundEnabled ? <Volume2 className="w-4 h-4 text-pink" /> : <VolumeX className="w-4 h-4 text-neutral-500" />}
               <span>AUDIO</span>
@@ -172,7 +160,7 @@ export const PauseModal: React.FC<PauseModalProps> = ({ onNavigate, onResume }) 
             EXIT DRILL (QUIT TO MAIN MENU)
           </button>
         </div>
-      </motion.div>
-    </motion.div>
+      </div>
+    </MotionModal>
   );
 };
