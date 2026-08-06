@@ -25,6 +25,7 @@ import {
 import { TargetPreview3D } from '../components/ui/TargetPreview3D';
 import { CrosshairStudio } from '../components/ui/CrosshairStudio';
 import { HexColorInput } from '../components/ui/HexColorInput';
+import { diagonalWipeVariants } from '../utils/motion';
 
 function getHexLuminance(hex: string): number {
   let c = hex.replace('#', '').trim();
@@ -310,10 +311,10 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
           /* LEVEL 2: SUB-CATEGORY SETTINGS CONTENT VIEW */
           <motion.div
             key={`category-${activeCategory}`}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.2 }}
+            variants={diagonalWipeVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
             className="max-w-4xl mx-auto space-y-8"
           >
             {/* Category Breadcrumb Bar */}

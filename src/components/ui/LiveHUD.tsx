@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore } from '../../store/useGameStore';
 import { useSettingsStore } from '../../store/useSettingsStore';
 import { CrosshairPreview } from './CrosshairPreview';
 import { Timer, Zap, Pause } from 'lucide-react';
 import { soundManager } from '../../utils/audio';
+import { countdownPunchVariants } from '../../utils/motion';
 
 const AnimatedNumber: React.FC<{ value: number }> = ({ value }) => {
   const [displayValue, setDisplayValue] = useState(value);
@@ -198,19 +199,40 @@ export const LiveHUD: React.FC = () => {
         </div>
       </div>
 
-      {/* Countdown Overlay */}
-      {status === 'countdown' && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/80 backdrop-blur-sm z-30 transition-all duration-200">
-          <div className="flex flex-col items-center gap-4">
-            <span className="font-display text-8xl md:text-9xl font-extrabold text-pink animate-pulse drop-shadow-lg">
-              {countdown}
-            </span>
-            <span className="font-mono text-sm tracking-widest text-white uppercase">
-              GET READY // TARGETS SPAWNING
-            </span>
-          </div>
-        </div>
-      )}
+      {/* Persona-Inspired Kinetic Countdown Overlay */}
+      <AnimatePresence mode="wait">
+        {status === 'countdown' && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0, transition: { duration: 0.15 } }}
+            className="absolute inset-0 flex items-center justify-center bg-black/85 backdrop-blur-md z-30 select-none overflow-hidden"
+          >
+            <div className="flex flex-col items-center gap-3">
+              <div className="flex items-center justify-center gap-4">
+                <span className="font-mono text-3xl font-extrabold text-pink opacity-40 select-none">//</span>
+                <motion.span
+                  key={countdown}
+                  variants={countdownPunchVariants}
+                  initial="initial"
+                  animate="animate"
+                  className="font-display text-8xl md:text-9xl font-black text-pink drop-shadow-[0_0_35px_rgba(var(--accent-color-rgb),0.5)] tracking-tighter"
+                >
+                  {countdown}
+                </motion.span>
+                <span className="font-mono text-3xl font-extrabold text-pink opacity-40 select-none">//</span>
+              </div>
+              <motion.span
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="font-mono text-xs md:text-sm tracking-[0.25em] text-white uppercase font-extrabold bg-[#0d0d0d]/90 px-4 py-1.5 rounded-[8px] border border-pink/40 shadow-lg"
+              >
+                GET READY <span className="text-pink">//</span> TARGETS SPAWNING
+              </motion.span>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Center Screen Crosshair */}
       {status === 'playing' && (

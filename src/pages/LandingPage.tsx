@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { HeroScene } from '../components/3d/HeroScene';
 import { getDailyStreak } from '../utils/storage';
 import { useGameStore } from '../store/useGameStore';
@@ -8,6 +8,7 @@ import { CrosshairPreview } from '../components/ui/CrosshairPreview';
 import { soundManager } from '../utils/audio';
 import { ChevronLeft, Flame, MousePointer, Key } from 'lucide-react';
 import type { ScenarioCategory } from '../utils/scenarios';
+import { diagonalWipeVariants, springPunch } from '../utils/motion';
 
 interface LandingPageProps {
   onNavigate: (page: string, scenarioId?: string) => void;
@@ -129,10 +130,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
       {isPointerLocked && (
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 pointer-events-none flex flex-col items-center justify-center">
           {/* Dynamic Lock-On Brackets around Crosshair */}
-          <div
-            className={`relative transition-all duration-200 flex items-center justify-center ${
-              lockedNodeData ? 'scale-110' : 'scale-100'
-            }`}
+          <motion.div
+            animate={{ scale: lockedNodeData ? 1.12 : 1.0 }}
+            transition={springPunch}
+            className="relative flex items-center justify-center"
           >
             {lockedNodeData && (
               <div className="absolute -inset-4 border-2 border-accent rounded-[12px] opacity-85 animate-pulse shadow-[0_0_20px_var(--accent-color)]" />
@@ -140,12 +141,17 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
 
             {/* Player Active Crosshair */}
             <CrosshairPreview config={crosshairConfig} sizePx={64} transparent />
-          </div>
+          </motion.div>
         </div>
       )}
 
       {/* 2D HUD Chrome Header Top Right */}
-      <div className="absolute top-6 right-6 z-20 pointer-events-auto flex items-center gap-3">
+      <motion.div
+        initial={{ opacity: 0, x: 20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={springPunch}
+        className="absolute top-6 right-6 z-20 pointer-events-auto flex items-center gap-3"
+      >
         {/* Optional Aim Lock Mode Toggle Button */}
         <button
           onClick={() => {
@@ -182,47 +188,51 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
             <span>[ESC] UNLOCK</span>
           </div>
         )}
-      </div>
+      </motion.div>
 
-      {/* Drill Selector 2D Category Filter Bar (Bottom Center in Drill-Select Mode) */}
-      {pageMode === 'drill-select' && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 pointer-events-auto flex items-center gap-2 bg-[#0d0d0d]/90 backdrop-blur-md p-2 rounded-[16px] border border-[#262626] shadow-2xl"
-        >
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              soundManager.playClick();
-              setPageMode('main-menu');
-            }}
-            className="px-3 py-1.5 rounded-[10px] bg-[#141414] hover:bg-[#262626] text-neutral-300 hover:text-white border border-[#262626] font-mono text-xs font-bold flex items-center gap-1 transition-all"
+      {/* Drill Selector 2D Category Filter Bar (Bottom Center in Drill-Select Mode) with Sharp Diagonal Slice Wipe */}
+      <AnimatePresence>
+        {pageMode === 'drill-select' && (
+          <motion.div
+            variants={diagonalWipeVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 pointer-events-auto flex items-center gap-2 bg-[#0d0d0d]/90 backdrop-blur-md p-2 rounded-[16px] border border-[#262626] shadow-2xl"
           >
-            <ChevronLeft className="w-3.5 h-3.5 text-accent" /> BACK TO MAIN MENU
-          </button>
-
-          <div className="h-4 w-px bg-[#262626] mx-1" />
-
-          {categories.map((cat) => (
             <button
-              key={cat.id}
               onClick={(e) => {
                 e.stopPropagation();
                 soundManager.playClick();
-                setActiveCategory(cat.id);
+                setPageMode('main-menu');
               }}
-              className={`px-3 py-1.5 rounded-[10px] text-xs font-mono font-bold transition-all border ${
-                activeCategory === cat.id
-                  ? 'bg-accent text-[#0d0d0d] border-accent shadow-[0_0_12px_var(--accent-color)]'
-                  : 'bg-[#141414] text-neutral-400 hover:text-white border-[#262626]'
-              }`}
+              className="px-3 py-1.5 rounded-[10px] bg-[#141414] hover:bg-[#262626] text-neutral-300 hover:text-white border border-[#262626] font-mono text-xs font-bold flex items-center gap-1 transition-all"
             >
-              {cat.label}
+              <ChevronLeft className="w-3.5 h-3.5 text-accent" /> BACK TO MAIN MENU
             </button>
-          ))}
-        </motion.div>
-      )}
+
+            <div className="h-4 w-px bg-[#262626] mx-1" />
+
+            {categories.map((cat) => (
+              <button
+                key={cat.id}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  soundManager.playClick();
+                  setActiveCategory(cat.id);
+                }}
+                className={`px-3 py-1.5 rounded-[10px] text-xs font-mono font-bold transition-all border ${
+                  activeCategory === cat.id
+                    ? 'bg-accent text-[#0d0d0d] border-accent shadow-[0_0_12px_var(--accent-color)] font-extrabold'
+                    : 'bg-[#141414] text-neutral-400 hover:text-white border-[#262626]'
+                }`}
+              >
+                {cat.label}
+              </button>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

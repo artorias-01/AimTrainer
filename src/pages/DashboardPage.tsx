@@ -9,6 +9,7 @@ import {
 } from '../utils/storage';
 import { Trophy, Target, Activity, Calendar, AlertTriangle, Play } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
+import { kineticStaggerContainer, kineticCascadeItem, springPunch } from '../utils/motion';
 
 interface DashboardPageProps {
   onNavigate: (page: string, scenarioId?: string) => void;
@@ -100,13 +101,14 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
+      variants={kineticStaggerContainer}
+      initial="hidden"
+      animate="visible"
       exit={{ opacity: 0, y: -10 }}
       className="p-6 md:p-10 space-y-8 max-w-7xl mx-auto select-none"
     >
       {/* Top Header Card */}
-      <div className="bg-[#141414] border border-[#262626] rounded-[12px] p-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <motion.div variants={kineticCascadeItem} className="bg-[#141414] border border-[#262626] rounded-[12px] p-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <span className="font-mono text-xs text-pink uppercase font-bold tracking-widest">
@@ -135,7 +137,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
             </select>
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {importStatusMsg && (
         <div className="max-w-7xl mx-auto bg-[#141414] border border-pink text-pink p-3 rounded-[12px] font-mono text-xs font-bold text-center">
@@ -145,7 +147,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
 
       {/* Weak-Point Detector Insights Box */}
       {hasEnoughData && (
-        <div className="max-w-7xl mx-auto bg-[#141414] border border-pink rounded-[12px] p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <motion.div variants={kineticCascadeItem} className="max-w-7xl mx-auto bg-[#141414] border border-pink rounded-[12px] p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-[10px] bg-amber-500/10 text-amber-400 border border-amber-500/30 flex items-center justify-center shrink-0">
               <AlertTriangle className="w-5 h-5" />
@@ -166,26 +168,26 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
           >
             <Play className="w-3.5 h-3.5 fill-[#0d0d0d]" /> PRACTICE WEAK POINT
           </button>
-        </div>
+        </motion.div>
       )}
 
       {/* High Level Stats Row */}
-      <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-[#141414] border border-[#262626] rounded-[12px] p-6 space-y-2">
+      <motion.div variants={kineticCascadeItem} className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <motion.div whileHover={{ scale: 1.03 }} transition={springPunch} className="bg-[#141414] border border-[#262626] rounded-[12px] p-6 space-y-2">
           <span className="text-neutral-400 font-mono text-xs flex items-center gap-1.5">
             <Activity className="w-3.5 h-3.5 text-pink" /> TOTAL SESSIONS
           </span>
           <div className="font-display font-bold text-4xl text-white">{totalSessions}</div>
-        </div>
+        </motion.div>
 
-        <div className="bg-[#141414] border border-[#262626] rounded-[12px] p-6 space-y-2">
+        <motion.div whileHover={{ scale: 1.03 }} transition={springPunch} className="bg-[#141414] border border-[#262626] rounded-[12px] p-6 space-y-2">
           <span className="text-neutral-400 font-mono text-xs flex items-center gap-1.5">
             <Trophy className="w-3.5 h-3.5 text-pink" /> ALL-TIME HIGH SCORE
           </span>
           <div className="font-display font-bold text-4xl text-pink">
             {highestScore.toLocaleString()}
           </div>
-        </div>
+        </motion.div>
 
         <div className="bg-[#141414] border border-[#262626] rounded-[12px] p-6 space-y-2">
           <span className="text-neutral-400 font-mono text-xs flex items-center gap-1.5">
@@ -202,7 +204,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
             {dailyStreak.streakCount} DAYS
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* 30-Day Activity Heatmap Grid */}
       <div className="max-w-7xl mx-auto bg-[#141414] border border-[#262626] rounded-[12px] p-6 space-y-4">
